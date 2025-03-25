@@ -16,3 +16,15 @@ export interface Client {
     saldo: string;
     estado: string;
 }
+
+export interface LastPays {
+    id: string;
+    motivo: string;
+    cliente: string;
+    fecha: string;
+    montoUSD: number;
+    montoVES: number;
+    tipoPago: string;
+    referencia: string;
+    estado: string;
+}

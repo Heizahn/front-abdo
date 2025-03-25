@@ -143,7 +143,7 @@ const MainLayout = ({
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 2,
+                    p: 3,
                     width: { sm: `calc(100% - ${drawerWidth}px)` },
                     bgcolor: "#f5f5f5",
                 }}

@@ -3,11 +3,7 @@ import MainLayout from "../layouts/MainLayout";
 import CollectionsChart from "../components/dashboard/CollectionsChart";
 import ClientStatusChart from "../components/dashboard/ClientStatusChart";
 import RecentPaymentsTable from "../components/dashboard/RecentPaymentsTable";
-import {
-    dailyCollectionsData,
-    clientStatusData,
-    recentPayments,
-} from "../data/mockData";
+import { dailyCollectionsData, clientStatusData } from "../data/mockData";
 
 const Dashboard = () => {
     return (
@@ -25,7 +21,7 @@ const Dashboard = () => {
                 </Grid>
             </Grid>
 
-            <RecentPaymentsTable data={recentPayments} />
+            <RecentPaymentsTable />
         </MainLayout>
     );
 };

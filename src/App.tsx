@@ -2,7 +2,8 @@ import { ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import Router from "./router/Router";
 import { AuthProvider } from "./context/AuthContext";
-
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./query-client";
 // Define un tema personalizado (opcional, puedes ajustarlo según tus necesidades)
 const theme = createTheme({
     palette: {
@@ -27,9 +28,11 @@ const theme = createTheme({
 function App() {
     return (
         <ThemeProvider theme={theme}>
-            <AuthProvider>
-                <Router />
-            </AuthProvider>
+            <QueryClientProvider client={queryClient}>
+                <AuthProvider>
+                    <Router />
+                </AuthProvider>
+            </QueryClientProvider>
         </ThemeProvider>
     );
 }
