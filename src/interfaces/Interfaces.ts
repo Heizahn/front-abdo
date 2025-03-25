@@ -28,3 +28,10 @@ export interface LastPays {
     referencia: string;
     estado: string;
 }
+
+export interface CollectionsChartDTO {
+    dim0: string;
+    mea0: number;
+    mea1: number;
+    __id: string;
+}

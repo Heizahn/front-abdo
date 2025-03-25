@@ -52,9 +52,9 @@ const RecentPaymentsTable = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data?.map((row) => (
+                        {data?.map((row, idx) => (
                             <TableRow
-                                key={row.id}
+                                key={idx}
                                 sx={{
                                     "&:last-child td, &:last-child th": {
                                         border: 0,
