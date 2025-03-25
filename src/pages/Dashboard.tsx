@@ -3,7 +3,6 @@ import MainLayout from "../layouts/MainLayout";
 import CollectionsChart from "../components/dashboard/CollectionsChart";
 import ClientStatusChart from "../components/dashboard/ClientStatusChart";
 import RecentPaymentsTable from "../components/dashboard/RecentPaymentsTable";
-import { clientStatusData } from "../data/mockData";
 
 const Dashboard = () => {
     return (
@@ -17,7 +16,7 @@ const Dashboard = () => {
 
                 {/* Pie Chart */}
                 <Grid item xs={12} md={4}>
-                    <ClientStatusChart data={clientStatusData} />
+                    <ClientStatusChart />
                 </Grid>
             </Grid>
 

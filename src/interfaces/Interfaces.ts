@@ -35,3 +35,9 @@ export interface CollectionsChartDTO {
     mea1: number;
     __id: string;
 }
+
+export interface PieChartDTO {
+    dim0: string;
+    mea0: string;
+    __id: number;
+}

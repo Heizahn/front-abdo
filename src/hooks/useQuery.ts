@@ -2,16 +2,6 @@ import { useQuery, QueryOptions } from "@tanstack/react-query";
 import axios from "axios";
 import { HOST_API } from "../../vite-env.d";
 
-const API_BASE_URL = HOST_API;
-
-const apiClient = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-    },
-});
-
 export function useFetchData<T>(
     endpoint: string,
     queryKey: string,
@@ -20,7 +10,7 @@ export function useFetchData<T>(
     return useQuery<T, Error, T>({
         queryKey: [queryKey],
         queryFn: async (): Promise<T> => {
-            const response = await apiClient.get<T>(endpoint);
+            const response = await axios.get<T>(`${HOST_API}${endpoint}`);
             return response.data;
         },
         ...options,
