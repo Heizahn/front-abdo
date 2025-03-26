@@ -7,11 +7,11 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-import { CHART_COLORS } from "../../data/mockData";
 import { useFetchData } from "../../hooks/useQuery";
 import { PieChartDTO } from "../../interfaces/Interfaces";
 
 const ClientStatusChart = () => {
+    const CHART_COLORS = ["#1976d2", "#ed6c02"];
     const { data, isLoading, error } = useFetchData<[{ data: PieChartDTO[] }]>(
         "/clientsPieChart0",
         "clientsPieChart"

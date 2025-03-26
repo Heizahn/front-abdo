@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, createContext } from "react";
 import authService from "../services/authServices";
 import { User } from "../interfaces/Interfaces";
 
-const AuthContext = React.createContext({
+const AuthContext = createContext({
     user: { id: "", name: "", role: 0 } as User | null,
     logout: () => {},
     isAuthenticated: () => authService.isAuthenticated(),
