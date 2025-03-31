@@ -14,7 +14,7 @@ const getStateComponent = (estado: string) => {
 			return (
 				<Box sx={{ display: 'flex', alignItems: 'center' }}>
 					<Typography variant='body1' color='warning.main'>
-						Moroso
+						Activo
 					</Typography>
 				</Box>
 			);
