@@ -11,17 +11,14 @@ import {
 	TableRow,
 } from '@mui/material';
 import { getStateComponent } from './ClientStatus';
-import {
-	PaidOutlined as PaidIcon,
-	CheckBoxOutlined as CheckIcon,
-	DangerousOutlined as SuspendeIcon,
-} from '@mui/icons-material';
+import { PaidOutlined as PaidIcon } from '@mui/icons-material';
 import { Client } from '../../interfaces/Interfaces';
 import { useClients } from '../../context/ClientsContext';
 import TableClientsSkeleton from '../skeletons/TableSkeleton';
 import SimpleModalWrapper from '../common/ContainerForm';
 import Pay from '../common/Pay';
 import SendLastPay from './SendLastPay';
+import SuspendedClient from '../common/SuspendedClient';
 
 export default function TableClients() {
 	const {
@@ -168,29 +165,10 @@ export default function TableClients() {
 
 											<SendLastPay clientesId={client.id} />
 
-											{client.estado === 'Suspendido' ? (
-												<IconButton
-													size='medium'
-													title='Activar'
-													color='success'
-												>
-													<CheckIcon
-														fontSize='medium'
-														color='success'
-													/>
-												</IconButton>
-											) : (
-												<IconButton
-													size='medium'
-													title='Suspender'
-													color='error'
-												>
-													<SuspendeIcon
-														fontSize='medium'
-														color='error'
-													/>
-												</IconButton>
-											)}
+											<SuspendedClient
+												clientStatus={client.estado}
+												clientId={client.id}
+											/>
 										</Box>
 									</TableCell>
 								</TableRow>
