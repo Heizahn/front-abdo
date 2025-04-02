@@ -12,13 +12,16 @@ import {
 } from '@mui/material';
 import { getStateComponent } from './ClientStatus';
 import {
-	Edit as EditIcon,
-	Check as CheckIcon,
-	Delete as DeleteIcon,
+	PaidOutlined as PaidIcon,
+	CheckBoxOutlined as CheckIcon,
+	DangerousOutlined as SuspendeIcon,
+	SendOutlined as SendIcon,
 } from '@mui/icons-material';
 import { Client } from '../../interfaces/Interfaces';
 import { useClients } from '../../context/ClientsContext';
 import TableClientsSkeleton from '../skeletons/TableSkeleton';
+import SimpleModalWrapper from '../common/ContainerForm';
+import Pay from '../common/Pay';
 
 export default function TableClients() {
 	const {
@@ -136,22 +139,64 @@ export default function TableClients() {
 												justifyContent: 'center',
 											}}
 										>
-											<IconButton size='small'>
-												<EditIcon fontSize='small' color='primary' />
+											<IconButton
+												size='medium'
+												title='Subir pago'
+												color='primary'
+												component={({ children, ...props }) => (
+													<SimpleModalWrapper
+														triggerButtonText=''
+														triggerButtonColor='primary'
+														triggerTooltip='Subir pago'
+														showCloseButton={false}
+														triggerComponent={
+															<IconButton {...props}>
+																{children}
+															</IconButton>
+														}
+													>
+														<Pay
+															clientesId={client.id}
+															clientName={client.nombre}
+															onCancel={() => {}}
+														/>
+													</SimpleModalWrapper>
+												)}
+											>
+												<PaidIcon fontSize='medium' color='primary' />
+											</IconButton>
+
+											<IconButton
+												size='medium'
+												title='Enviar ultimo pago'
+												color='primary'
+											>
+												<SendIcon fontSize='medium' color='primary' />
 											</IconButton>
 
 											{client.estado === 'Suspendido' ? (
-												<IconButton size='small'>
+												<IconButton
+													size='medium'
+													title='Activar'
+													color='success'
+												>
 													<CheckIcon
-														fontSize='small'
+														fontSize='medium'
 														color='success'
 													/>
 												</IconButton>
-											) : null}
-
-											<IconButton size='small'>
-												<DeleteIcon fontSize='small' color='error' />
-											</IconButton>
+											) : (
+												<IconButton
+													size='medium'
+													title='Suspender'
+													color='error'
+												>
+													<SuspendeIcon
+														fontSize='medium'
+														color='error'
+													/>
+												</IconButton>
+											)}
 										</Box>
 									</TableCell>
 								</TableRow>

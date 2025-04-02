@@ -113,3 +113,36 @@ export type Subscription = {
 	planesId: string;
 	clientesId: string;
 };
+
+export type PaymentDataForm = {
+	tipoPago: string;
+	referencia: string;
+	comentario?: string;
+	montoRef: number;
+	montoBs: number;
+	reciboPor: string;
+	facturaId: string;
+};
+
+export type PaymentDTO = Partial<PaymentDataForm> & {
+	monto: number;
+	fecha: string;
+	creadoPor: string;
+	estado: string;
+	recibidoPor: string;
+	tasa: number;
+	clientesId: string;
+};
+
+export type Invoice = {
+	id: string;
+	fechaFacturacion: string;
+	estado: string;
+	monto: number;
+	deuda: number;
+	motivo: string;
+	creadoPor: string;
+	editadoPor?: string;
+	fechaEdicion?: string;
+	clientesId: string;
+};
