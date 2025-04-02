@@ -15,13 +15,13 @@ import {
 	PaidOutlined as PaidIcon,
 	CheckBoxOutlined as CheckIcon,
 	DangerousOutlined as SuspendeIcon,
-	SendOutlined as SendIcon,
 } from '@mui/icons-material';
 import { Client } from '../../interfaces/Interfaces';
 import { useClients } from '../../context/ClientsContext';
 import TableClientsSkeleton from '../skeletons/TableSkeleton';
 import SimpleModalWrapper from '../common/ContainerForm';
 import Pay from '../common/Pay';
+import SendLastPay from './SendLastPay';
 
 export default function TableClients() {
 	const {
@@ -166,13 +166,7 @@ export default function TableClients() {
 												<PaidIcon fontSize='medium' color='primary' />
 											</IconButton>
 
-											<IconButton
-												size='medium'
-												title='Enviar ultimo pago'
-												color='primary'
-											>
-												<SendIcon fontSize='medium' color='primary' />
-											</IconButton>
+											<SendLastPay clientesId={client.id} />
 
 											{client.estado === 'Suspendido' ? (
 												<IconButton
