@@ -14,10 +14,12 @@ export type ClientFormData = {
 	routersId: string;
 };
 
-export type ClientDataDTO = ClientFormData & {
+export type ClientDataDTO = Omit<ClientFormData, 'planesId'> & {
 	estado: string;
 	creadoPor: string;
 	fechaCreacion: string;
+	fechaPago: number;
+	saldo: number;
 };
 
 export interface SelectList {
@@ -104,3 +106,10 @@ export interface NotificationContextType {
 	notifyWarning: (message: string, title?: string) => void;
 	notifyInfo: (message: string, title?: string) => void;
 }
+
+export type Subscription = {
+	fecha: string;
+	creadoPor: string;
+	planesId: string;
+	clientesId: string;
+};

@@ -43,7 +43,7 @@ const NotificationAlert: React.FC<NotificationAlertProps> = ({
 	title,
 	message,
 	severity = 'info',
-	autoHideDuration = 6000,
+	autoHideDuration = 4000,
 	position = { vertical: 'top', horizontal: 'right' },
 }) => {
 	const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
