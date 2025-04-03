@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useMutateDate } from '../../hooks/useQuery';
 import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
+import { queryClient } from '../../query-client';
 
 const ClientsPage: React.FC = () => {
 	const { user } = useAuth();
@@ -16,17 +17,15 @@ const ClientsPage: React.FC = () => {
 		id: string;
 	};
 
-	const mutation = useMutateDate<extend, ClientDataDTO>(
-		'/clientes',
-		{
-			onError: (err) => {
-				if (err instanceof Error) {
-					notifyError(err.message, 'Error al crear el cliente');
-				}
-			},
+	const queryKeys = ['clientsPieChart', 'clientsStats', 'clients'];
+
+	const mutation = useMutateDate<extend, ClientDataDTO>('/clientes', {
+		onError: (err) => {
+			if (err instanceof Error) {
+				notifyError(err.message, 'Error al crear el cliente');
+			}
 		},
-		['clientsPieChart', 'clientsStats', 'clients'],
-	);
+	});
 
 	const mutationSus = useMutateDate<
 		{
@@ -36,23 +35,25 @@ const ClientsPage: React.FC = () => {
 			clientesId: string;
 		},
 		Subscription
-	>(
-		'/suscripciones',
-		{
-			onSuccess: () => {
-				notifySuccess(
-					'El cliente se ha creado correctamente en el sistema',
-					'Cliente creado',
-				);
-			},
-			onError: (err) => {
-				if (err instanceof Error) {
-					notifyError(err.message, 'Error al agregar el plan');
-				}
-			},
+	>('/suscripciones', {
+		onSuccess: () => {
+			notifySuccess(
+				'El cliente se ha creado correctamente en el sistema',
+				'Cliente creado',
+			);
+			queryKeys.forEach((key) => {
+				queryClient.invalidateQueries({
+					queryKey: [key],
+					predicate: (query) => query.queryKey.includes(key),
+				});
+			});
 		},
-		['clientsPieChart', 'clientsStats'],
-	);
+		onError: (err) => {
+			if (err instanceof Error) {
+				notifyError(err.message, 'Error al agregar el plan');
+			}
+		},
+	});
 
 	const handleClientCreated = async (data: ClientFormData) => {
 		const { planesId } = data;

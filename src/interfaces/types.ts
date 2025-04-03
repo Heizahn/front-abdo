@@ -116,6 +116,7 @@ export type Subscription = {
 
 export type PaymentDataForm = {
 	tipoPago: string;
+	tipoMoneda: 'USD' | 'VES';
 	referencia: string;
 	comentario?: string;
 	montoRef: number;
@@ -130,6 +131,7 @@ export type PaymentDTO = Partial<PaymentDataForm> & {
 	creadoPor: string;
 	estado: string;
 	recibidoPor: string;
+	tipo: 1 | 2;
 	tasa: number;
 	clientesId: string;
 };

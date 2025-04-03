@@ -11,6 +11,10 @@ import {
 	Box,
 	Typography,
 	FormHelperText,
+	FormControlLabel,
+	FormLabel,
+	RadioGroup,
+	Radio,
 } from '@mui/material';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { getBsToUsd, getUsdToBs } from '../../services/BCBService';
@@ -22,6 +26,7 @@ import ConfirmDialog from './Confirm';
 import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
 import authService from '../../services/authServices';
+import { queryClient } from '../../query-client';
 
 export default function Pay({
 	clientesId,
@@ -54,11 +59,26 @@ export default function Pay({
 	const { notifyError, notifySuccess } = useNotification();
 	const { refetchClients } = useClients();
 
+	const queryKeys = [
+		'clientsStats',
+		'clientsPieChart',
+		'paysBarChart0',
+		'lastPays',
+		'paysPieChart0-' + clientesId,
+		`client-${clientesId}`,
+	];
+
 	const mutationWithInvoice = useMutateDate<PaymentDTO, PaymentDTO>(
 		`/paysClient0/factura/${paymentData.facturaId}`,
 		{
 			onSuccess: () => {
 				notifySuccess('El pago se ha creado correctamente', 'Pago creado');
+				queryKeys.forEach((key) => {
+					queryClient.invalidateQueries({
+						queryKey: [key],
+						predicate: (query) => query.queryKey.includes(key),
+					});
+				});
 			},
 			onError: (err) => {
 				if (err instanceof Error) {
@@ -66,23 +86,24 @@ export default function Pay({
 				}
 			},
 		},
-		['clientsStats', 'clientsPieChart', 'paysBarChart0', 'lastPays'],
 	);
 
-	const mutation = useMutateDate<PaymentDTO, PaymentDTO>(
-		`/paysClient0`,
-		{
-			onSuccess: () => {
-				notifySuccess('El pago se ha creado correctamente', 'Pago creado');
-			},
-			onError: (err) => {
-				if (err instanceof Error) {
-					notifyError(err.message, 'Error al crear el pago');
-				}
-			},
+	const mutation = useMutateDate<PaymentDTO, PaymentDTO>(`/paysClient0`, {
+		onSuccess: () => {
+			notifySuccess('El pago se ha creado correctamente', 'Pago creado');
+			queryKeys.forEach((key) => {
+				queryClient.invalidateQueries({
+					queryKey: [key],
+					predicate: (query) => query.queryKey.includes(key),
+				});
+			});
 		},
-		['clientsStats', 'clientsPieChart', 'paysBarChart0', 'lastPays'],
-	);
+		onError: (err) => {
+			if (err instanceof Error) {
+				notifyError(err.message, 'Error al crear el pago');
+			}
+		},
+	});
 
 	useEffect(() => {
 		const validateForm = async () => {
@@ -199,6 +220,7 @@ export default function Pay({
 				recibidoPor: paymentData.reciboPor,
 				tasa: Number(paymentData.montoBs),
 				tipoPago: paymentData.tipoPago,
+				tipo: paymentData.tipoMoneda === 'USD' ? 1 : 2,
 				clientesId,
 				referencia: paymentData.referencia,
 			};
@@ -214,6 +236,7 @@ export default function Pay({
 				fecha: new Date().toISOString(),
 				creadoPor: (await authService.profile()).id,
 				estado: 'Activo',
+				tipo: paymentData.tipoMoneda === 'USD' ? 1 : 2,
 				recibidoPor: paymentData.reciboPor,
 				tasa: Number(paymentData.montoBs),
 				tipoPago: paymentData.tipoPago,
@@ -319,6 +342,37 @@ export default function Pay({
 							</FormControl>
 						</Grid>
 					)}
+
+					<Grid item xs={12}>
+						<FormControl fullWidth required margin='dense'>
+							<FormLabel component='legend'>Tipo de Moneda</FormLabel>
+							<RadioGroup
+								row
+								name='tipoMoneda'
+								value={paymentData.tipoMoneda}
+								onChange={handleChange}
+								sx={{
+									display: 'grid',
+									gridTemplateColumns: '1fr 1fr',
+								}}
+							>
+								<FormControlLabel
+									value='USD'
+									control={<Radio />}
+									label='Dólares'
+								/>
+								<FormControlLabel
+									value='VES'
+									control={<Radio />}
+									label='Bolívares'
+								/>
+							</RadioGroup>
+							{attemptedSubmit && errors.tipoMoneda && (
+								<FormHelperText error>{errors.tipoMoneda}</FormHelperText>
+							)}
+						</FormControl>
+					</Grid>
+
 					<Grid item xs={12} sm={6}>
 						<Button
 							variant='contained'
@@ -428,6 +482,7 @@ export default function Pay({
 							</Select>
 						</FormControl>
 					</Grid>
+
 					<Grid item xs={12}>
 						<TextField
 							margin='dense'
