@@ -19,6 +19,7 @@ import SimpleModalWrapper from '../common/ContainerForm';
 import Pay from '../common/Pay';
 import SendLastPay from './SendLastPay';
 import SuspendedClient from '../common/SuspendedClient';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function TableClients() {
 	const {
@@ -30,12 +31,17 @@ export default function TableClients() {
 		loading,
 		totalClients,
 	} = useClients();
+	const navigate = useNavigate();
 
 	const SuspendedColorCell = (client: Client) => {
 		return {
 			fontWeight: client.estado === 'Suspendido' ? 'normal' : 'medium',
 			color: client.estado === 'Suspendido' ? 'text.secondary' : 'inherit',
 		};
+	};
+
+	const handleNavigate = (clientId: string) => {
+		navigate(`/client/${clientId}`);
 	};
 
 	return (
@@ -87,29 +93,48 @@ export default function TableClients() {
 												: client.estado === 'Suspendido'
 												? '4px solid #d32f2f'
 												: 'none',
+										cursor: 'pointer',
 									}}
 								>
 									<TableCell
 										component='th'
 										scope='row'
 										sx={() => SuspendedColorCell(client)}
+										onClick={() => handleNavigate(client.id)}
 									>
 										{client.nombre}
 									</TableCell>
-									<TableCell sx={() => SuspendedColorCell(client)}>
+									<TableCell
+										sx={() => SuspendedColorCell(client)}
+										onClick={() => handleNavigate(client.id)}
+									>
 										{client.identificacion}
 									</TableCell>
-									<TableCell sx={() => SuspendedColorCell(client)}>
+									<TableCell
+										sx={() => SuspendedColorCell(client)}
+										onClick={() => handleNavigate(client.id)}
+									>
 										{client.telefonos}
 									</TableCell>
-									<TableCell sx={() => SuspendedColorCell(client)}>
+									<TableCell
+										sx={() => SuspendedColorCell(client)}
+										onClick={() => handleNavigate(client.id)}
+									>
 										{client.sector}
 									</TableCell>
-									<TableCell sx={() => SuspendedColorCell(client)}>
+									<TableCell
+										sx={() => SuspendedColorCell(client)}
+										onClick={() => handleNavigate(client.id)}
+									>
 										{client.router}
 									</TableCell>
-									<TableCell sx={() => SuspendedColorCell(client)}>
-										{client.ipv4}
+									<TableCell
+										sx={() => SuspendedColorCell(client)}
+										style={{ cursor: 'default' }}
+									>
+										<Link to={`http://${client.ipv4}`} target='_blank'>
+											{client.ipv4}
+										</Link>
 									</TableCell>
 									<TableCell sx={() => SuspendedColorCell(client)}>
 										{client.plan}
@@ -121,10 +146,11 @@ export default function TableClients() {
 													? 'error.main'
 													: 'success.main',
 										}}
+										onClick={() => handleNavigate(client.id)}
 									>
 										{client.saldo}
 									</TableCell>
-									<TableCell>
+									<TableCell onClick={() => handleNavigate(client.id)}>
 										{getStateComponent(
 											client.saldo < 0 ? 'Moroso' : client.estado,
 										)}
