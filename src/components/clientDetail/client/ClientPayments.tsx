@@ -8,9 +8,6 @@ export default function ClientPayments() {
 	const { client, loading } = useClientDetailsContext();
 	// const { notifySuccess, notifyError } = useNotification();
 
-	const handleAddPayment = () => {
-		console.log('Add new payment');
-	};
 	const handleDownloadReceipt = (payment: Pago) => {
 		console.log('Download receipt PDF for payment', payment);
 	};
@@ -39,7 +36,6 @@ export default function ClientPayments() {
 				<PaymentsTable
 					payments={client?.pagosTabla || []}
 					isLoading={loading}
-					onAddPayment={handleAddPayment}
 					onDownloadReceipt={handleDownloadReceipt}
 					onSendPayment={handleSendPayment}
 				/>

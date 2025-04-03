@@ -15,20 +15,20 @@ import {
 	TableSortLabel,
 	CircularProgress,
 	Typography,
-	Button,
 } from '@mui/material';
 import {
 	Search as SearchIcon,
-	Add as AddIcon,
 	DownloadOutlined as DownloadIcon,
 	SendOutlined as SendIcon,
 } from '@mui/icons-material';
 import { Pago } from '../../../interfaces/InterfacesClientDetails';
+import Pay from '../../common/Pay';
+import { useClientDetailsContext } from '../../../context/ClientDetailContext';
+import SimpleModalWrapper from '../../common/ContainerForm';
 
 interface PaymentsTableProps {
 	payments: Pago[];
 	isLoading?: boolean;
-	onAddPayment?: () => void;
 	onDownloadReceipt?: (payment: Pago) => void;
 	onSendPayment?: (id: Pago['_id']) => void;
 }
@@ -40,13 +40,14 @@ type OrderBy = keyof Pago | 'montoVES' | 'montoUSD';
 const PaymentsTable: React.FC<PaymentsTableProps> = ({
 	payments,
 	isLoading = false,
-	onAddPayment,
 	onDownloadReceipt,
 	onSendPayment,
 }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
 	const [orderBy, setOrderBy] = useState<OrderBy>('fecha');
+
+	const { client } = useClientDetailsContext();
 
 	// Handle search input change
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,17 +123,17 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 					sx={{ width: '300px' }}
 				/>
 				<Box>
-					{onAddPayment && (
-						<Button
-							variant='contained'
-							color='primary'
-							startIcon={<AddIcon />}
-							onClick={onAddPayment}
-							size='small'
-						>
-							Agregar
-						</Button>
-					)}
+					<SimpleModalWrapper
+						triggerButtonText='Agregar pago'
+						triggerButtonColor='primary'
+						showCloseButton={false}
+					>
+						<Pay
+							clientesId={client?.id as string}
+							clientName={client?.nombre as string}
+							onCancel={() => {}}
+						/>
+					</SimpleModalWrapper>
 				</Box>
 			</Box>
 
