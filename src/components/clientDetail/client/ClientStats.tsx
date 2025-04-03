@@ -24,13 +24,7 @@ import {
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import { useFetchData } from '../../../hooks/useQuery';
 import { useParams } from 'react-router-dom';
-
-// Interfaz para los datos del endpoint de tipos de pago
-interface TipoPagoStat {
-	_id: string;
-	count: number;
-	tipo: string;
-}
+import { ClientStats as TipoPagoStat } from '../../../interfaces/InterfacesClientDetails';
 
 const ClientStats = () => {
 	const { client, loading: clientLoading, error: clientError } = useClientDetailsContext();
@@ -72,7 +66,7 @@ const ClientStats = () => {
 	const pieChartData = useMemo(() => {
 		if (!tiposPagoData) return [];
 
-		return tiposPagoData.map((item: { tipo: any; count: any }) => ({
+		return tiposPagoData.map((item: { tipo: TipoPagoStat['tipo']; count: number }) => ({
 			name: item.tipo,
 			value: item.count,
 		}));
@@ -154,7 +148,9 @@ const ClientStats = () => {
 					textAlign: 'center',
 				}}
 			>
-				<Typography color='error'>{clientError || tiposError}</Typography>
+				<Typography color='error'>
+					{clientError?.message || tiposError?.message}
+				</Typography>
 			</Box>
 		);
 	}
