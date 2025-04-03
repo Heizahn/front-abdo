@@ -1,13 +1,23 @@
-import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
+import PaymentsTable from './PaymentsTable';
+// import { useNotification } from '../../../context/NotificationContext';
+import { Pago } from '../../../interfaces/InterfacesClientDetails';
 
-const ClientPayments = () => {
+export default function ClientPayments() {
 	const { client, loading } = useClientDetailsContext();
+	// const { notifySuccess, notifyError } = useNotification();
 
-	if (loading) {
-		return <Box>Cargando...</Box>;
-	}
+	const handleAddPayment = () => {
+		console.log('Add new payment');
+	};
+	const handleDownloadReceipt = (payment: Pago) => {
+		console.log('Download receipt PDF for payment', payment);
+	};
+
+	const handleSendPayment = (id: string) => {
+		console.log('Sending payment', id);
+	};
 
 	return (
 		<Box
@@ -23,16 +33,17 @@ const ClientPayments = () => {
 				Historial de Pagos
 			</Typography>
 
-			{client?.pagosTabla && client.pagosTabla.length > 0 ? (
-				<Box>
-					{/* Aquí puedes implementar una tabla o lista de pagos */}
-					<pre>{JSON.stringify(client.pagosTabla, null, 2)}</pre>
-				</Box>
+			{loading ? (
+				<Box sx={{ textAlign: 'center', py: 2 }}>Cargando...</Box>
 			) : (
-				<Typography variant='body1'>No hay pagos registrados</Typography>
+				<PaymentsTable
+					payments={client?.pagosTabla || []}
+					isLoading={loading}
+					onAddPayment={handleAddPayment}
+					onDownloadReceipt={handleDownloadReceipt}
+					onSendPayment={handleSendPayment}
+				/>
 			)}
 		</Box>
 	);
-};
-
-export default ClientPayments;
+}

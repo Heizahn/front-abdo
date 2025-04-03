@@ -51,15 +51,15 @@ export interface Pago {
 	fecha: string;
 	creadoPor: string;
 	recibidoPor: string;
-	estado: string;
-	tipoPago: string;
+	estado: 'Activo' | 'Anulado' | string;
+	tipoPago: 'Digital' | 'Efectivo' | string;
 	referencia: string;
-	comentario: string;
-	editadoPor: string | null;
+	comentario?: string;
+	editadoPor?: string;
+	fechaEdicion?: string;
 	montoUSD: number;
 	montoVES: number;
 	motivo: string;
-	fechaEdicion: string | null;
 }
 
 export interface ClientDetails {
