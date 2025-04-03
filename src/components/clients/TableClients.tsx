@@ -9,6 +9,8 @@ import {
 	TableHead,
 	TablePagination,
 	TableRow,
+	Tooltip,
+	Link,
 } from '@mui/material';
 import { getStateComponent } from './ClientStatus';
 import { PaidOutlined as PaidIcon } from '@mui/icons-material';
@@ -19,7 +21,7 @@ import SimpleModalWrapper from '../common/ContainerForm';
 import Pay from '../common/Pay';
 import SendLastPay from './SendLastPay';
 import SuspendedClient from '../common/SuspendedClient';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function TableClients() {
 	const {
@@ -132,9 +134,14 @@ export default function TableClients() {
 										sx={() => SuspendedColorCell(client)}
 										style={{ cursor: 'default' }}
 									>
-										<Link to={`http://${client.ipv4}`} target='_blank'>
-											{client.ipv4}
-										</Link>
+										<Tooltip title='Equipo del cliente'>
+											<Link
+												href={`http://${client.ipv4}`}
+												target='_blank'
+											>
+												{client.ipv4}
+											</Link>
+										</Tooltip>
 									</TableCell>
 									<TableCell sx={() => SuspendedColorCell(client)}>
 										{client.plan}
@@ -162,32 +169,35 @@ export default function TableClients() {
 												justifyContent: 'center',
 											}}
 										>
-											<IconButton
-												size='medium'
-												title='Subir pago'
-												color='primary'
-												component={({ children, ...props }) => (
-													<SimpleModalWrapper
-														triggerButtonText=''
-														triggerButtonColor='primary'
-														triggerTooltip='Subir pago'
-														showCloseButton={false}
-														triggerComponent={
-															<IconButton {...props}>
-																{children}
-															</IconButton>
-														}
-													>
-														<Pay
-															clientesId={client.id}
-															clientName={client.nombre}
-															onCancel={() => {}}
-														/>
-													</SimpleModalWrapper>
-												)}
-											>
-												<PaidIcon fontSize='medium' color='primary' />
-											</IconButton>
+											<Tooltip title='Cargar pago'>
+												<IconButton
+													size='medium'
+													color='primary'
+													component={({ children, ...props }) => (
+														<SimpleModalWrapper
+															triggerButtonText=''
+															triggerButtonColor='primary'
+															showCloseButton={false}
+															triggerComponent={
+																<IconButton {...props}>
+																	{children}
+																</IconButton>
+															}
+														>
+															<Pay
+																clientesId={client.id}
+																clientName={client.nombre}
+																onCancel={() => {}}
+															/>
+														</SimpleModalWrapper>
+													)}
+												>
+													<PaidIcon
+														fontSize='medium'
+														color='primary'
+													/>
+												</IconButton>
+											</Tooltip>
 
 											<SendLastPay clientesId={client.id} />
 

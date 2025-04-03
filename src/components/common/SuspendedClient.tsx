@@ -2,7 +2,7 @@ import {
 	CheckBoxOutlined as CheckIcon,
 	DangerousOutlined as SuspendeIcon,
 } from '@mui/icons-material';
-import { Button, IconButton } from '@mui/material';
+import { Button, IconButton, Tooltip } from '@mui/material';
 import { HOST_API } from '../../../vite-env.d';
 import axios from 'axios';
 import { useNotification } from '../../context/NotificationContext';
@@ -115,23 +115,27 @@ export default function SuspendedClient({
 	return (
 		<>
 			{clientStatus === 'Suspendido' ? (
-				<IconButton
-					size='medium'
-					title='Activar'
-					color='success'
-					onClick={handleShowConfirmation}
-				>
-					<CheckIcon fontSize='medium' color='success' />
-				</IconButton>
+				<Tooltip title='Activar cliente'>
+					<IconButton
+						size='medium'
+						title='Activar'
+						color='success'
+						onClick={handleShowConfirmation}
+					>
+						<CheckIcon fontSize='medium' color='success' />
+					</IconButton>
+				</Tooltip>
 			) : (
-				<IconButton
-					size='medium'
-					title='Suspender'
-					color='error'
-					onClick={handleShowConfirmation}
-				>
-					<SuspendeIcon fontSize='medium' color='error' />
-				</IconButton>
+				<Tooltip title='Suspender cliente'>
+					<IconButton
+						size='medium'
+						title='Suspender'
+						color='error'
+						onClick={handleShowConfirmation}
+					>
+						<SuspendeIcon fontSize='medium' color='error' />
+					</IconButton>
+				</Tooltip>
 			)}
 
 			{/* Confirmation Dialog */}

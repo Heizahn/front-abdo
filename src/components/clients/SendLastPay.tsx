@@ -1,4 +1,4 @@
-import { IconButton } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { SendOutlined as SendIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNotification } from '../../context/NotificationContext';
@@ -37,14 +37,15 @@ export default function SendLastPay({ clientesId }: { clientesId: string }) {
 		}
 	};
 	return (
-		<IconButton
-			size='medium'
-			title='Enviar ultimo pago'
-			color='primary'
-			onClick={handleSendLastPay}
-			disabled={sendingLastPay}
-		>
-			<SendIcon fontSize='medium' color={sendingLastPay ? 'disabled' : 'primary'} />
-		</IconButton>
+		<Tooltip title='Enviar ultimo pago'>
+			<IconButton
+				size='medium'
+				color='primary'
+				onClick={handleSendLastPay}
+				disabled={sendingLastPay}
+			>
+				<SendIcon fontSize='medium' color={sendingLastPay ? 'disabled' : 'primary'} />
+			</IconButton>
+		</Tooltip>
 	);
 }
