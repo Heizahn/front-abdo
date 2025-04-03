@@ -1,12 +1,28 @@
+import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
+import InvoicesTable, { Invoice } from './InvoicesTable';
+import { Factura } from '../../../interfaces/InterfacesClientDetails';
 
-const ClientAccounts = () => {
+const ClientAccounts: React.FC = () => {
 	const { client, loading } = useClientDetailsContext();
 
-	if (loading) {
-		return <Box>Cargando...</Box>;
-	}
+	const formatInvoices = (): Invoice[] => {
+		if (!client?.facturas) return [];
+
+		return client.facturas.map((factura: Factura) => ({
+			id: factura._id,
+			motivo: factura.motivo,
+			creado: factura.fecha,
+			monto: factura.monto,
+			deuda: factura.deuda,
+			estado: factura.estado,
+		}));
+	};
+
+	const handleAddInvoice = () => {
+		console.log('Add new invoice');
+	};
 
 	return (
 		<Box
@@ -22,13 +38,14 @@ const ClientAccounts = () => {
 				Cuentas por Cobrar
 			</Typography>
 
-			{client?.facturas && client.facturas.length > 0 ? (
-				<Box>
-					{/* Aquí puedes implementar una tabla o lista de facturas */}
-					<pre>{JSON.stringify(client.facturas, null, 2)}</pre>
-				</Box>
+			{loading ? (
+				<Box sx={{ textAlign: 'center', py: 2 }}>Cargando...</Box>
 			) : (
-				<Typography variant='body1'>No hay facturas disponibles</Typography>
+				<InvoicesTable
+					invoices={formatInvoices()}
+					isLoading={loading}
+					onAddInvoice={handleAddInvoice}
+				/>
 			)}
 		</Box>
 	);
