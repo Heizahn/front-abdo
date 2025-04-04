@@ -20,6 +20,7 @@ import {
 	Search as SearchIcon,
 	SendRounded as SendIcon,
 	DownloadRounded as DownloadIcon,
+	Add as AddIcon,
 } from '@mui/icons-material';
 import { Pago } from '../../../interfaces/InterfacesClientDetails';
 import Pay from '../../common/Pay';
@@ -123,9 +124,11 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 				/>
 				<Box>
 					<SimpleModalWrapper
-						triggerButtonText='Agregar pago'
+						triggerButtonText='Agregar'
 						triggerButtonColor='primary'
 						showCloseButton={false}
+						size='small'
+						icon={<AddIcon />}
 					>
 						<Pay
 							clientesId={client?.id as string}

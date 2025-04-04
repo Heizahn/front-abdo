@@ -21,6 +21,8 @@ function SimpleModalWrapper({
 	maxWidth = 'sm',
 	fullScreen = false,
 	showCloseButton = true,
+	size = 'medium',
+	icon,
 }: SimpleModalWrapperProps) {
 	const [open, setOpen] = useState<boolean>(false);
 
@@ -45,6 +47,7 @@ function SimpleModalWrapper({
 						aria-label={triggerTooltip}
 						onClick={handleOpen}
 						sx={triggerButtonSx}
+						size={size}
 					>
 						<AddIcon />
 					</Fab>
@@ -58,6 +61,8 @@ function SimpleModalWrapper({
 				color={triggerButtonColor}
 				onClick={handleOpen}
 				sx={triggerButtonSx}
+				size={size}
+				startIcon={icon}
 			>
 				{triggerButtonText}
 			</Button>
@@ -94,6 +99,7 @@ function SimpleModalWrapper({
 							color: (theme) => theme.palette.grey[500],
 							zIndex: 1,
 						}}
+						size={size}
 					>
 						<CloseIcon />
 					</IconButton>

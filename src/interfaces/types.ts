@@ -49,6 +49,10 @@ export interface SimpleModalWrapperProps {
 	fullScreen?: boolean;
 	/** Si debe mostrar el botón de cerrar en la esquina superior derecha */
 	showCloseButton?: boolean;
+	/**Tamaño del botón */
+	size?: 'small' | 'medium' | 'large';
+	/**Icono para el botón */
+	icon?: ReactNode;
 }
 
 export interface ConfirmDialogProps {
