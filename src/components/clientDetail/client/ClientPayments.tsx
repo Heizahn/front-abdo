@@ -2,15 +2,10 @@ import { Box, Typography } from '@mui/material';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import PaymentsTable from './PaymentsTable';
 // import { useNotification } from '../../../context/NotificationContext';
-import { Pago } from '../../../interfaces/InterfacesClientDetails';
 
 export default function ClientPayments() {
 	const { client, loading } = useClientDetailsContext();
-	// const { notifySuccess, notifyError } = useNotification();
-
-	const handleDownloadReceipt = (payment: Pago) => {
-		console.log('Download receipt PDF for payment', payment);
-	};
+	// const { notifyError } = useNotification();
 
 	const handleSendPayment = (id: string) => {
 		console.log('Sending payment', id);
@@ -36,7 +31,6 @@ export default function ClientPayments() {
 				<PaymentsTable
 					payments={client?.pagosTabla || []}
 					isLoading={loading}
-					onDownloadReceipt={handleDownloadReceipt}
 					onSendPayment={handleSendPayment}
 				/>
 			)}

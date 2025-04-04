@@ -18,18 +18,16 @@ import {
 } from '@mui/material';
 import {
 	Search as SearchIcon,
-	DownloadOutlined as DownloadIcon,
-	SendOutlined as SendIcon,
+	SendRounded as SendIcon,
+	DownloadRounded as DownloadIcon,
 } from '@mui/icons-material';
 import { Pago } from '../../../interfaces/InterfacesClientDetails';
 import Pay from '../../common/Pay';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import SimpleModalWrapper from '../../common/ContainerForm';
-
 interface PaymentsTableProps {
 	payments: Pago[];
 	isLoading?: boolean;
-	onDownloadReceipt?: (payment: Pago) => void;
 	onSendPayment?: (id: Pago['_id']) => void;
 }
 
@@ -40,7 +38,6 @@ type OrderBy = keyof Pago | 'montoVES' | 'montoUSD';
 const PaymentsTable: React.FC<PaymentsTableProps> = ({
 	payments,
 	isLoading = false,
-	onDownloadReceipt,
 	onSendPayment,
 }) => {
 	const [searchTerm, setSearchTerm] = useState('');
@@ -287,16 +284,8 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 												</IconButton>
 											</Tooltip>
 
-											<Tooltip title='Descargar Recibo'>
-												<IconButton
-													color='primary'
-													onClick={() =>
-														onDownloadReceipt &&
-														onDownloadReceipt(payment)
-													}
-													size='small'
-													sx={{ mr: 1 }}
-												>
+											<Tooltip title='Coming soon'>
+												<IconButton size='small' color='primary'>
 													<DownloadIcon />
 												</IconButton>
 											</Tooltip>
