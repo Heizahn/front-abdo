@@ -28,6 +28,7 @@ import SimpleModalWrapper from '../../common/ContainerForm';
 interface PaymentsTableProps {
 	payments: Pago[];
 	isLoading?: boolean;
+	isSending?: boolean;
 	onSendPayment?: (id: Pago['_id']) => void;
 }
 
@@ -38,6 +39,7 @@ type OrderBy = keyof Pago | 'montoVES' | 'montoUSD';
 const PaymentsTable: React.FC<PaymentsTableProps> = ({
 	payments,
 	isLoading = false,
+	isSending = false,
 	onSendPayment,
 }) => {
 	const [searchTerm, setSearchTerm] = useState('');
@@ -279,6 +281,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 														onSendPayment(payment._id)
 													}
 													size='small'
+													disabled={isSending}
 												>
 													<SendIcon />
 												</IconButton>
