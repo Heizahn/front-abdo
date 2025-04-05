@@ -13,9 +13,11 @@ import {
 	TableSortLabel,
 	CircularProgress,
 	Typography,
-	Button,
 } from '@mui/material';
 import { Search as SearchIcon, Add as AddIcon } from '@mui/icons-material';
+import SimpleModalWrapper from '../../common/ContainerForm';
+import CreateInvoice from './CreateInvoice';
+import { useParams } from 'react-router-dom';
 
 // Define the Invoice interface based on your data
 export interface Invoice {
@@ -30,21 +32,17 @@ export interface Invoice {
 interface InvoicesTableProps {
 	invoices: Invoice[];
 	isLoading?: boolean;
-	onAddInvoice?: () => void;
 }
 
 // Type for sorting
 type Order = 'asc' | 'desc';
 type OrderBy = keyof Invoice;
 
-const InvoicesTable: React.FC<InvoicesTableProps> = ({
-	invoices,
-	isLoading = false,
-	onAddInvoice,
-}) => {
+const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = false }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
 	const [orderBy, setOrderBy] = useState<OrderBy>('creado');
+	const { id } = useParams();
 
 	// Handle search input change
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,19 +106,14 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({
 					}}
 					sx={{ width: '300px' }}
 				/>
-				<Box>
-					{onAddInvoice && (
-						<Button
-							variant='contained'
-							color='primary'
-							startIcon={<AddIcon />}
-							onClick={onAddInvoice}
-							size='small'
-						>
-							Agregar
-						</Button>
-					)}
-				</Box>
+				<SimpleModalWrapper
+					triggerButtonText='Agregar'
+					showCloseButton={false}
+					size='small'
+					icon={<AddIcon />}
+				>
+					<CreateInvoice clientId={id as string} onCancel={() => {}} />
+				</SimpleModalWrapper>
 			</Box>
 
 			<TableContainer
