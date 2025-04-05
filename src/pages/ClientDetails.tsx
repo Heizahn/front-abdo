@@ -5,7 +5,7 @@ import ClientHeader from '../components/clientDetail/layout/ClientHeader';
 import Navigation from '../components/clientDetail/layout/Navigation';
 import ClientDetailsCard from '../components/clientDetail/client/ClientDetailCard';
 import ClientAccounts from '../components/clientDetail/client/Invoices/ClientAccounts';
-import ClientPayments from '../components/clientDetail/client/ClientPayments';
+import ClientPayments from '../components/clientDetail/client/payments/ClientPayments';
 import ClientStats from '../components/clientDetail/client/ClientStats';
 import MainLayout from '../layouts/MainLayout';
 import { ClientDetailsProvider } from '../context/ClientDetailContext';

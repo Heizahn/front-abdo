@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
 	Box,
 	Table,
@@ -15,37 +15,35 @@ import {
 	TableSortLabel,
 	CircularProgress,
 	Typography,
+	Button,
 } from '@mui/material';
 import {
 	Search as SearchIcon,
-	SendRounded as SendIcon,
 	DownloadRounded as DownloadIcon,
 	Add as AddIcon,
 } from '@mui/icons-material';
-import { Pago } from '../../../interfaces/InterfacesClientDetails';
-import Pay from '../../common/Pay';
-import { useClientDetailsContext } from '../../../context/ClientDetailContext';
-import SimpleModalWrapper from '../../common/ContainerForm';
+import { Pago } from '../../../../interfaces/InterfacesClientDetails';
+import Pay from '../../../common/Pay';
+import { useClientDetailsContext } from '../../../../context/ClientDetailContext';
+import SimpleModalWrapper from '../../../common/ContainerForm';
+import PaymentDetails from './PaymentDetails';
+import SendPay from './SendPay';
+
 interface PaymentsTableProps {
 	payments: Pago[];
 	isLoading?: boolean;
-	isSending?: boolean;
-	onSendPayment?: (id: Pago['_id']) => void;
 }
 
 // Type for sorting
 type Order = 'asc' | 'desc';
 type OrderBy = keyof Pago | 'montoVES' | 'montoUSD';
 
-const PaymentsTable: React.FC<PaymentsTableProps> = ({
-	payments,
-	isLoading = false,
-	isSending = false,
-	onSendPayment,
-}) => {
+const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = false }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
 	const [orderBy, setOrderBy] = useState<OrderBy>('fecha');
+	const [selectedPayment, setSelectedPayment] = useState<Pago | null>(null);
+	const modalTriggerRef = useRef<HTMLButtonElement>(null);
 
 	const { client } = useClientDetailsContext();
 
@@ -64,6 +62,17 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 	// Create sort handler
 	const createSortHandler = (property: OrderBy) => () => {
 		handleRequestSort(property);
+	};
+
+	// Handle row click to show details
+	const handleRowClick = (payment: Pago) => {
+		setSelectedPayment(payment);
+		// Activar programáticamente el modal después de que el estado se actualice
+		setTimeout(() => {
+			if (modalTriggerRef.current) {
+				modalTriggerRef.current.click();
+			}
+		}, 0);
 	};
 
 	// Filter and sort payments
@@ -239,7 +248,12 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 							</TableRow>
 						) : filteredPayments.length > 0 ? (
 							filteredPayments.map((payment) => (
-								<TableRow key={payment._id} hover>
+								<TableRow
+									key={payment._id}
+									hover
+									onClick={() => handleRowClick(payment)}
+									sx={{ cursor: 'pointer' }}
+								>
 									<TableCell>{payment.motivo}</TableCell>
 									<TableCell>{payment.tipoPago}</TableCell>
 									<TableCell>{payment.fecha}</TableCell>
@@ -275,22 +289,10 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 									<TableCell align='center'>
 										<Box
 											sx={{ display: 'flex', justifyContent: 'center' }}
+											onClick={(e) => e.stopPropagation()} // Prevenir que el clic en el botón active el modal
 										>
-											<Tooltip title='Enviar Pago'>
-												<IconButton
-													color='primary'
-													onClick={() =>
-														onSendPayment &&
-														onSendPayment(payment._id)
-													}
-													size='small'
-													disabled={isSending}
-												>
-													<SendIcon />
-												</IconButton>
-											</Tooltip>
-
-											<Tooltip title='Coming soon'>
+											<SendPay paymentId={payment._id} />
+											<Tooltip title='Descargar recibo'>
 												<IconButton size='small' color='primary'>
 													<DownloadIcon />
 												</IconButton>
@@ -311,6 +313,26 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({
 					</TableBody>
 				</Table>
 			</TableContainer>
+
+			{/* Botón oculto que sirve como trigger para el SimpleModalWrapper */}
+			<div style={{ display: 'none' }}>
+				<Button ref={modalTriggerRef} id='hidden-modal-trigger'>
+					Trigger
+				</Button>
+			</div>
+
+			{/* Modal para mostrar detalles del pago - Solo se renderiza cuando hay un pago seleccionado */}
+			{selectedPayment && (
+				<SimpleModalWrapper
+					showCloseButton={false}
+					triggerComponent={
+						<span id='modal-trigger-element' ref={modalTriggerRef} />
+					}
+					maxWidth='md'
+				>
+					<PaymentDetails payment={selectedPayment} />
+				</SimpleModalWrapper>
+			)}
 		</Box>
 	);
 };

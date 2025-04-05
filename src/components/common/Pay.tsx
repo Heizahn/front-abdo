@@ -416,6 +416,12 @@ export default function Pay({
 							type='number'
 							fullWidth
 							value={paymentData.montoRef}
+							onInput={(e: ChangeEvent<HTMLInputElement>) => {
+								const { value } = e.target;
+								if (value.startsWith('0')) {
+									e.target.value = value.replace('0', '');
+								}
+							}}
 							onChange={handleChange}
 							variant='outlined'
 							error={Boolean(attemptedSubmit && errors.montoRef)}
@@ -433,6 +439,12 @@ export default function Pay({
 							type='number'
 							fullWidth
 							value={paymentData.montoBs}
+							onInput={(e: ChangeEvent<HTMLInputElement>) => {
+								const { value } = e.target;
+								if (value.startsWith('0')) {
+									e.target.value = value.replace('0', '');
+								}
+							}}
 							onChange={handleChange}
 							variant='outlined'
 							error={Boolean(attemptedSubmit && errors.montoBs)}
@@ -546,7 +558,7 @@ export default function Pay({
 				onClose={handleCancelConfirmation}
 				onConfirm={handleConfirm}
 				title='Confirmar creación'
-				message='¿Está seguro que desea crear este cliente con los datos ingresados?'
+				message='¿Está seguro que desea crear este pago con los datos ingresados?'
 				confirmText='Crear'
 				cancelText='Cancelar'
 			/>
