@@ -1,11 +1,10 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import * as yup from 'yup';
-import authService from '../../../services/authServices';
-import { useNotification } from '../../../context/NotificationContext';
-import { useMutateDate } from '../../../hooks/useQuery';
-import { queryClient } from '../../../query-client';
-import { useClients } from '../../../context/ClientsContext';
-import ConfirmDialog from '../../common/Confirm';
+import authService from '../../../../services/authServices';
+import { useNotification } from '../../../../context/NotificationContext';
+import { useMutateDate } from '../../../../hooks/useQuery';
+import { queryClient } from '../../../../query-client';
+import ConfirmDialog from '../../../common/Confirm';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 
 type CreateInvoiceFormData = {
@@ -54,7 +53,6 @@ export default function CreateInvoice({
 	const [showCancelConfirmation, setShowCancelConfirmation] = useState<boolean>(false);
 
 	const { notifyError, notifySuccess } = useNotification();
-	const { refetchClients } = useClients();
 
 	const queryKeys = ['clientsPieChart', `client-${clientId}`, `clients-`];
 
@@ -268,7 +266,7 @@ export default function CreateInvoice({
 				onClose={handleCancelConfirmation}
 				onConfirm={handleConfirm}
 				title='Confirmar creación'
-				message='¿Está seguro que desea crear este cliente con los datos ingresados?'
+				message='¿Está seguro que desea crear esta factura con los datos ingresados?'
 				confirmText='Crear'
 				cancelText='Cancelar'
 			/>

@@ -77,7 +77,6 @@ function SimpleModalWrapper({
 				open={open}
 				onClose={handleClose}
 				maxWidth={maxWidth}
-				fullWidth
 				fullScreen={fullScreen}
 				PaperProps={{
 					sx: {

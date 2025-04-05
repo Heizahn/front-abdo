@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
 	Box,
 	Table,
@@ -13,35 +13,30 @@ import {
 	TableSortLabel,
 	CircularProgress,
 	Typography,
+	Button,
 } from '@mui/material';
 import { Search as SearchIcon, Add as AddIcon } from '@mui/icons-material';
-import SimpleModalWrapper from '../../common/ContainerForm';
+import SimpleModalWrapper from '../../../common/ContainerForm';
 import CreateInvoice from './CreateInvoice';
 import { useParams } from 'react-router-dom';
-
-// Define the Invoice interface based on your data
-export interface Invoice {
-	id: string;
-	motivo: string;
-	creado: string;
-	monto: number;
-	deuda: number;
-	estado: 'Activo' | 'Anulado' | string;
-}
+import { Factura } from '../../../../interfaces/InterfacesClientDetails';
+import InvoiceDetails from './InvoiceDetails';
 
 interface InvoicesTableProps {
-	invoices: Invoice[];
+	invoices: Factura[];
 	isLoading?: boolean;
 }
 
 // Type for sorting
 type Order = 'asc' | 'desc';
-type OrderBy = keyof Invoice;
+type OrderBy = keyof Factura;
 
 const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = false }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('creado');
+	const [orderBy, setOrderBy] = useState<OrderBy>('fecha');
+	const [selectedInvoice, setSelectedInvoice] = useState<Factura | null>(null);
+	const modalTriggerRef = useRef<HTMLButtonElement>(null);
 	const { id } = useParams();
 
 	// Handle search input change
@@ -60,13 +55,23 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 	const createSortHandler = (property: OrderBy) => () => {
 		handleRequestSort(property);
 	};
+	// Handle row click to show details
+	const handleRowClick = (invoice: Factura) => {
+		setSelectedInvoice(invoice);
+		// Activar programáticamente el modal después de que el estado se actualice
+		setTimeout(() => {
+			if (modalTriggerRef.current) {
+				modalTriggerRef.current.click();
+			}
+		}, 0);
+	};
 
 	// Filter and sort invoices
 	const filteredInvoices = invoices
 		.filter(
 			(invoice) =>
 				invoice.motivo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				invoice.creado.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				invoice.fecha.toLowerCase().includes(searchTerm.toLowerCase()) ||
 				invoice.estado.toLowerCase().includes(searchTerm.toLowerCase()),
 		)
 		.sort((a, b) => {
@@ -134,9 +139,9 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 							</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'creado'}
-									direction={orderBy === 'creado' ? order : 'asc'}
-									onClick={createSortHandler('creado')}
+									active={orderBy === 'fecha'}
+									direction={orderBy === 'fecha' ? order : 'asc'}
+									onClick={createSortHandler('fecha')}
 								>
 									Creado
 								</TableSortLabel>
@@ -173,15 +178,20 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 					<TableBody>
 						{isLoading ? (
 							<TableRow>
-								<TableCell colSpan={5} align='center'>
+								<TableCell colSpan={6} align='center'>
 									<CircularProgress size={40} sx={{ my: 2 }} />
 								</TableCell>
 							</TableRow>
 						) : filteredInvoices.length > 0 ? (
 							filteredInvoices.map((invoice) => (
-								<TableRow key={invoice.id} hover>
+								<TableRow
+									key={invoice._id}
+									hover
+									onClick={() => handleRowClick(invoice)}
+									sx={{ cursor: 'pointer' }}
+								>
 									<TableCell>{invoice.motivo}</TableCell>
-									<TableCell>{invoice.creado}</TableCell>
+									<TableCell>{invoice.fecha}</TableCell>
 									<TableCell align='right'>{invoice.monto}$</TableCell>
 									<TableCell align='right'>{invoice.deuda}$</TableCell>
 									<TableCell>
@@ -210,7 +220,7 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 							))
 						) : (
 							<TableRow>
-								<TableCell colSpan={5} align='center'>
+								<TableCell colSpan={6} align='center'>
 									<Typography variant='body1' sx={{ py: 2 }}>
 										No hay facturas disponibles
 									</Typography>
@@ -220,6 +230,26 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 					</TableBody>
 				</Table>
 			</TableContainer>
+
+			{/* Botón oculto que sirve como trigger para el SimpleModalWrapper */}
+			<div style={{ display: 'none' }}>
+				<Button ref={modalTriggerRef} id='hidden-modal-trigger'>
+					Trigger
+				</Button>
+			</div>
+
+			{/* Modal para mostrar detalles de la factura - Solo se renderiza cuando hay una factura seleccionada */}
+			{selectedInvoice && (
+				<SimpleModalWrapper
+					showCloseButton={false}
+					triggerComponent={
+						<span id='modal-trigger-element' ref={modalTriggerRef} />
+					}
+					maxWidth='md'
+				>
+					<InvoiceDetails invoice={selectedInvoice} />
+				</SimpleModalWrapper>
+			)}
 		</Box>
 	);
 };
