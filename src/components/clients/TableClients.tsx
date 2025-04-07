@@ -204,44 +204,32 @@ export default function TableClients() {
 												: 'none',
 										cursor: 'pointer',
 									}}
+									onClick={() => handleNavigate(client.id)}
 								>
 									<TableCell
 										component='th'
 										scope='row'
 										sx={() => SuspendedColorCell(client)}
-										onClick={() => handleNavigate(client.id)}
 									>
 										{client.nombre}
 									</TableCell>
-									<TableCell
-										sx={() => SuspendedColorCell(client)}
-										onClick={() => handleNavigate(client.id)}
-									>
+									<TableCell sx={() => SuspendedColorCell(client)}>
 										{client.identificacion}
 									</TableCell>
-									<TableCell
-										sx={() => SuspendedColorCell(client)}
-										onClick={() => handleNavigate(client.id)}
-									>
+									<TableCell sx={() => SuspendedColorCell(client)}>
 										{client.telefonos}
 									</TableCell>
-									<TableCell
-										sx={() => SuspendedColorCell(client)}
-										onClick={() => handleNavigate(client.id)}
-									>
+									<TableCell sx={() => SuspendedColorCell(client)}>
 										{client.sector}
 									</TableCell>
-									<TableCell
-										sx={() => SuspendedColorCell(client)}
-										onClick={() => handleNavigate(client.id)}
-									>
+									<TableCell sx={() => SuspendedColorCell(client)}>
 										{client.router}
 									</TableCell>
-									<TableCell
-										sx={() => SuspendedColorCell(client)}
-										style={{ cursor: 'default' }}
-									>
-										<Tooltip title='Equipo del cliente'>
+									<TableCell sx={() => SuspendedColorCell(client)}>
+										<Tooltip
+											title='Equipo del cliente'
+											onClick={(e) => e.stopPropagation()}
+										>
 											<Link
 												href={`http://${client.ipv4}`}
 												target='_blank'
@@ -260,11 +248,10 @@ export default function TableClients() {
 													? 'error.main'
 													: 'success.main',
 										}}
-										onClick={() => handleNavigate(client.id)}
 									>
 										{client.saldo}
 									</TableCell>
-									<TableCell onClick={() => handleNavigate(client.id)}>
+									<TableCell>
 										{getStateComponent(
 											client.saldo < 0 ? 'Moroso' : client.estado,
 										)}
@@ -275,6 +262,7 @@ export default function TableClients() {
 												display: 'flex',
 												justifyContent: 'center',
 											}}
+											onClick={(e) => e.stopPropagation()} // Prevenir que el clic en el botón active el modal
 										>
 											<Tooltip title='Cargar pago'>
 												<IconButton
