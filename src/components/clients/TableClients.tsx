@@ -11,7 +11,9 @@ import {
 	TableRow,
 	Tooltip,
 	Link,
+	TableSortLabel,
 } from '@mui/material';
+import { useState } from 'react';
 import { getStateComponent } from './ClientStatus';
 import { PaidRounded as PaidIcon } from '@mui/icons-material';
 import { Client } from '../../interfaces/Interfaces';
@@ -22,6 +24,10 @@ import Pay from '../common/Pay';
 import SendLastPay from './SendLastPay';
 import SuspendedClient from '../common/SuspendedClient';
 import { useNavigate } from 'react-router-dom';
+
+// Type for sorting
+type Order = 'asc' | 'desc';
+type OrderBy = keyof Client;
 
 export default function TableClients() {
 	const {
@@ -35,6 +41,22 @@ export default function TableClients() {
 	} = useClients();
 	const navigate = useNavigate();
 
+	// Add sorting states
+	const [order, setOrder] = useState<Order>('asc');
+	const [orderBy, setOrderBy] = useState<OrderBy>('nombre');
+
+	// Handle sort request
+	const handleRequestSort = (property: OrderBy) => {
+		const isAsc = orderBy === property && order === 'asc';
+		setOrder(isAsc ? 'desc' : 'asc');
+		setOrderBy(property);
+	};
+
+	// Create sort handler
+	const createSortHandler = (property: OrderBy) => () => {
+		handleRequestSort(property);
+	};
+
 	const SuspendedColorCell = (client: Client) => {
 		return {
 			fontWeight: client.estado === 'Suspendido' ? 'normal' : 'medium',
@@ -45,6 +67,19 @@ export default function TableClients() {
 	const handleNavigate = (clientId: string) => {
 		navigate(`/client/${clientId}`);
 	};
+
+	// Sort clients
+	const sortedClients = [...clients].sort((a, b) => {
+		if (orderBy === 'saldo') {
+			return order === 'asc' ? a.saldo - b.saldo : b.saldo - a.saldo;
+		} else {
+			const valueA = String(a[orderBy]).toLowerCase();
+			const valueB = String(b[orderBy]).toLowerCase();
+			return order === 'asc'
+				? valueA.localeCompare(valueB)
+				: valueB.localeCompare(valueA);
+		}
+	});
 
 	return (
 		<Paper
@@ -61,15 +96,87 @@ export default function TableClients() {
 				<Table stickyHeader size='small'>
 					<TableHead>
 						<TableRow>
-							<TableCell>Nombre</TableCell>
-							<TableCell>Identificación</TableCell>
-							<TableCell>Teléfono</TableCell>
-							<TableCell>Sector</TableCell>
-							<TableCell>Router</TableCell>
-							<TableCell>IPv4</TableCell>
-							<TableCell>Plan</TableCell>
-							<TableCell>Saldo</TableCell>
-							<TableCell>Estado</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'nombre'}
+									direction={orderBy === 'nombre' ? order : 'asc'}
+									onClick={createSortHandler('nombre')}
+								>
+									Nombre
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'identificacion'}
+									direction={orderBy === 'identificacion' ? order : 'asc'}
+									onClick={createSortHandler('identificacion')}
+								>
+									Identificación
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'telefonos'}
+									direction={orderBy === 'telefonos' ? order : 'asc'}
+									onClick={createSortHandler('telefonos')}
+								>
+									Teléfono
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'sector'}
+									direction={orderBy === 'sector' ? order : 'asc'}
+									onClick={createSortHandler('sector')}
+								>
+									Sector
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'router'}
+									direction={orderBy === 'router' ? order : 'asc'}
+									onClick={createSortHandler('router')}
+								>
+									Router
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'ipv4'}
+									direction={orderBy === 'ipv4' ? order : 'asc'}
+									onClick={createSortHandler('ipv4')}
+								>
+									IPv4
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'plan'}
+									direction={orderBy === 'plan' ? order : 'asc'}
+									onClick={createSortHandler('plan')}
+								>
+									Plan
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'saldo'}
+									direction={orderBy === 'saldo' ? order : 'asc'}
+									onClick={createSortHandler('saldo')}
+								>
+									Saldo
+								</TableSortLabel>
+							</TableCell>
+							<TableCell>
+								<TableSortLabel
+									active={orderBy === 'estado'}
+									direction={orderBy === 'estado' ? order : 'asc'}
+									onClick={createSortHandler('estado')}
+								>
+									Estado
+								</TableSortLabel>
+							</TableCell>
 							<TableCell align='center' width={100}>
 								Acciones
 							</TableCell>
@@ -78,8 +185,8 @@ export default function TableClients() {
 					<TableBody>
 						{loading ? (
 							<TableClientsSkeleton />
-						) : clients.length > 0 ? (
-							clients.map((client: Client) => (
+						) : sortedClients.length > 0 ? (
+							sortedClients.map((client: Client) => (
 								<TableRow
 									key={client.id}
 									hover
