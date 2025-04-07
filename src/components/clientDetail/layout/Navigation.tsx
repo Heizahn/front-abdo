@@ -1,4 +1,5 @@
 import { Tabs, Tab, Box } from '@mui/material';
+import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 
 interface NavigationProps {
 	activeTab: string;
@@ -6,8 +7,11 @@ interface NavigationProps {
 }
 
 const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
+	const { setIsEditing } = useClientDetailsContext();
+
 	const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
 		onTabChange(newValue);
+		setIsEditing(false);
 	};
 
 	const tabs = [

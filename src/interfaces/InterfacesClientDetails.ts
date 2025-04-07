@@ -79,7 +79,7 @@ export interface ClientDetails {
 	editadoPor: string | null;
 	fechaEdicion: string | null;
 	fechaRetiro: string | null;
-	router: Router;
+	routers: Router;
 	sector: Sector;
 	plan: Plan;
 	facturas: Factura[];

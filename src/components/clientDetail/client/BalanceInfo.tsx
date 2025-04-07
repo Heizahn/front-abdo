@@ -1,8 +1,12 @@
 import { Box, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
 import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
+import { useClientDetailsContext } from '../../../context/ClientDetailContext';
+import { Edit } from '@mui/icons-material';
+import EditableInfoField from '../common/EditableInfoField';
 
 const BalanceInfo = ({ data }: { data: ClientDetails }) => {
+	const { isEditing } = useClientDetailsContext();
 	return (
 		<Box>
 			<Typography variant='subtitle1' fontWeight='bold' sx={{ mb: 2 }}>
@@ -13,7 +17,16 @@ const BalanceInfo = ({ data }: { data: ClientDetails }) => {
 				value={`${data.saldo}$`}
 				color={data.saldo < 0 ? 'error' : 'success'}
 			/>
-			<InfoField label='Día de Pago' value={data.fechaPago} />
+			{!isEditing ? (
+				<InfoField label='Día de Pago' value={data.fechaPago} />
+			) : (
+				<EditableInfoField
+					label='Día de Pago'
+					valueInitial={data.fechaPago}
+					name='fechaPago'
+					type='number'
+				/>
+			)}
 		</Box>
 	);
 };
