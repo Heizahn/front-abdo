@@ -1,5 +1,5 @@
 import { IconButton, Tooltip } from '@mui/material';
-import { SendOutlined as SendIcon } from '@mui/icons-material';
+import { SendRounded as SendIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNotification } from '../../context/NotificationContext';
 import axios from 'axios';

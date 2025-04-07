@@ -1,6 +1,6 @@
 import {
-	CheckBoxOutlined as CheckIcon,
-	DangerousOutlined as SuspendeIcon,
+	CheckBoxRounded as CheckIcon,
+	DangerousRounded as SuspendeIcon,
 } from '@mui/icons-material';
 import { Button, IconButton, Tooltip } from '@mui/material';
 import { HOST_API } from '../../../vite-env.d';

@@ -13,7 +13,7 @@ import {
 	Link,
 } from '@mui/material';
 import { getStateComponent } from './ClientStatus';
-import { PaidOutlined as PaidIcon } from '@mui/icons-material';
+import { PaidRounded as PaidIcon } from '@mui/icons-material';
 import { Client } from '../../interfaces/Interfaces';
 import { useClients } from '../../context/ClientsContext';
 import TableClientsSkeleton from '../skeletons/TableSkeleton';
