@@ -6,6 +6,7 @@ import Login from '../pages/Login';
 import ProtectedRouter from './ProtectedRouter';
 import ClientDetails from '../pages/ClientDetails';
 import PaymentsView from '../pages/PaymentsView';
+import ServicesView from '../pages/ServicesView';
 
 export default function Router() {
 	return (
@@ -18,6 +19,7 @@ export default function Router() {
 					<Route path='/clients' element={<Clients />} />
 					<Route path='/client/:id' element={<ClientDetails />} />
 					<Route path='/payments' element={<PaymentsView />} />
+					<Route path='/services' element={<ServicesView />} />
 					<Route path='*' element={<NotFound />} />
 				</Route>
 			</Routes>
