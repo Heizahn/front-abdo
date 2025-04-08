@@ -8,8 +8,8 @@ import RouterIcon from '@mui/icons-material/Router';
 export const navigationItems = [
 	{ text: 'Home', icon: <HomeIcon />, path: '/home' },
 	{ text: 'Clientes', icon: <PeopleIcon />, path: '/clients' },
-	{ text: 'Pagos', icon: <AttachMoneyIcon />, path: '/pagos' },
-	{ text: 'Servicios', icon: <LayersIcon />, path: '/servicios' },
-	{ text: 'Sectores', icon: <LocationOnIcon />, path: '/sectores' },
+	{ text: 'Pagos', icon: <AttachMoneyIcon />, path: '/payments' },
+	{ text: 'Servicios', icon: <LayersIcon />, path: '/services' },
+	{ text: 'Sectores', icon: <LocationOnIcon />, path: '/sectors' },
 	{ text: 'Routers', icon: <RouterIcon />, path: '/routers' },
 ];

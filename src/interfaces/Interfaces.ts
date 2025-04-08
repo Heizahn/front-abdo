@@ -70,3 +70,20 @@ export interface ClientsContextType {
 	totalClients: number;
 	refetchClients: () => void;
 }
+
+export interface ClientViewPayment {
+	deuda: 12;
+	direccion: 'd1';
+	estado: 'Retirado';
+	fechaCreacion: '2021-05-28T21:03:04.731Z';
+	fechaEdicion: '2023-05-10T13:54:23.162Z';
+	fechaPago: 1;
+	identificacion: 'V2';
+	ipv4: '172.16.0.131';
+	nombre: 'A2 A2';
+	nombres: 'a2';
+	routersId: '644ad2baf4ecb62da8a017c4';
+	saldo: -12;
+	sectoresId: '602ac0ae34cf8200044319a4';
+	_id: '60b15a88a902e11db8dd7659';
+}

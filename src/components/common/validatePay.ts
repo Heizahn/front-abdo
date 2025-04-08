@@ -3,7 +3,7 @@ import { PaymentDataForm } from '../../interfaces/types';
 
 export const validationSchema = yup.object({
 	tipoPago: yup.string().required(),
-	referencia: yup.string().required(),
+	referencia: yup.string().required('Debe ingresar una referencia'),
 	montoRef: yup.number().required(),
 	montoBs: yup.number().required(),
 	reciboPor: yup.string().required(),

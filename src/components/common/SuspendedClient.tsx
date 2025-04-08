@@ -71,7 +71,6 @@ export default function SuspendedClient({
 				{clientStatus === 'Suspendido' ? (
 					<Button
 						size='medium'
-						title='Activar'
 						color='success'
 						variant='contained'
 						onClick={handleShowConfirmation}
@@ -81,7 +80,6 @@ export default function SuspendedClient({
 				) : (
 					<Button
 						size='medium'
-						title='Suspender'
 						color='error'
 						variant='contained'
 						onClick={handleShowConfirmation}
@@ -116,23 +114,13 @@ export default function SuspendedClient({
 		<>
 			{clientStatus === 'Suspendido' ? (
 				<Tooltip title='Activar cliente'>
-					<IconButton
-						size='medium'
-						title='Activar'
-						color='success'
-						onClick={handleShowConfirmation}
-					>
+					<IconButton size='medium' color='success' onClick={handleShowConfirmation}>
 						<CheckIcon fontSize='medium' color='success' />
 					</IconButton>
 				</Tooltip>
 			) : (
 				<Tooltip title='Suspender cliente'>
-					<IconButton
-						size='medium'
-						title='Suspender'
-						color='error'
-						onClick={handleShowConfirmation}
-					>
+					<IconButton size='medium' color='error' onClick={handleShowConfirmation}>
 						<SuspendeIcon fontSize='medium' color='error' />
 					</IconButton>
 				</Tooltip>

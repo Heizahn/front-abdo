@@ -66,6 +66,7 @@ export default function Pay({
 		'lastPays',
 		'paysPieChart0-' + clientesId,
 		`client-${clientesId}`,
+		'clientsList',
 	];
 
 	const mutationWithInvoice = useMutateDate<PaymentDTO, PaymentDTO>(

@@ -39,9 +39,10 @@ const EditableSelectField = ({
 
 	useEffect(() => {
 		if (selectList.length > 0) {
+			const selectedItem = selectList.filter((item) => item.nombre === valueInitial)[0];
 			setClientUpdate((prevData: ClientUpdateType) => ({
 				...prevData,
-				[name]: selectList.filter((item) => item.nombre === valueInitial)[0]._id,
+				[name]: selectedItem ? selectedItem._id : null,
 			}));
 		}
 	}, [name, selectList, setClientUpdate, valueInitial]);
