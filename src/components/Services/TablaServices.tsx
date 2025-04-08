@@ -25,7 +25,7 @@ import ServiceDetail from './ServiceDetail';
 
 // Define the Plan interface based on your API schema
 interface Plan {
-	id: string;
+	_id: string;
 	nombre: string;
 	costo: number;
 	tipo: string;
@@ -279,7 +279,7 @@ const PlansTable: React.FC = () => {
 								<>
 									{visibleData.map((plan) => (
 										<TableRow
-											key={plan.id}
+											key={plan._id}
 											hover
 											onClick={() => handleRowClick(plan)}
 											sx={{
