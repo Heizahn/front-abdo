@@ -25,8 +25,8 @@ import * as yup from 'yup';
 import ConfirmDialog from './Confirm';
 import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
-import authService from '../../services/authServices';
 import { queryClient } from '../../query-client';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Pay({
 	clientesId,
@@ -39,6 +39,7 @@ export default function Pay({
 	onCancel: () => void;
 	closeModal?: () => void;
 }) {
+	const { user } = useAuth();
 	const [paymentData, setPaymentData] = useState<PaymentDataForm>(valueInitial);
 	const [sendingPayment, setSendingPayment] = useState(false);
 	const [loadingBsToUsd, setLoadingBsToUsd] = useState(false);
@@ -218,7 +219,7 @@ export default function Pay({
 			const Payment: PaymentDTO = {
 				monto: Number(paymentData.montoRef),
 				fecha: new Date().toISOString(),
-				creadoPor: (await authService.profile()).id,
+				creadoPor: user?.id as string,
 				estado: 'Activo',
 				recibidoPor: paymentData.reciboPor,
 				tasa: Number(paymentData.montoBs),
@@ -237,7 +238,7 @@ export default function Pay({
 			const Payment: PaymentDTO = {
 				monto: Number(paymentData.montoRef),
 				fecha: new Date().toISOString(),
-				creadoPor: (await authService.profile()).id,
+				creadoPor: user?.id as string,
 				estado: 'Activo',
 				tipo: paymentData.tipoMoneda === 'USD' ? 1 : 2,
 				recibidoPor: paymentData.reciboPor,
@@ -483,7 +484,9 @@ export default function Pay({
 								labelId='recibo-por-label'
 								id='reciboPor'
 								name='reciboPor'
-								value={paymentData.reciboPor}
+								value={
+									!paymentData.reciboPor ? user?.id : paymentData.reciboPor
+								}
 								label='Recibo por'
 								onChange={handleSelectChange}
 								required

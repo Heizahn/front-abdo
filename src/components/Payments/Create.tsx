@@ -25,10 +25,11 @@ import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
 import { PaymentDataForm, PaymentDTO } from '../../interfaces/types';
 import { queryClient } from '../../query-client';
-import authService from '../../services/authServices';
 import { ClientViewPayment } from '../../interfaces/Interfaces';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Create() {
+	const { user } = useAuth();
 	const [paymentData, setPaymentData] = useState<PaymentDataForm>(valueInitial);
 	const [sendingPayment, setSendingPayment] = useState(false);
 	const [loadingBsToUsd, setLoadingBsToUsd] = useState(false);
@@ -186,7 +187,7 @@ export default function Create() {
 		const Payment: PaymentDTO = {
 			monto: Number(paymentData.montoRef),
 			fecha: new Date().toISOString(),
-			creadoPor: (await authService.profile()).id,
+			creadoPor: user?.id as string,
 			estado: 'Activo',
 			tipo: paymentData.tipoMoneda === 'USD' ? 1 : 2,
 			recibidoPor: paymentData.reciboPor,
@@ -378,7 +379,11 @@ export default function Create() {
 									labelId='recibo-por-label'
 									id='reciboPor'
 									name='reciboPor'
-									value={paymentData.reciboPor}
+									value={
+										!paymentData.reciboPor
+											? user?.id
+											: paymentData.reciboPor
+									}
 									label='Recibo por'
 									onChange={handleSelectChange}
 									required
