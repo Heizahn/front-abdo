@@ -52,6 +52,8 @@ export default function Create() {
 		`client-${clientesId}`,
 		'clientsList',
 		'clients-',
+		'paysListSimple',
+		'paysList',
 	];
 
 	const mutation = useMutateDate<PaymentDTO, PaymentDTO>(`/paysClient0`, {
