@@ -17,31 +17,28 @@ import {
 	DialogContent,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { useFetchData } from '../../hooks/useQuery';
+import SectorDetail from './SectorDetail'; // Import the detail component we'll create
 import SimpleModalWrapper from '../common/ContainerForm';
-import CreateServiceForm from './CreateService';
-import ServiceDetail from './ServiceDetail';
+import CreateSectorForm from './CreateSector';
+import { useFetchData } from '../../hooks/useQuery';
 
-// Define the Plan interface based on your API schema
-interface Plan {
+// Define the Sector interface based on your API schema
+interface Sector {
 	_id: string;
 	nombre: string;
-	costo: number;
-	tipo: string;
-	descripcion: string;
 	estado: string;
-	clientes?: number;
 	creadoPor: string;
-	editadoPor: string;
+	clientes?: number;
+	editadoPor?: string;
 	fechaCreacion: string;
-	fechaEdicion: string;
+	fechaEdicion?: string;
 }
 
 // Type for sorting
 type Order = 'asc' | 'desc';
-type OrderBy = keyof Plan;
+type OrderBy = keyof Sector;
 
-const PlansTable: React.FC = () => {
+const SectorsTable: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('asc');
 	const [orderBy, setOrderBy] = useState<OrderBy>('nombre');
@@ -51,10 +48,13 @@ const PlansTable: React.FC = () => {
 
 	// State for detail view
 	const [detailOpen, setDetailOpen] = useState(false);
-	const [selectedService, setSelectedService] = useState<Plan | null>(null);
+	const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
 
 	// Use TanStack Query to fetch data
-	const { data: plans = [], isLoading } = useFetchData<Plan[]>('/plansList', 'plansList');
+	const { data: sectors = [], isLoading } = useFetchData<Sector[]>(
+		'/sectorsList',
+		'sectorsList',
+	);
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
@@ -81,15 +81,13 @@ const PlansTable: React.FC = () => {
 	};
 
 	// Filter and sort data
-	const filteredPlans = useMemo(() => {
-		return plans
+	const filteredSectors = useMemo(() => {
+		return sectors
 			.filter(
-				(plan) =>
+				(sector) =>
 					!searchTerm || // If no search term, include all
-					safeIncludes(plan.nombre, searchTerm) ||
-					safeIncludes(plan.tipo, searchTerm) ||
-					safeIncludes(plan.descripcion, searchTerm) ||
-					safeIncludes(plan.estado, searchTerm),
+					safeIncludes(sector.nombre, searchTerm) ||
+					safeIncludes(sector.estado, searchTerm),
 			)
 			.sort((a, b) => {
 				const valueA = a[orderBy];
@@ -99,21 +97,15 @@ const PlansTable: React.FC = () => {
 				if (valueA == null) return order === 'asc' ? -1 : 1;
 				if (valueB == null) return order === 'asc' ? 1 : -1;
 
-				if (typeof valueA === 'number' && typeof valueB === 'number') {
-					return order === 'asc' ? valueA - valueB : valueB - valueA;
-				} else {
-					const strA = String(valueA).toLowerCase();
-					const strB = String(valueB).toLowerCase();
-					return order === 'asc'
-						? strA.localeCompare(strB)
-						: strB.localeCompare(strA);
-				}
+				const strA = String(valueA).toLowerCase();
+				const strB = String(valueB).toLowerCase();
+				return order === 'asc' ? strA.localeCompare(strB) : strB.localeCompare(strA);
 			});
-	}, [plans, searchTerm, orderBy, order]);
+	}, [sectors, searchTerm, orderBy, order]);
 
 	const visibleData = useMemo(() => {
-		return filteredPlans.slice(0, visibleItems);
-	}, [filteredPlans, visibleItems]);
+		return filteredSectors.slice(0, visibleItems);
+	}, [filteredSectors, visibleItems]);
 
 	// Infinite scroll handling
 	const handleScroll = useCallback(() => {
@@ -121,16 +113,16 @@ const PlansTable: React.FC = () => {
 
 		const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
 		if (scrollHeight - scrollTop - clientHeight < 200 && !isLoadingMore) {
-			if (visibleItems < filteredPlans.length) {
+			if (visibleItems < filteredSectors.length) {
 				setIsLoadingMore(true);
 
 				setTimeout(() => {
-					setVisibleItems((prev) => Math.min(prev + 50, filteredPlans.length));
+					setVisibleItems((prev) => Math.min(prev + 50, filteredSectors.length));
 					setIsLoadingMore(false);
 				}, 150);
 			}
 		}
-	}, [visibleItems, filteredPlans.length, isLoadingMore]);
+	}, [visibleItems, filteredSectors.length, isLoadingMore]);
 
 	useEffect(() => {
 		const currentContainer = containerRef.current;
@@ -157,37 +149,51 @@ const PlansTable: React.FC = () => {
 		);
 	};
 
+	// Format date for display
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString('es-ES', {
+			year: 'numeric',
+			month: 'short',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: 'numeric',
+		});
+	};
+
 	// Handle row click to open detail view
-	const handleRowClick = (plan: Plan) => {
-		setSelectedService(plan);
+	const handleRowClick = (sector: Sector) => {
+		setSelectedSector(sector);
 		setDetailOpen(true);
 	};
 
 	// Handle close of detail view
 	const handleDetailClose = () => {
 		setDetailOpen(false);
-		setSelectedService(null);
+		setSelectedSector(null);
 	};
 
 	return (
 		<Box sx={{ width: '100%' }}>
 			<Box
 				sx={{
+					mt: 3,
+					mb: 2,
 					display: 'flex',
 					justifyContent: 'space-between',
 					alignItems: 'center',
 				}}
 			>
 				<Typography variant='h5' gutterBottom>
-					Servicios
+					Sectores
 				</Typography>
+
 				<Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
 					<SimpleModalWrapper
-						triggerButtonText='Crear Servicio'
+						triggerButtonText='Crear Sector'
 						triggerButtonColor='primary'
 						showCloseButton={false}
 					>
-						<CreateServiceForm />
+						<CreateSectorForm />
 					</SimpleModalWrapper>
 					<TextField
 						size='small'
@@ -207,9 +213,9 @@ const PlansTable: React.FC = () => {
 				</Box>
 			</Box>
 
-			<Paper sx={{ width: '100%', mt: 2 }}>
-				<TableContainer component={Paper} sx={{ maxHeight: 870 }} ref={containerRef}>
-					<Table stickyHeader size='small' aria-label='tabla de servicios'>
+			<Paper sx={{ width: '100%', mb: 2 }}>
+				<TableContainer component={Paper} sx={{ maxHeight: 790 }} ref={containerRef}>
+					<Table stickyHeader size='small' aria-label='tabla de sectores'>
 						<TableHead>
 							<TableRow>
 								<TableCell>
@@ -223,11 +229,11 @@ const PlansTable: React.FC = () => {
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'tipo'}
-										direction={orderBy === 'tipo' ? order : 'asc'}
-										onClick={createSortHandler('tipo')}
+										active={orderBy === 'fechaCreacion'}
+										direction={orderBy === 'fechaCreacion' ? order : 'asc'}
+										onClick={createSortHandler('fechaCreacion')}
 									>
-										Tipo
+										Fecha de Creación
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
@@ -237,15 +243,6 @@ const PlansTable: React.FC = () => {
 										onClick={createSortHandler('clientes')}
 									>
 										Clientes
-									</TableSortLabel>
-								</TableCell>
-								<TableCell>
-									<TableSortLabel
-										active={orderBy === 'costo'}
-										direction={orderBy === 'costo' ? order : 'asc'}
-										onClick={createSortHandler('costo')}
-									>
-										Costo
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
@@ -262,17 +259,17 @@ const PlansTable: React.FC = () => {
 						<TableBody>
 							{isLoading ? (
 								<TableRow>
-									<TableCell colSpan={5} align='center'>
+									<TableCell colSpan={4} align='center'>
 										<CircularProgress size={40} sx={{ my: 2 }} />
 									</TableCell>
 								</TableRow>
 							) : visibleData.length > 0 ? (
 								<>
-									{visibleData.map((plan) => (
+									{visibleData.map((sector) => (
 										<TableRow
-											key={plan._id}
+											key={sector._id}
 											hover
-											onClick={() => handleRowClick(plan)}
+											onClick={() => handleRowClick(sector)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
@@ -280,20 +277,23 @@ const PlansTable: React.FC = () => {
 												},
 											}}
 										>
-											<TableCell>{plan.nombre || '-'}</TableCell>
-											<TableCell>{plan.tipo || '-'}</TableCell>
-											<TableCell>
-												{plan.clientes !== undefined
-													? plan.clientes
-													: 0}
+											<TableCell component='th' scope='row'>
+												{sector.nombre || '-'}
 											</TableCell>
 											<TableCell>
-												{plan.costo !== undefined
-													? `${plan.costo}$`
+												{sector.fechaCreacion
+													? formatDate(sector.fechaCreacion)
 													: '-'}
 											</TableCell>
 											<TableCell>
-												{plan.estado ? renderEstado(plan.estado) : '-'}
+												{sector.clientes !== undefined
+													? sector.clientes
+													: 0}
+											</TableCell>
+											<TableCell>
+												{sector.estado
+													? renderEstado(sector.estado)
+													: '-'}
 											</TableCell>
 										</TableRow>
 									))}
@@ -301,7 +301,7 @@ const PlansTable: React.FC = () => {
 									{isLoadingMore && (
 										<TableRow>
 											<TableCell
-												colSpan={5}
+												colSpan={4}
 												align='center'
 												sx={{ py: 2 }}
 											>
@@ -310,11 +310,11 @@ const PlansTable: React.FC = () => {
 										</TableRow>
 									)}
 
-									{visibleItems >= filteredPlans.length &&
-										filteredPlans.length > 100 && (
+									{visibleItems >= filteredSectors.length &&
+										filteredSectors.length > 100 && (
 											<TableRow>
 												<TableCell
-													colSpan={5}
+													colSpan={4}
 													align='center'
 													sx={{ py: 1 }}
 												>
@@ -330,8 +330,8 @@ const PlansTable: React.FC = () => {
 								</>
 							) : (
 								<TableRow>
-									<TableCell colSpan={5} align='center'>
-										No hay servicios disponibles
+									<TableCell colSpan={4} align='center'>
+										No hay sectores disponibles
 									</TableCell>
 								</TableRow>
 							)}
@@ -340,12 +340,12 @@ const PlansTable: React.FC = () => {
 				</TableContainer>
 			</Paper>
 
-			{/* Service Detail Dialog */}
+			{/* Sector Detail Dialog */}
 			<Dialog open={detailOpen} onClose={handleDetailClose} maxWidth='sm' fullWidth>
 				<DialogContent>
-					{selectedService && (
-						<ServiceDetail
-							serviceData={selectedService}
+					{selectedSector && (
+						<SectorDetail
+							sectorData={selectedSector}
 							onClose={handleDetailClose}
 						/>
 					)}
@@ -355,4 +355,4 @@ const PlansTable: React.FC = () => {
 	);
 };
 
-export default PlansTable;
+export default SectorsTable;

@@ -12,7 +12,6 @@ import {
 	TextField,
 	InputAdornment,
 	Typography,
-	Chip,
 	CircularProgress,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
@@ -79,7 +78,10 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 		handleRequestSort(property);
 	};
 
-	const safeIncludes = (value: any, searchString: string): boolean => {
+	const safeIncludes = (
+		value: string | number | null | undefined,
+		searchString: string,
+	): boolean => {
 		if (value == null) return false;
 		return String(value).toLowerCase().includes(searchString.toLowerCase());
 	};
@@ -152,26 +154,16 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 	}, [handleScroll]);
 
 	const renderEstadoChip = (estado: 'Activo' | 'Anulado' | 'Procesado') => {
-		let color: 'success' | 'error' | 'warning' = 'success';
-		if (estado === 'Anulado') {
+		let color: 'success' | 'error' = 'success';
+
+		if (estado.toLowerCase() !== 'activo') {
 			color = 'error';
-		} else if (estado === 'Procesado') {
-			color = 'warning';
 		}
 
 		return (
-			<Chip
-				label={estado}
-				size='small'
-				color={color}
-				sx={{
-					'& .MuiChip-icon': {
-						marginLeft: '8px',
-						marginRight: '-4px',
-						color: 'currentColor',
-					},
-				}}
-			/>
+			<Typography variant='body1' display='block' color={color}>
+				{estado}
+			</Typography>
 		);
 	};
 
