@@ -94,7 +94,17 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 				{payment && (
 					<>
 						<Typography variant='body1' gutterBottom>
-							<strong>Motivo:</strong> {payment.motivo}
+							{payment.motivo ? (
+								<>
+									<strong>Motivo:</strong> {payment.motivo}
+								</>
+							) : (
+								payment.cliente && (
+									<>
+										<strong>Cliente:</strong> {payment.cliente}
+									</>
+								)
+							)}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
 							<strong>Tipo de Pago:</strong> {payment.tipoPago}

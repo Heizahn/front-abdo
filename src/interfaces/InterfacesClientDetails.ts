@@ -48,6 +48,7 @@ export interface Factura {
 
 export interface Pago {
 	_id: string;
+	cliente?: string;
 	fecha: string;
 	creadoPor: string;
 	recibidoPor: string;

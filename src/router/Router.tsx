@@ -8,6 +8,7 @@ import ClientDetails from '../pages/ClientDetails';
 import PaymentsView from '../pages/PaymentsView';
 import ServicesView from '../pages/ServicesView';
 import SectorsView from '../pages/SectorView';
+import RouterView from '../pages/RouterView';
 
 export default function Router() {
 	return (
@@ -22,6 +23,7 @@ export default function Router() {
 					<Route path='/payments' element={<PaymentsView />} />
 					<Route path='/services' element={<ServicesView />} />
 					<Route path='/sectors' element={<SectorsView />} />
+					<Route path='/routers' element={<RouterView />} />
 					<Route path='*' element={<NotFound />} />
 				</Route>
 			</Routes>

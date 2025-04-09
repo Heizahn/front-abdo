@@ -170,12 +170,15 @@ const PlansTable: React.FC = () => {
 	};
 
 	return (
-		<Box sx={{ width: '100%' }}>
+		<>
 			<Box
 				sx={{
+					mt: 3,
+					mb: 2,
 					display: 'flex',
 					justifyContent: 'space-between',
 					alignItems: 'center',
+					px: 2,
 				}}
 			>
 				<Typography variant='h5' gutterBottom>
@@ -207,8 +210,19 @@ const PlansTable: React.FC = () => {
 				</Box>
 			</Box>
 
-			<Paper sx={{ width: '100%', mt: 2 }}>
-				<TableContainer component={Paper} sx={{ maxHeight: 870 }} ref={containerRef}>
+			<Paper
+				sx={{
+					flexGrow: 1,
+					overflow: 'hidden',
+					boxShadow: 'none',
+					border: '1px solid rgba(224, 224, 224, 1)',
+					display: 'flex',
+					flexDirection: 'column',
+					borderBottomRightRadius: 8,
+					borderBottomLeftRadius: 8,
+				}}
+			>
+				<TableContainer sx={{ maxHeight: 860 }} ref={containerRef}>
 					<Table stickyHeader size='small' aria-label='tabla de servicios'>
 						<TableHead>
 							<TableRow>
@@ -351,7 +365,7 @@ const PlansTable: React.FC = () => {
 					)}
 				</DialogContent>
 			</Dialog>
-		</Box>
+		</>
 	);
 };
 

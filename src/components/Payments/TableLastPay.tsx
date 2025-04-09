@@ -13,9 +13,12 @@ import {
 	InputAdornment,
 	Typography,
 	CircularProgress,
+	Button,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useFetchData } from '../../hooks/useQuery';
+import SimpleModalWrapper from '../common/ContainerForm';
+import PaymentDetails from '../clientDetail/client/payments/PaymentDetails';
 
 interface Pago {
 	_id: string;
@@ -24,10 +27,12 @@ interface Pago {
 	fecha: string;
 	creadoPor: string;
 	montoUSD: number;
-	montoVES: string;
+	montoVES: number;
 	referencia: string;
 	comentario: string;
 	estado: 'Activo' | 'Anulado';
+	recibidoPor: string;
+	motivo: string;
 }
 
 // Props para el componente
@@ -49,6 +54,8 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { data: pagosCompletosData = [] } = useFetchData<Pago[]>('/paysList', 'paysList');
 	const [datosCombinados, setDatosCombinados] = useState<Pago[]>([]);
+	const [selectedPayment, setSelectedPayment] = useState<Pago | null>(null);
+	const modalTriggerRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
 		if (pagosSimpleData.length > 0 && datosCombinados.length === 0) {
@@ -84,6 +91,17 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 	): boolean => {
 		if (value == null) return false;
 		return String(value).toLowerCase().includes(searchString.toLowerCase());
+	};
+
+	// Handle row click to show details
+	const handleRowClick = (payment: Pago) => {
+		setSelectedPayment(payment);
+		// Activar programáticamente el modal después de que el estado se actualice
+		setTimeout(() => {
+			if (modalTriggerRef.current) {
+				modalTriggerRef.current.click();
+			}
+		}, 0);
 	};
 
 	const filteredPagos = useMemo(() => {
@@ -170,7 +188,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 	const isInitialLoading = isLoadingSimple && datosCombinados.length === 0;
 
 	return (
-		<Box sx={{ width: '100%' }}>
+		<>
 			<Box
 				sx={{
 					mt: 3,
@@ -178,6 +196,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 					display: 'flex',
 					justifyContent: 'space-between',
 					alignItems: 'center',
+					px: 2,
 				}}
 			>
 				<Typography variant='h5' gutterBottom>
@@ -200,8 +219,19 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 				/>
 			</Box>
 
-			<Paper sx={{ width: '100%', mb: 2 }}>
-				<TableContainer component={Paper} sx={{ maxHeight: 790 }} ref={containerRef}>
+			<Paper
+				sx={{
+					flexGrow: 1,
+					overflow: 'hidden',
+					boxShadow: 'none',
+					border: '1px solid rgba(224, 224, 224, 1)',
+					display: 'flex',
+					flexDirection: 'column',
+					borderBottomRightRadius: 8,
+					borderBottomLeftRadius: 8,
+				}}
+			>
+				<TableContainer sx={{ maxHeight: 820 }} ref={containerRef}>
 					<Table stickyHeader size='small' aria-label='tabla de pagos'>
 						<TableHead>
 							<TableRow>
@@ -301,6 +331,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 										<TableRow
 											key={pago._id}
 											hover
+											onClick={() => handleRowClick(pago)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
@@ -372,7 +403,27 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 					</Table>
 				</TableContainer>
 			</Paper>
-		</Box>
+
+			{/* Botón oculto que sirve como trigger para el SimpleModalWrapper */}
+			<div style={{ display: 'none' }}>
+				<Button ref={modalTriggerRef} id='hidden-modal-trigger'>
+					Trigger
+				</Button>
+			</div>
+
+			{/* Modal para mostrar detalles del pago - Solo se renderiza cuando hay un pago seleccionado */}
+			{selectedPayment && (
+				<SimpleModalWrapper
+					showCloseButton={false}
+					triggerComponent={
+						<span id='modal-trigger-element' ref={modalTriggerRef} />
+					}
+					maxWidth='md'
+				>
+					<PaymentDetails payment={selectedPayment} />
+				</SimpleModalWrapper>
+			)}
+		</>
 	);
 };
 

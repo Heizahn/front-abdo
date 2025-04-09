@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
 	Paper,
 	Table,
@@ -13,49 +13,46 @@ import {
 	InputAdornment,
 	Typography,
 	CircularProgress,
-	Dialog,
-	DialogContent,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import SectorDetail from './SectorDetail'; // Import the detail component we'll create
-import SimpleModalWrapper from '../common/ContainerForm';
-import CreateSectorForm from './CreateSector';
 import { useFetchData } from '../../hooks/useQuery';
+import SimpleModalWrapper from '../common/ContainerForm';
+import Create from './Create';
 
-// Define the Sector interface based on your API schema
-interface Sector {
+interface Router {
 	_id: string;
 	nombre: string;
-	estado: string;
-	creadoPor: string;
-	clientes?: number;
-	editadoPor?: string;
+	ip: string;
 	fechaCreacion: string;
+	creadoPor: string;
 	fechaEdicion?: string;
+	editadoPor?: string;
+	estado: string;
+	direccion: string;
+	marca: string;
+	modelo: string;
+	descripcion: string;
+	sectores: string;
+	clientes: number;
 }
 
-// Type for sorting
+// Tipo para ordenar
 type Order = 'asc' | 'desc';
-type OrderBy = keyof Sector;
+type OrderBy = keyof Router;
 
-const SectorsTable: React.FC = () => {
+const RouterTable: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState('');
-	const [order, setOrder] = useState<Order>('asc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('nombre');
+	const [order, setOrder] = useState<Order>('desc');
+	const [orderBy, setOrderBy] = useState<OrderBy>('fechaCreacion');
 	const [visibleItems, setVisibleItems] = useState(100);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
-
-	// State for detail view
-	const [detailOpen, setDetailOpen] = useState(false);
-	const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
-
-	// Use TanStack Query to fetch data
-	const { data: sectors = [], isLoading } = useFetchData<Sector[]>(
-		'/sectorsList',
-		'sectorsList',
+	const { data: routersData = [], isLoading } = useFetchData<Router[]>(
+		'/routersList',
+		'routersList',
 	);
 
+	console.log(routersData);
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
 		setVisibleItems(100);
@@ -80,14 +77,17 @@ const SectorsTable: React.FC = () => {
 		return String(value).toLowerCase().includes(searchString.toLowerCase());
 	};
 
-	// Filter and sort data
-	const filteredSectors = useMemo(() => {
-		return sectors
+	const filteredPagos = useMemo(() => {
+		return routersData
 			.filter(
-				(sector) =>
-					!searchTerm || // If no search term, include all
-					safeIncludes(sector.nombre, searchTerm) ||
-					safeIncludes(sector.estado, searchTerm),
+				(pago) =>
+					!searchTerm || // Si no hay término de búsqueda, incluir todos
+					safeIncludes(pago.nombre, searchTerm) ||
+					safeIncludes(pago.ip, searchTerm) ||
+					safeIncludes(pago.fechaCreacion, searchTerm) ||
+					safeIncludes(pago.creadoPor, searchTerm) ||
+					safeIncludes(pago.sectores, searchTerm) ||
+					safeIncludes(pago.estado, searchTerm),
 			)
 			.sort((a, b) => {
 				const valueA = a[orderBy];
@@ -97,32 +97,37 @@ const SectorsTable: React.FC = () => {
 				if (valueA == null) return order === 'asc' ? -1 : 1;
 				if (valueB == null) return order === 'asc' ? 1 : -1;
 
-				const strA = String(valueA).toLowerCase();
-				const strB = String(valueB).toLowerCase();
-				return order === 'asc' ? strA.localeCompare(strB) : strB.localeCompare(strA);
+				if (typeof valueA === 'number' && typeof valueB === 'number') {
+					return order === 'asc' ? valueA - valueB : valueB - valueA;
+				} else {
+					const strA = String(valueA).toLowerCase();
+					const strB = String(valueB).toLowerCase();
+					return order === 'asc'
+						? strA.localeCompare(strB)
+						: strB.localeCompare(strA);
+				}
 			});
-	}, [sectors, searchTerm, orderBy, order]);
+	}, [routersData, searchTerm, orderBy, order]);
 
 	const visibleData = useMemo(() => {
-		return filteredSectors.slice(0, visibleItems);
-	}, [filteredSectors, visibleItems]);
+		return filteredPagos.slice(0, visibleItems);
+	}, [filteredPagos, visibleItems]);
 
-	// Infinite scroll handling
 	const handleScroll = useCallback(() => {
 		if (!containerRef.current) return;
 
 		const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
 		if (scrollHeight - scrollTop - clientHeight < 200 && !isLoadingMore) {
-			if (visibleItems < filteredSectors.length) {
+			if (visibleItems < filteredPagos.length) {
 				setIsLoadingMore(true);
 
 				setTimeout(() => {
-					setVisibleItems((prev) => Math.min(prev + 50, filteredSectors.length));
+					setVisibleItems((prev) => Math.min(prev + 50, filteredPagos.length));
 					setIsLoadingMore(false);
 				}, 150);
 			}
 		}
-	}, [visibleItems, filteredSectors.length, isLoadingMore]);
+	}, [visibleItems, filteredPagos.length, isLoadingMore]);
 
 	useEffect(() => {
 		const currentContainer = containerRef.current;
@@ -134,8 +139,7 @@ const SectorsTable: React.FC = () => {
 		}
 	}, [handleScroll]);
 
-	// Render status indicator
-	const renderEstado = (estado: string) => {
+	const renderEstadoChip = (estado: string) => {
 		let color: 'success' | 'error' = 'success';
 
 		if (estado.toLowerCase() !== 'activo') {
@@ -147,29 +151,6 @@ const SectorsTable: React.FC = () => {
 				{estado}
 			</Typography>
 		);
-	};
-
-	// Format date for display
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString('es-ES', {
-			year: 'numeric',
-			month: 'short',
-			day: '2-digit',
-			hour: '2-digit',
-			minute: 'numeric',
-		});
-	};
-
-	// Handle row click to open detail view
-	const handleRowClick = (sector: Sector) => {
-		setSelectedSector(sector);
-		setDetailOpen(true);
-	};
-
-	// Handle close of detail view
-	const handleDetailClose = () => {
-		setDetailOpen(false);
-		setSelectedSector(null);
 	};
 
 	return (
@@ -185,16 +166,12 @@ const SectorsTable: React.FC = () => {
 				}}
 			>
 				<Typography variant='h5' gutterBottom>
-					Sectores
+					Equipos
 				</Typography>
 
 				<Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-					<SimpleModalWrapper
-						triggerButtonText='Crear Sector'
-						triggerButtonColor='primary'
-						showCloseButton={false}
-					>
-						<CreateSectorForm />
+					<SimpleModalWrapper showCloseButton={false} triggerButtonText='Crear'>
+						<Create />
 					</SimpleModalWrapper>
 					<TextField
 						size='small'
@@ -227,7 +204,7 @@ const SectorsTable: React.FC = () => {
 				}}
 			>
 				<TableContainer sx={{ maxHeight: 860 }} ref={containerRef}>
-					<Table stickyHeader size='small' aria-label='tabla de sectores'>
+					<Table stickyHeader size='small' aria-label='tabla de pagos'>
 						<TableHead>
 							<TableRow>
 								<TableCell>
@@ -241,11 +218,29 @@ const SectorsTable: React.FC = () => {
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'fechaCreacion'}
-										direction={orderBy === 'fechaCreacion' ? order : 'asc'}
-										onClick={createSortHandler('fechaCreacion')}
+										active={orderBy === 'ip'}
+										direction={orderBy === 'ip' ? order : 'asc'}
+										onClick={createSortHandler('ip')}
 									>
-										Fecha de Creación
+										IP
+									</TableSortLabel>
+								</TableCell>
+								<TableCell>
+									<TableSortLabel
+										active={orderBy === 'sectores'}
+										direction={orderBy === 'sectores' ? order : 'asc'}
+										onClick={createSortHandler('sectores')}
+									>
+										Sector
+									</TableSortLabel>
+								</TableCell>
+								<TableCell>
+									<TableSortLabel
+										active={orderBy === 'creadoPor'}
+										direction={orderBy === 'creadoPor' ? order : 'asc'}
+										onClick={createSortHandler('creadoPor')}
+									>
+										Creado Por
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
@@ -271,17 +266,16 @@ const SectorsTable: React.FC = () => {
 						<TableBody>
 							{isLoading ? (
 								<TableRow>
-									<TableCell colSpan={4} align='center'>
+									<TableCell colSpan={9} align='center'>
 										<CircularProgress size={40} sx={{ my: 2 }} />
 									</TableCell>
 								</TableRow>
 							) : visibleData.length > 0 ? (
 								<>
-									{visibleData.map((sector) => (
+									{visibleData.map((pago) => (
 										<TableRow
-											key={sector._id}
+											key={pago._id}
 											hover
-											onClick={() => handleRowClick(sector)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
@@ -289,22 +283,14 @@ const SectorsTable: React.FC = () => {
 												},
 											}}
 										>
-											<TableCell component='th' scope='row'>
-												{sector.nombre || '-'}
-											</TableCell>
+											<TableCell>{pago.nombre || '-'}</TableCell>
+											<TableCell>{pago.ip || '-'}</TableCell>
+											<TableCell>{pago.sectores || '-'}</TableCell>
+											<TableCell>{pago.creadoPor || '-'}</TableCell>
+											<TableCell>{pago.clientes || 0}</TableCell>
 											<TableCell>
-												{sector.fechaCreacion
-													? formatDate(sector.fechaCreacion)
-													: '-'}
-											</TableCell>
-											<TableCell>
-												{sector.clientes !== undefined
-													? sector.clientes
-													: 0}
-											</TableCell>
-											<TableCell>
-												{sector.estado
-													? renderEstado(sector.estado)
+												{pago.estado
+													? renderEstadoChip(pago.estado)
 													: '-'}
 											</TableCell>
 										</TableRow>
@@ -313,7 +299,7 @@ const SectorsTable: React.FC = () => {
 									{isLoadingMore && (
 										<TableRow>
 											<TableCell
-												colSpan={4}
+												colSpan={9}
 												align='center'
 												sx={{ py: 2 }}
 											>
@@ -322,11 +308,11 @@ const SectorsTable: React.FC = () => {
 										</TableRow>
 									)}
 
-									{visibleItems >= filteredSectors.length &&
-										filteredSectors.length > 100 && (
+									{visibleItems >= filteredPagos.length &&
+										filteredPagos.length > 100 && (
 											<TableRow>
 												<TableCell
-													colSpan={4}
+													colSpan={9}
 													align='center'
 													sx={{ py: 1 }}
 												>
@@ -342,8 +328,8 @@ const SectorsTable: React.FC = () => {
 								</>
 							) : (
 								<TableRow>
-									<TableCell colSpan={4} align='center'>
-										No hay sectores disponibles
+									<TableCell colSpan={9} align='center'>
+										No hay routers u OLTs disponibles
 									</TableCell>
 								</TableRow>
 							)}
@@ -351,20 +337,8 @@ const SectorsTable: React.FC = () => {
 					</Table>
 				</TableContainer>
 			</Paper>
-
-			{/* Sector Detail Dialog */}
-			<Dialog open={detailOpen} onClose={handleDetailClose} maxWidth='sm' fullWidth>
-				<DialogContent>
-					{selectedSector && (
-						<SectorDetail
-							sectorData={selectedSector}
-							onClose={handleDetailClose}
-						/>
-					)}
-				</DialogContent>
-			</Dialog>
 		</>
 	);
 };
 
-export default SectorsTable;
+export default RouterTable;

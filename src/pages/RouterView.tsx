@@ -1,12 +1,12 @@
 import { Box } from '@mui/material';
 import MainLayout from '../layouts/MainLayout';
-import PlansTable from '../components/Services/TablaServices';
+import RouterTable from '../components/routers/RouterTable';
 
-export default function ServicesView() {
+export default function RouterView() {
 	return (
-		<MainLayout title='Servicios'>
+		<MainLayout title='Routers y OLTs'>
 			<Box sx={{ bgcolor: 'background.paper', pt: 2, borderRadius: 2 }}>
-				<PlansTable />
+				<RouterTable />
 			</Box>
 		</MainLayout>
 	);

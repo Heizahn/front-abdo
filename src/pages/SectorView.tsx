@@ -6,7 +6,7 @@ import MainLayout from '../layouts/MainLayout';
 const SectorsView: React.FC = () => {
 	return (
 		<MainLayout title='Sectores'>
-			<Box sx={{ backgroundColor: 'background.paper', p: 2, borderRadius: 2 }}>
+			<Box sx={{ backgroundColor: 'background.paper', pt: 2, borderRadius: 2 }}>
 				{/* Sectors Table */}
 				<SectorsTable />
 			</Box>

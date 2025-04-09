@@ -14,10 +14,12 @@ interface Pago {
 	fecha: string;
 	creadoPor: string;
 	montoUSD: number;
-	montoVES: string;
+	montoVES: number;
 	referencia: string;
 	comentario: string;
 	estado: 'Activo' | 'Anulado';
+	recibidoPor: string;
+	motivo: string;
 }
 
 export default function PaymentsView() {
@@ -60,12 +62,7 @@ export default function PaymentsView() {
 				sx={{
 					bgcolor: 'background.paper',
 					pt: 1,
-					px: 6,
-					pb: 2,
-					borderTopLeftRadius: 8,
-					borderTopRightRadius: 8,
-					borderBottomLeftRadius: 8,
-					borderBottomRightRadius: 8,
+					borderRadius: 2,
 					boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.1)',
 				}}
 			>
