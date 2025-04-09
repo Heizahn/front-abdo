@@ -91,20 +91,17 @@ const ClientsPage: React.FC = () => {
 	};
 
 	return (
-		<Box sx={{ p: 3 }}>
-			{/* Opción 1: Botón simple */}
-			<Box sx={{ mb: 2 }}>
-				<SimpleModalWrapper
-					triggerButtonText='Crear'
-					triggerButtonColor='primary'
-					showCloseButton={false}
-				>
-					<ClientFormWithConfirmation
-						onSubmit={handleClientCreated}
-						onCancel={() => {}}
-					/>
-				</SimpleModalWrapper>
-			</Box>
+		<Box sx={{ my: 2 }}>
+			<SimpleModalWrapper
+				triggerButtonText='Crear'
+				triggerButtonColor='primary'
+				showCloseButton={false}
+			>
+				<ClientFormWithConfirmation
+					onSubmit={handleClientCreated}
+					onCancel={() => {}}
+				/>
+			</SimpleModalWrapper>
 		</Box>
 	);
 };

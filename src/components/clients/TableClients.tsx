@@ -92,7 +92,7 @@ export default function TableClients() {
 				flexDirection: 'column',
 			}}
 		>
-			<TableContainer sx={{ flexGrow: 1, height: 'calc(100vh - 80rem)' }}>
+			<TableContainer sx={{ flexGrow: 1, height: 720 }}>
 				<Table stickyHeader size='small'>
 					<TableHead>
 						<TableRow>
@@ -261,6 +261,7 @@ export default function TableClients() {
 											sx={{
 												display: 'flex',
 												justifyContent: 'center',
+												alignItems: 'center',
 											}}
 											onClick={(e) => e.stopPropagation()} // Prevenir que el clic en el botón active el modal
 										>

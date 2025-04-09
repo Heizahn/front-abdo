@@ -23,10 +23,9 @@ export default function Clients() {
 						sx={{
 							display: 'flex',
 							justifyContent: 'space-between',
-							alignItems: 'center',
+							alignItems: 'flex-start',
 							bgcolor: 'background.default',
-							paddingRight: 4,
-							paddingBottom: 0.2,
+							paddingRight: 2,
 							borderTopLeftRadius: 8,
 							borderTopRightRadius: 8,
 						}}
@@ -44,7 +43,8 @@ export default function Clients() {
 							display: 'flex',
 							justifyContent: 'space-between',
 							alignItems: 'center',
-							p: 1,
+							px: 2,
+							py: 1,
 							bgcolor: 'background.default',
 						}}
 					>

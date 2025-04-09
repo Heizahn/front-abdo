@@ -39,7 +39,6 @@ const FilterStatusButton = ({
 			sx={{
 				width: 100,
 				textAlign: 'center',
-				py: 1,
 				borderBottom: `3px solid ${active ? color : 'transparent'}`,
 				cursor: 'pointer',
 				transition: 'all 0.2s',
