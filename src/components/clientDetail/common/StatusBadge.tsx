@@ -1,6 +1,6 @@
 import { Chip } from '@mui/material';
 
-const StatusBadge = ({ status, saldo }: { status: string | null; saldo: number | null }) => {
+const StatusBadge = ({ status, saldo }: { status: string | null; saldo?: number | null }) => {
 	const isActive = status?.toLowerCase() === 'activo';
 	const isMoroso = saldo && saldo < 0;
 

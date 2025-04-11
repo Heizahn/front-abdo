@@ -18,6 +18,7 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import { useFetchData } from '../../hooks/useQuery';
 import SimpleModalWrapper from '../common/ContainerForm';
 import Create from './Create';
+import { useNavigate } from 'react-router-dom';
 
 interface Router {
 	_id: string;
@@ -47,12 +48,13 @@ const RouterTable: React.FC = () => {
 	const [visibleItems, setVisibleItems] = useState(100);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
+
+	const navigate = useNavigate();
 	const { data: routersData = [], isLoading } = useFetchData<Router[]>(
 		'/routersList',
 		'routersList',
 	);
 
-	console.log(routersData);
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
 		setVisibleItems(100);
@@ -171,7 +173,7 @@ const RouterTable: React.FC = () => {
 
 				<Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
 					<SimpleModalWrapper showCloseButton={false} triggerButtonText='Crear'>
-						<Create />
+						<Create onCancel={() => {}} />
 					</SimpleModalWrapper>
 					<TextField
 						size='small'
@@ -272,9 +274,9 @@ const RouterTable: React.FC = () => {
 								</TableRow>
 							) : visibleData.length > 0 ? (
 								<>
-									{visibleData.map((pago) => (
+									{visibleData.map((equipment) => (
 										<TableRow
-											key={pago._id}
+											key={equipment._id}
 											hover
 											sx={{
 												cursor: 'pointer',
@@ -282,15 +284,18 @@ const RouterTable: React.FC = () => {
 													backgroundColor: 'rgba(0, 0, 0, 0.04)',
 												},
 											}}
+											onClick={() => {
+												navigate(`/router/${equipment._id}`);
+											}}
 										>
-											<TableCell>{pago.nombre || '-'}</TableCell>
-											<TableCell>{pago.ip || '-'}</TableCell>
-											<TableCell>{pago.sectores || '-'}</TableCell>
-											<TableCell>{pago.creadoPor || '-'}</TableCell>
-											<TableCell>{pago.clientes || 0}</TableCell>
+											<TableCell>{equipment.nombre || '-'}</TableCell>
+											<TableCell>{equipment.ip || '-'}</TableCell>
+											<TableCell>{equipment.sectores || '-'}</TableCell>
+											<TableCell>{equipment.creadoPor || '-'}</TableCell>
+											<TableCell>{equipment.clientes || 0}</TableCell>
 											<TableCell>
-												{pago.estado
-													? renderEstadoChip(pago.estado)
+												{equipment.estado
+													? renderEstadoChip(equipment.estado)
 													: '-'}
 											</TableCell>
 										</TableRow>
