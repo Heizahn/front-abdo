@@ -8,6 +8,7 @@ import RouterHeader from '../components/routers/RouterHeader';
 import Navigation from '../components/routers/Navigation';
 import RouterDetail from '../components/routers/routerDetail/RouterDetail';
 import EquipoSkeleton from '../components/routers/routerDetail/skeleton';
+import ClientsTable from '../components/routers/routerClients/clientsTable';
 
 export default function RouterView() {
 	const { id } = useParams();
@@ -26,7 +27,12 @@ export default function RouterView() {
 			case 'details':
 				return <RouterDetail router={routerData && routerData[0]} />;
 			case 'clients':
-				return <>Clients</>;
+				return (
+					<ClientsTable
+						clients={routerData && routerData[0].clientes}
+						routerId={id as string}
+					/>
+				);
 			default:
 				return <RouterDetail router={routerData && routerData[0]} />;
 		}
