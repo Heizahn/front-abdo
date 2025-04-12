@@ -1,8 +1,9 @@
 import { Box, Grid } from '@mui/material';
 import Information from './Information';
 import StatusInfo from './RouterState';
+import { RouterDetails } from '../../../interfaces/types';
 
-export default function RouterDetail({ router }: { router: any }) {
+export default function RouterDetail({ router }: { router: RouterDetails }) {
 	return (
 		<Box
 			sx={{

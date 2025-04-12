@@ -9,6 +9,7 @@ import Navigation from '../components/routers/Navigation';
 import RouterDetail from '../components/routers/routerDetail/RouterDetail';
 import EquipoSkeleton from '../components/routers/routerDetail/skeleton';
 import ClientsTable from '../components/routers/routerClients/clientsTable';
+import { RouterDetails } from '../interfaces/types';
 
 export default function RouterView() {
 	const { id } = useParams();
@@ -20,6 +21,19 @@ export default function RouterView() {
 	const handleTabChange = (tab: string) => {
 		setActiveTab(tab);
 	};
+
+	const { data: routerData, isLoading } = useFetchData<Array<RouterDetails>>(
+		'/routersDetail/' + id,
+		'router-' + id,
+	);
+
+	if (!routerData) {
+		return (
+			<MainLayout title='Router'>
+				<EquipoSkeleton />;
+			</MainLayout>
+		);
+	}
 
 	// Función para renderizar el contenido según la pestaña activa
 	const renderTabContent = () => {
@@ -37,11 +51,6 @@ export default function RouterView() {
 				return <RouterDetail router={routerData && routerData[0]} />;
 		}
 	};
-
-	const { data: routerData, isLoading } = useFetchData<[{}]>(
-		'/routersDetail/' + id,
-		'router-' + id,
-	);
 
 	return (
 		<MainLayout title='Router'>

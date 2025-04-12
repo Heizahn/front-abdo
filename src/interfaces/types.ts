@@ -152,3 +152,33 @@ export type Invoice = {
 	fechaEdicion?: string;
 	clientesId: string;
 };
+
+export interface ClientRouterTable {
+	_id: string;
+	nombre: string;
+	identificacion: string;
+	ipv4: string;
+	estado: string;
+	editadoPor?: string;
+	fechaEdicion?: string;
+}
+
+export interface SectorRouter {
+	_id: string;
+	nombre: string;
+}
+
+export interface RouterDetails {
+	_id: string;
+	nombre: string;
+	ip: string;
+	fechaCreacion: string;
+	creadoPor: string;
+	fechaEdicion?: string;
+	editadoPor?: string;
+	estado: string;
+	direccion: string;
+	descripcion: string;
+	sectores: SectorRouter;
+	clientes: ClientRouterTable[];
+}

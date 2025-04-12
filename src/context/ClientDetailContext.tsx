@@ -1,5 +1,5 @@
 // src/context/ClientDetailContext.tsx
-import { createContext, ReactNode, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { ClientDetails } from '../interfaces/InterfacesClientDetails';
 
 import { useParams } from 'react-router-dom';
@@ -33,7 +33,7 @@ interface ClientContextType {
 	error: Error | null;
 	isEditing: boolean;
 	setIsEditing: (isEditing: boolean) => void;
-	setClientUpdate: (clientUpdate: ClientUpdateType | null) => void;
+	setClientUpdate: React.Dispatch<React.SetStateAction<ClientUpdateType>>;
 	updateClient: () => void;
 }
 
@@ -52,7 +52,19 @@ const ClientContext = createContext<ClientContextType>({
 export const ClientDetailsProvider = ({ children }: { children: ReactNode }) => {
 	const { id } = useParams();
 	const [isEditing, setIsEditing] = useState(false);
-	const [clientUpdate, setClientUpdate] = useState<ClientUpdateType | null>(null);
+	const [clientUpdate, setClientUpdate] = useState<ClientUpdateType>({
+		nombre: '',
+		identificacion: '',
+		telefonos: '',
+		direccion: '',
+		email: '',
+		sectoresId: '',
+		coordenadas: '',
+		planesId: '',
+		ipv4: '',
+		routersId: '',
+		fechaPago: 0,
+	});
 	const { notifySuccess, notifyError } = useNotification();
 
 	const queryKeys = [`client-${id}`];

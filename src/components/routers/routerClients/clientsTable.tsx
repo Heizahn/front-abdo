@@ -19,16 +19,7 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import SimpleModalWrapper from '../../common/ContainerForm';
 import AddClient from './AddClient';
 import QuitRouter from './QuitRouter';
-
-export interface Client {
-	_id: string;
-	nombre: string;
-	identificacion: string;
-	ipv4: string;
-	estado: string;
-	editadoPor?: string;
-	fechaEdicion?: string;
-}
+import { ClientRouterTable as Client } from '../../../interfaces/types';
 
 // Tipo para ordenar
 type Order = 'asc' | 'desc';

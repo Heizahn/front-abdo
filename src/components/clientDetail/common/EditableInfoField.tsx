@@ -23,14 +23,14 @@ const EditableInfoField = ({
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 
-		setClientUpdate((prevData: ClientUpdateType) => ({
+		setClientUpdate((prevData) => ({
 			...prevData,
 			[name]: value,
 		}));
 	};
 
 	useEffect(() => {
-		setClientUpdate((prevData: ClientUpdateType) => ({
+		setClientUpdate((prevData) => ({
 			...prevData,
 			[name]: valueInitial,
 		}));

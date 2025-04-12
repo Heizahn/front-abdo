@@ -46,7 +46,7 @@ const NotificationAlert: React.FC<NotificationAlertProps> = ({
 	autoHideDuration = 4000,
 	position = { vertical: 'top', horizontal: 'right' },
 }) => {
-	const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+	const handleClose = (_: React.SyntheticEvent | Event, reason?: string) => {
 		if (reason === 'clickaway') {
 			return;
 		}

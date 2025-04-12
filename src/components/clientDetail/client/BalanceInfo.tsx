@@ -2,7 +2,6 @@ import { Box, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
 import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
-import { Edit } from '@mui/icons-material';
 import EditableInfoField from '../common/EditableInfoField';
 
 const BalanceInfo = ({ data }: { data: ClientDetails }) => {
