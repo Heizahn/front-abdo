@@ -29,14 +29,17 @@ FROM node:22.14.0-alpine
 
 WORKDIR /app
 
-# Instalar un servidor web ligero
+# Instalar serve globalmente
 RUN npm install -g serve
 
 # Copiar los archivos de build
 COPY --from=build /app/dist .
 
+# Crear archivo de configuración para serve
+RUN echo '{"rewrites": [{"source": "**", "destination": "/index.html"}]}' > serve.json
+
 # Exponer el puerto
 EXPOSE 80
 
-# Iniciar el servidor
-CMD ["serve", "-s", ".", "-l", "80"]
+# Iniciar el servidor con la configuración explícita para SPA
+CMD ["serve", "-s", ".", "-l", "80", "--single"]
