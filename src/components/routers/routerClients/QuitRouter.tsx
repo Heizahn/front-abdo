@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
-import { HOST_API } from '../../../../vite-env.d';
+import { HOST_API } from '../../../config/env';
 import { useNotification } from '../../../context/NotificationContext';
 import { useParams } from 'react-router-dom';
 import { queryClient } from '../../../query-client';

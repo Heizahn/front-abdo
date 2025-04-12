@@ -1,4 +1,4 @@
-import { HOST_BCV } from '../../vite-env.d';
+import { HOST_BCV } from '../config/env';
 
 export const getBCV = async (): Promise<number> => {
 	const res = await fetch(`${HOST_BCV}`);

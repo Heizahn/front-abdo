@@ -5,7 +5,7 @@ import { ClientDetails } from '../interfaces/InterfacesClientDetails';
 import { useParams } from 'react-router-dom';
 import { useFetchData, useMutateDate } from '../hooks/useQuery';
 import axios from 'axios';
-import { HOST_API } from '../../vite-env.d';
+import { HOST_API } from '../config/env';
 import { useNotification } from './NotificationContext';
 import { Subscription } from '../interfaces/types';
 import { queryClient } from '../query-client';

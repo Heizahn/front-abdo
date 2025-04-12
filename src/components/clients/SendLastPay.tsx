@@ -3,7 +3,7 @@ import { SendRounded as SendIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNotification } from '../../context/NotificationContext';
 import axios from 'axios';
-import { HOST_API } from '../../../vite-env.d';
+import { HOST_API } from '../../config/env';
 
 export default function SendLastPay({ clientesId }: { clientesId: string }) {
 	const [sendingLastPay, setSendingLastPay] = useState(false);

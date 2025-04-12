@@ -5,7 +5,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNotification } from '../../context/NotificationContext';
 import { queryClient } from '../../query-client';
-import { HOST_API } from '../../../vite-env.d';
+import { HOST_API } from '../../config/env';
 import ConfirmDialog from '../common/Confirm';
 
 export default function RouterHeader({

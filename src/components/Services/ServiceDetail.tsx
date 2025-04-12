@@ -15,7 +15,7 @@ import ConfirmDialog from '../common/Confirm'; // Adjust path as needed
 import * as yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
-import { HOST_API } from '../../../vite-env.d';
+import { HOST_API } from '../../config/env';
 import { useNotification } from '../../context/NotificationContext';
 import { queryClient } from '../../query-client';
 

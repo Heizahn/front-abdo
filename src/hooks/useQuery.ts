@@ -1,6 +1,6 @@
 import { useQuery, QueryOptions, MutationOptions, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { HOST_API } from '../../vite-env.d';
+import { HOST_API } from '../config/env';
 
 export function useFetchData<T>(
 	endpoint: string,

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { HOST_API } from '../../vite-env.d';
+import { HOST_API } from '../config/env';
 import { Navigate } from 'react-router-dom';
 
 const authService = {

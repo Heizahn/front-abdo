@@ -3,7 +3,7 @@ import { SendRounded as SendIcon } from '@mui/icons-material';
 import { useState } from 'react';
 import axios from 'axios';
 import { useNotification } from '../../../../context/NotificationContext';
-import { HOST_API } from '../../../../../vite-env.d';
+import { HOST_API } from '../../../../config/env';
 import { useClientDetailsContext } from '../../../../context/ClientDetailContext';
 
 export default function SendPay({ paymentId }: { paymentId: string }) {

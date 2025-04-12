@@ -3,7 +3,7 @@ import {
 	DangerousRounded as SuspendeIcon,
 } from '@mui/icons-material';
 import { Button, IconButton, Tooltip } from '@mui/material';
-import { HOST_API } from '../../../vite-env.d';
+import { HOST_API } from '../../config/env';
 import axios from 'axios';
 import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';

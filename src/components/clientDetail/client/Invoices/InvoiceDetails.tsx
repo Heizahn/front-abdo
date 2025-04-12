@@ -3,7 +3,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { Factura } from '../../../../interfaces/InterfacesClientDetails';
 import ConfirmDialog from '../../../common/Confirm';
 import axios from 'axios';
-import { HOST_API } from '../../../../../vite-env.d';
+import { HOST_API } from '../../../../config/env';
 import { queryClient } from '../../../../query-client';
 import { useParams } from 'react-router-dom';
 import { useNotification } from '../../../../context/NotificationContext';

@@ -20,7 +20,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import axios from 'axios';
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
-import { HOST_API } from '../../../../vite-env.d';
+import { HOST_API } from '../../../config/env';
 import { Client } from './clientsTable';
 import { useNotification } from '../../../context/NotificationContext';
 import { queryClient } from '../../../query-client';
