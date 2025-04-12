@@ -2,7 +2,7 @@ node_modules
 dist
 .git
 .gitignore
-README.md
-.DS_Store
-.vscode
+.env
+.env.*
 *.log
+README.md

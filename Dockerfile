@@ -13,26 +13,30 @@ RUN npm ci
 # Copiar el resto de los archivos del proyecto
 COPY . .
 
+# Los argumentos se pasarán desde Coolify
+ARG VITE_HOST_API
+ARG VITE_HOST_BCV
+
+# Crear archivo .env con las variables
+RUN echo "VITE_HOST_API=${VITE_HOST_API}" > .env
+RUN echo "VITE_HOST_BCV=${VITE_HOST_BCV}" >> .env
+
 # Construir la aplicación
 RUN npm run build
 
 # Etapa de producción
-FROM node:22.14.0-alpine as production
+FROM node:22.14.0-alpine
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
-COPY package.json package-lock.json ./
+# Instalar un servidor web ligero
+RUN npm install -g serve
 
-# Instalar solo dependencias de producción
-RUN npm ci --production
+# Copiar los archivos de build
+COPY --from=build /app/dist .
 
-# Copiar los archivos de build desde la etapa anterior
-COPY --from=build /app/dist ./dist
+# Exponer el puerto
+EXPOSE 80
 
-# Exponer el puerto que utilizará la aplicación
-EXPOSE 4173
-
-# Comando para iniciar la aplicación en modo preview
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0"]
+# Iniciar el servidor
+CMD ["serve", "-s", ".", "-l", "80"]
