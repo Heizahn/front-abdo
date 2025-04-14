@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { HOST_API } from '../config/env';
-import { Navigate } from 'react-router-dom';
 
 const authService = {
 	login: async (email: string, password: string) => {
@@ -56,9 +55,9 @@ const authService = {
 			(response) => response,
 			(error) => {
 				if (error.response && error.response.status === 401) {
-					// Si recibimos un 401, limpiamos el localStorage y redirigimos al login
+					// Si recibimos un 401, limpiamos el token y redirigimos al login
 					authService.logout();
-					return <Navigate to='/login' />;
+					window.location.href = '/login'; // Usar window.location en lugar de Navigate
 				}
 				return Promise.reject(error);
 			},

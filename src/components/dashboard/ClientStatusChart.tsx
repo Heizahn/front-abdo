@@ -40,7 +40,7 @@ const ClientStatusChart = () => {
 						outerRadius={100}
 						fill='#8884d8'
 						dataKey='value'
-						label={({ name, percent }) => `${name} ${(percent * 100).toFixed(1)}%`}
+						label={({ percent }) => `${(percent * 100).toFixed(1)}%`}
 					>
 						{dataChar.map((_, index) => (
 							<Cell
