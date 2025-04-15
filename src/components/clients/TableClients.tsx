@@ -31,15 +31,51 @@ type Order = 'asc' | 'desc';
 type OrderBy = keyof Client;
 
 // Tamaño de cada fila en píxeles
-const ROW_HEIGHT = 42;
+const ROW_HEIGHT = 36;
+
+// Definir las proporciones de columnas (en porcentaje)
+const COLUMN_WIDTHS = {
+	nombre: '18%', // Nombre - reducido ligeramente
+	identificacion: '12%', // Identificación - aumentado para datos más largos
+	telefonos: '10%', // Teléfono - mantenido
+	sector: '10%', // Sector - mantenido
+	router: '10%', // Router - mantenido
+	ipv4: '12%', // IPv4 - aumentado para acomodar direcciones IP completas
+	plan: '8%', // Plan - reducido ligeramente
+	saldo: '6%', // Saldo - aumentado ligeramente para valores con decimales
+	estado: '7%', // Estado - mantenido
+	acciones: '7%', // Acciones - mantenido
+};
 
 // Estilos usando styled de Material UI
 const StyledTableCell = styled(TableCell)(() => ({
 	overflow: 'hidden',
 	textOverflow: 'ellipsis',
-	whiteSpace: 'nowrap',
-	padding: '6px 16px',
+	whiteSpace: 'normal', // Permitir que el texto se envuelva
+	padding: '4px 8px', // Reducir padding para permitir más espacio para el texto
 	height: '100%',
+	fontSize: '0.8rem', // Reducir el tamaño de fuente para evitar dos líneas
+	lineHeight: '1.2', // Reducir la altura de línea
+	'&:first-of-type': {
+		paddingLeft: 16,
+	},
+	'&:last-of-type': {
+		paddingRight: 16,
+	},
+	// Asegurar que el texto se corta con elipsis después de 2 líneas si es necesario
+	display: '-webkit-box',
+	WebkitLineClamp: 1,
+	WebkitBoxOrient: 'vertical',
+}));
+
+const StyledTableHeadCell = styled(TableCell)(() => ({
+	overflow: 'hidden',
+	textOverflow: 'ellipsis',
+	whiteSpace: 'nowrap', // Los encabezados no necesitan envolverse
+	padding: '6px 8px',
+	height: '100%',
+	fontSize: '0.85rem', // Un poco más grande que las celdas de datos
+	fontWeight: 'bold',
 	'&:first-of-type': {
 		paddingLeft: 16,
 	},
@@ -158,9 +194,10 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '20%',
+							width: COLUMN_WIDTHS.nombre,
 						}}
 						sx={() => SuspendedColorCell(client)}
+						title={client.nombre} // Mostrar todo el texto en un tooltip al pasar el ratón
 					>
 						{client.nombre}
 					</StyledTableCell>
@@ -171,9 +208,10 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '10%',
+							width: COLUMN_WIDTHS.identificacion,
 						}}
 						sx={() => SuspendedColorCell(client)}
+						title={client.identificacion}
 					>
 						{client.identificacion}
 					</StyledTableCell>
@@ -184,9 +222,10 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '10%',
+							width: COLUMN_WIDTHS.telefonos,
 						}}
 						sx={() => SuspendedColorCell(client)}
+						title={client.telefonos}
 					>
 						{client.telefonos}
 					</StyledTableCell>
@@ -197,9 +236,10 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '10%',
+							width: COLUMN_WIDTHS.sector,
 						}}
 						sx={() => SuspendedColorCell(client)}
+						title={client.sector}
 					>
 						{client.sector}
 					</StyledTableCell>
@@ -210,9 +250,10 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '10%',
+							width: COLUMN_WIDTHS.router,
 						}}
 						sx={() => SuspendedColorCell(client)}
+						title={client.router}
 					>
 						{client.router}
 					</StyledTableCell>
@@ -223,7 +264,7 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '10%',
+							width: COLUMN_WIDTHS.ipv4,
 						}}
 						sx={() => SuspendedColorCell(client)}
 					>
@@ -243,9 +284,10 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '10%',
+							width: COLUMN_WIDTHS.plan,
 						}}
 						sx={() => SuspendedColorCell(client)}
+						title={client.plan}
 					>
 						{client.plan}
 					</StyledTableCell>
@@ -256,13 +298,13 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '5%',
+							width: COLUMN_WIDTHS.saldo,
 						}}
 						sx={{
 							color: client.saldo < 0 ? 'error.main' : 'success.main',
 						}}
 					>
-						{client.saldo}
+						{client.saldo.toFixed(2)}
 					</StyledTableCell>
 					<StyledTableCell
 						component='div'
@@ -271,7 +313,7 @@ export default function TableClients() {
 							display: 'flex',
 							alignItems: 'center',
 							height: '100%',
-							width: '8%',
+							width: COLUMN_WIDTHS.estado,
 						}}
 					>
 						{getStateComponent(getClientRealState(client))}
@@ -284,7 +326,7 @@ export default function TableClients() {
 							alignItems: 'center',
 							justifyContent: 'center',
 							height: '100%',
-							width: '8%',
+							width: COLUMN_WIDTHS.acciones,
 						}}
 					>
 						<Box
@@ -375,6 +417,7 @@ export default function TableClients() {
 				display: 'flex',
 				flexDirection: 'column',
 				position: 'relative',
+				height: '100%',
 			}}
 		>
 			{/* Encabezados de la tabla */}
@@ -382,10 +425,14 @@ export default function TableClients() {
 				<Table size='small'>
 					<TableHead>
 						<StyledTableRow sx={{ height: ROW_HEIGHT }}>
-							<StyledTableCell
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '20%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.nombre,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'nombre'}
@@ -394,11 +441,15 @@ export default function TableClients() {
 								>
 									Nombre
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '12%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.identificacion,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'identificacion'}
@@ -407,11 +458,15 @@ export default function TableClients() {
 								>
 									Identificación
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '10%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.telefonos,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'telefonos'}
@@ -420,11 +475,15 @@ export default function TableClients() {
 								>
 									Teléfono
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '10%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.sector,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'sector'}
@@ -433,11 +492,15 @@ export default function TableClients() {
 								>
 									Sector
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '10%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.router,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'router'}
@@ -446,11 +509,15 @@ export default function TableClients() {
 								>
 									Router
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '10%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.ipv4,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'ipv4'}
@@ -459,11 +526,15 @@ export default function TableClients() {
 								>
 									IPv4
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '8%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.plan,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'plan'}
@@ -472,11 +543,15 @@ export default function TableClients() {
 								>
 									Plan
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '7%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.saldo,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'saldo'}
@@ -485,11 +560,15 @@ export default function TableClients() {
 								>
 									Saldo
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
-								style={{ width: '8%', display: 'flex', alignItems: 'center' }}
+								style={{
+									width: COLUMN_WIDTHS.estado,
+									display: 'flex',
+									alignItems: 'center',
+								}}
 							>
 								<TableSortLabel
 									active={orderBy === 'estado'}
@@ -498,19 +577,19 @@ export default function TableClients() {
 								>
 									Estado
 								</TableSortLabel>
-							</StyledTableCell>
-							<StyledTableCell
+							</StyledTableHeadCell>
+							<StyledTableHeadCell
 								component='div'
 								variant='head'
 								style={{
-									width: '10%',
+									width: COLUMN_WIDTHS.acciones,
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
 								}}
 							>
 								Acciones
-							</StyledTableCell>
+							</StyledTableHeadCell>
 						</StyledTableRow>
 					</TableHead>
 				</Table>
@@ -519,7 +598,7 @@ export default function TableClients() {
 			{/* Cuerpo virtualizado de la tabla */}
 			<Box sx={{ flex: 1, overflow: 'hidden' }}>{renderTableContent()}</Box>
 
-			{/* Indicador sutil en la parte superior */}
+			{/* Indicador sutil en la parte inferior */}
 			<Box
 				sx={{
 					borderBottom: '1px solid rgba(224, 224, 224, 0.4)',
@@ -527,7 +606,7 @@ export default function TableClients() {
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					px: 2,
-					py: 1,
+					py: 0.5,
 				}}
 			>
 				<Typography
