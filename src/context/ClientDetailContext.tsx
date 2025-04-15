@@ -67,7 +67,7 @@ export const ClientDetailsProvider = ({ children }: { children: ReactNode }) => 
 	});
 	const { notifySuccess, notifyError } = useNotification();
 
-	const queryKeys = [`client-${id}`];
+	const queryKeys = [`client-${id}`, 'all-clients'];
 
 	const mutationSus = useMutateDate<
 		{

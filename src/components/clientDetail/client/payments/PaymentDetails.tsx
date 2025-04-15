@@ -31,7 +31,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 	const queryKeys = [
 		'clientsPieChart',
 		`client-${clientId}`,
-		'clients-',
+		'all-clients',
 		'paysBarChart0',
 		'lastPays',
 	];

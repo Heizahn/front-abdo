@@ -28,7 +28,7 @@ const formatDate = (dateString: string) => {
 
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose }) => {
 	const { id: clientId } = useParams();
-	const queryKeys = ['clientsPieChart', `client-${clientId}`, `clients-`];
+	const queryKeys = ['clientsPieChart', `client-${clientId}`, 'all-clients'];
 	const { notifyError, notifySuccess } = useNotification();
 
 	const handleAnular = async () => {

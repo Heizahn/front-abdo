@@ -58,7 +58,7 @@ export default function AddClient({
 
 	const { notifySuccess, notifyError } = useNotification();
 
-	const queryKeys = ['router-' + routerId, 'client-', 'clients-'];
+	const queryKeys = ['router-' + routerId, 'client-', 'all-clients'];
 
 	useEffect(() => {
 		const getClients = async () => {

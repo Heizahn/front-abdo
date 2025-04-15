@@ -70,6 +70,7 @@ export default function Pay({
 		'clientsList',
 		'paysListSimple',
 		'paysList',
+		'all-clients',
 	];
 
 	const mutationWithInvoice = useMutateDate<PaymentDTO, PaymentDTO>(

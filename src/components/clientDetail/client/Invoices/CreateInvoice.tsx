@@ -54,7 +54,7 @@ export default function CreateInvoice({
 
 	const { notifyError, notifySuccess } = useNotification();
 
-	const queryKeys = ['clientsPieChart', `client-${clientId}`, `clients-`, 'clientsList'];
+	const queryKeys = ['clientsPieChart', `client-${clientId}`, 'all-clients', 'clientsList'];
 
 	const mutation = useMutateDate<CreateInvoiceDTO, CreateInvoiceDTO>(`/billsClient0`, {
 		onSuccess: () => {

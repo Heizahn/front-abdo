@@ -17,7 +17,7 @@ const ClientsPage: React.FC = () => {
 		id: string;
 	};
 
-	const queryKeys = ['clientsPieChart', 'clientsStats', 'clients'];
+	const queryKeys = ['clientsPieChart', 'clientsStats', 'clients', 'all-clients'];
 
 	const mutation = useMutateDate<extend, ClientDataDTO>('/clientes', {
 		onError: (err) => {

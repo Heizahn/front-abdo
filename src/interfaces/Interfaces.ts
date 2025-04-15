@@ -8,13 +8,14 @@ export interface Client {
 	id: string;
 	nombre: string;
 	identificacion: string;
-	sector: string;
-	plan: string;
-	ipv4?: string;
 	telefonos: string;
-	router?: string;
+	sector: string;
+	router: string;
+	ipv4: string;
+	plan: string;
 	saldo: number;
 	estado: string;
+	// Add other client properties as needed
 }
 
 export interface LastPays {
@@ -51,24 +52,29 @@ interface ClientStats {
 }
 
 export interface ClientsResponse {
-	total: number;
 	clients: Client[];
+	total: number;
+}
+export interface ClientStatsFiltered {
+	todos: boolean;
+	solventes: boolean;
+	morosos: boolean;
+	suspendidos: boolean;
+	retirados: boolean;
 }
 
 export interface ClientsContextType {
 	searchTerms: string;
-	setSearchTerms: (terms: string) => void;
-	clientStatsFiltered: ClientStats;
+	setSearchTerms: (term: string) => void;
+	clientStatsFiltered: ClientStatsFiltered;
 	setClientStatsFiltered: React.Dispatch<React.SetStateAction<ClientStats>>;
-	handleChangePage: (_: unknown, newPage: number) => void;
-	handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	page: number;
-	rowsPerPage: number;
 	handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	clients: Client[];
+	filteredClients: Client[];
 	loading: boolean;
 	totalClients: number;
 	refetchClients: () => void;
+	// No se necesitan propiedades adicionales para infinite scroll
 }
 
 export interface ClientViewPayment {

@@ -52,7 +52,7 @@ export default function Create() {
 		'paysPieChart0-' + clientesId,
 		`client-${clientesId}`,
 		'clientsList',
-		'clients-',
+		'all-clients',
 		'paysListSimple',
 		'paysList',
 	];
