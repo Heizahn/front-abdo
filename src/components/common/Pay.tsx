@@ -40,7 +40,10 @@ export default function Pay({
 	closeModal?: () => void;
 }) {
 	const { user } = useAuth();
-	const [paymentData, setPaymentData] = useState<PaymentDataForm>(valueInitial);
+	const [paymentData, setPaymentData] = useState<PaymentDataForm>({
+		...valueInitial,
+		reciboPor: user?.id || '',
+	});
 	const [sendingPayment, setSendingPayment] = useState(false);
 	const [loadingBsToUsd, setLoadingBsToUsd] = useState(false);
 	const [loadingUsdToBs, setLoadingUsdToBs] = useState(false);
@@ -71,6 +74,7 @@ export default function Pay({
 		'paysListSimple',
 		'paysList',
 		'all-clients',
+		`invoices-${clientesId}`,
 	];
 
 	const mutationWithInvoice = useMutateDate<PaymentDTO, PaymentDTO>(
@@ -133,7 +137,10 @@ export default function Pay({
 		validateForm();
 
 		// Determinar si hay cambios en el formulario
-		const initialFormData: PaymentDataForm = valueInitial;
+		const initialFormData: PaymentDataForm = {
+			...valueInitial,
+			reciboPor: user?.id || '',
+		};
 
 		const hasAnyChanges = Object.keys(paymentData).some(
 			(key) =>
@@ -142,7 +149,7 @@ export default function Pay({
 		);
 
 		setHasChanges(hasAnyChanges);
-	}, [paymentData]);
+	}, [paymentData, user]);
 
 	const handleGetBsToUsd = async () => {
 		try {
