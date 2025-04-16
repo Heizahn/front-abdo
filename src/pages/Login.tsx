@@ -4,20 +4,20 @@ import {
 	Container,
 	TextField,
 	Button,
-	Typography,
 	Paper,
 	InputAdornment,
 	IconButton,
 	CircularProgress,
 	Snackbar,
 	Alert,
+	Toolbar,
 } from '@mui/material';
 import { Visibility, VisibilityOff, Person, Lock } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authServices';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
-
+import logo from '../assets/logo.svg';
 const Login = () => {
 	const [credentials, setCredentials] = useState({
 		email: '',
@@ -94,9 +94,9 @@ const Login = () => {
 						borderRadius: 2,
 					}}
 				>
-					<Typography component='h1' variant='h5' align='center' sx={{ mb: 3 }}>
-						Iniciar Sesión
-					</Typography>
+					<Toolbar>
+						<img src={logo} alt='logo' width='100%' />
+					</Toolbar>
 
 					<Box component='form' onSubmit={handleSubmit} sx={{ mt: 1 }}>
 						<TextField

@@ -2,6 +2,7 @@ import { Paper, Typography } from '@mui/material';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useFetchData } from '../../hooks/useQuery';
 import { PieChartDTO } from '../../interfaces/Interfaces';
+import ClientsStatusChartSkeleton from './skeletons/ClientStatusChartSkeleton';
 
 const ClientStatusChart = () => {
 	const CHART_COLORS = ['#1976d2', '#ed6c02'];
@@ -11,7 +12,7 @@ const ClientStatusChart = () => {
 	);
 
 	if (isLoading) {
-		return <div>Loading...</div>;
+		return <ClientsStatusChartSkeleton />;
 	}
 
 	if (error) {

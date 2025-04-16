@@ -54,7 +54,6 @@ export default function MonthlyCollectionSkeleton() {
 								alignItems: 'center',
 							}}
 						>
-							<Skeleton variant='text' width={35} height={25} />
 							<Skeleton variant='rectangular' width={100} height={80} />
 						</Box>
 
@@ -66,7 +65,6 @@ export default function MonthlyCollectionSkeleton() {
 								alignItems: 'center',
 							}}
 						>
-							<Skeleton variant='text' width={35} height={25} />
 							<Skeleton variant='rectangular' width={100} height={180} />
 						</Box>
 					</Box>
@@ -102,25 +100,6 @@ export default function MonthlyCollectionSkeleton() {
 					}}
 				>
 					<Skeleton variant='text' width={80} height={30} />
-				</Box>
-
-				{/* Skeleton para la leyenda */}
-				<Box
-					sx={{
-						position: 'absolute',
-						bottom: -10,
-						left: 25,
-						right: 0,
-						display: 'flex',
-						gap: 1,
-					}}
-				>
-					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						<Skeleton variant='text' width={120} height={30} />
-					</Box>
-					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						<Skeleton variant='text' width={120} height={30} />
-					</Box>
 				</Box>
 			</Box>
 		</Paper>

@@ -50,7 +50,7 @@ export default function MonthlyCollection() {
 	};
 
 	return (
-		<Paper elevation={3} sx={{ p: 2, height: '100%' }}>
+		<Paper sx={{ p: 2, height: '100%' }}>
 			<Typography variant='h6' component='h2' gutterBottom>
 				Recaudación del Mes
 			</Typography>
