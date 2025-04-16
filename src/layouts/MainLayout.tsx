@@ -12,11 +12,12 @@ import {
 	Divider,
 } from '@mui/material';
 
-// Importar los items de navegación desde una constante
-import { navigationItems } from '../constants/navigationItems';
-import { useNavigate } from 'react-router-dom';
+// Importar los items de navegación y la función para filtrarlos por rol
+import { getNavigationItemsByRole } from '../constants/navigationItems';
+import { useNavigate, useLocation } from 'react-router-dom'; // Añadimos useLocation
 import PerfilButton from '../components/perfil-botton';
 import logo from '../assets/logo.svg';
+import { useAuth } from '../context/AuthContext'; // Importamos el hook de autenticación
 
 const drawerWidth = 220;
 
@@ -28,6 +29,11 @@ const MainLayout = ({
 	title: string;
 }) => {
 	const navigate = useNavigate();
+	const location = useLocation(); // Obtenemos la ubicación actual
+	const { user } = useAuth(); // Obtenemos el usuario del contexto de autenticación
+
+	// Filtramos los items de navegación según el rol del usuario
+	const filteredNavigationItems = getNavigationItemsByRole(user?.role as 0 | 1 | 2);
 
 	const handleNavigation = (path: string) => {
 		navigate(path);
@@ -40,7 +46,7 @@ const MainLayout = ({
 			</Toolbar>
 			<Divider />
 			<List>
-				{navigationItems.map((item) => (
+				{filteredNavigationItems.map((item) => (
 					<ListItem key={item.text} disablePadding>
 						<ListItemButton
 							onClick={() => handleNavigation(item.path)}
@@ -59,8 +65,8 @@ const MainLayout = ({
 		<Box
 			sx={{
 				display: 'flex',
-				minHeight: '100vh', // Asegura que el contenedor principal tenga al menos el 100% de la altura de la ventana
-				bgcolor: '#f5f5f5', // Aplica el color de fondo gris a todo el contenedor principal
+				minHeight: '100vh',
+				bgcolor: '#f5f5f5',
 			}}
 		>
 			<AppBar

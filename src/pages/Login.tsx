@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Box,
 	Container,
@@ -18,6 +18,7 @@ import authService from '../services/authServices';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import logo from '../assets/logo.svg';
+
 const Login = () => {
 	const [credentials, setCredentials] = useState({
 		email: '',
@@ -29,8 +30,26 @@ const Login = () => {
 	const [openSnackbar, setOpenSnackbar] = useState(false);
 
 	const navigate = useNavigate();
-	const { loadUser } = useAuth();
+	const { loadUser, isAuthenticated } = useAuth();
 	const { notifySuccess } = useNotification();
+
+	// Verificar si ya está autenticado al cargar el componente
+	useEffect(() => {
+		if (isAuthenticated()) {
+			// Si ya está autenticado, redirigir según el rol
+			// Para esto necesitarás cargar el usuario primero
+			const checkAndRedirect = async () => {
+				try {
+					await loadUser();
+					navigate('/');
+				} catch (error) {
+					console.error('Error verificando autenticación:', error);
+				}
+			};
+
+			checkAndRedirect();
+		}
+	}, [isAuthenticated, loadUser, navigate]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -56,10 +75,17 @@ const Login = () => {
 		setLoading(true);
 
 		try {
+			// Hacer login
 			await authService.login(credentials.email, credentials.password);
-			loadUser();
+
+			// Pequeña pausa para asegurar que el token se ha establecido correctamente
+			await new Promise((resolve) => setTimeout(resolve, 100));
+
+			// Intentar cargar el perfil del usuario
+			await loadUser();
+
 			notifySuccess('Sesión iniciada correctamente', 'Sesión iniciada');
-			navigate('/home');
+			navigate('/');
 		} catch (error) {
 			if (error instanceof Error) {
 				console.error('Error durante el login:', error.message);
@@ -70,7 +96,6 @@ const Login = () => {
 			setLoading(false);
 		}
 	};
-
 	const handleCloseSnackbar = () => {
 		setOpenSnackbar(false);
 	};
