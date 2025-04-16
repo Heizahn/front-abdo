@@ -7,6 +7,7 @@ import { HOST_API } from '../../../../config/env';
 import { queryClient } from '../../../../query-client';
 import { useParams } from 'react-router-dom';
 import { useNotification } from '../../../../context/NotificationContext';
+import { ROLES, useAuth } from '../../../../context/AuthContext';
 
 interface PaymentDetailsProps {
 	payment: Pago;
@@ -35,6 +36,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 		'paysBarChart0',
 		'lastPays',
 	];
+	const { user } = useAuth();
 	const { notifyError, notifySuccess } = useNotification();
 
 	const handleAnular = async () => {
@@ -151,16 +153,17 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 						<Box
 							sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}
 						>
-							{payment.estado === 'Activo' && (
-								<Button
-									onClick={() => setShowConfirmation(true)}
-									color='error'
-									variant='contained'
-									disabled={canceling}
-								>
-									Anular
-								</Button>
-							)}
+							{payment.estado === 'Activo' &&
+								user?.role !== ROLES.PAYMENT_USER && (
+									<Button
+										onClick={() => setShowConfirmation(true)}
+										color='error'
+										variant='contained'
+										disabled={canceling}
+									>
+										Anular
+									</Button>
+								)}
 							<Button onClick={onClose} color='primary' variant='contained'>
 								Cerrar
 							</Button>
