@@ -24,11 +24,12 @@ import { useClientList } from '../../../hooks/useClientList';
 import { getBCV } from '../../../services/BCBService';
 import PricePanel from './pricePanel';
 import { useQuery } from '@tanstack/react-query';
+import { IClientPayment } from '../../../interfaces/Interfaces';
 
 const SearchClient = () => {
 	const [identificacion, setIdentificacion] = useState('');
 	const [loading, setLoading] = useState(false);
-	const [clients, setClients] = useState([]);
+	const [clients, setClients] = useState<IClientPayment[]>([]);
 	const [error, setError] = useState('');
 	const [searching, setSearching] = useState(false);
 	const [bcvData, setBcvData] = useState<{ precio: number; fecha: string } | null>(null);
@@ -56,7 +57,7 @@ const SearchClient = () => {
 		}
 	}, [data]);
 
-	const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e?.preventDefault();
 
 		if (!identificacion) {
@@ -96,7 +97,7 @@ const SearchClient = () => {
 	return (
 		<>
 			{/* Panel de información de precios */}
-			<PricePanel bcvData={bcvData} />
+			{bcvData && <PricePanel bcvData={bcvData} />}
 
 			{/* Panel de búsqueda */}
 			<Paper
@@ -135,7 +136,7 @@ const SearchClient = () => {
 						</Select>
 					</FormControl>
 				</Box>
-				<Box component='form' onSubmit={handleSearch}>
+				<Box component='form' onSubmit={handleSubmit}>
 					<TextField
 						fullWidth
 						id='identificacion'
@@ -175,10 +176,10 @@ const SearchClient = () => {
 						}}
 					>
 						<Button
+							type='submit'
 							variant='contained'
 							color='primary'
 							startIcon={loading ? null : <SearchIcon />}
-							onClick={handleSearch}
 							disabled={loading || !identificacion}
 						>
 							{loading ? (
@@ -214,14 +215,7 @@ const SearchClient = () => {
 			{/* Resultados de la búsqueda */}
 			{clients &&
 				clients.length > 0 &&
-				clients.map((client) => (
-					<ClientDetail
-						key={client.id}
-						client={client}
-						setClients={setClients}
-						onNewSearch={handleClear}
-					/>
-				))}
+				clients.map((client) => <ClientDetail key={client.id} client={client} />)}
 		</>
 	);
 };

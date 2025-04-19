@@ -3,6 +3,20 @@ export interface User {
 	name: string;
 	role: number;
 }
+export interface IPaymentHistory {
+	fecha: string;
+	tipoPago: string;
+	referencia: string;
+	motivo: string;
+	monto: number;
+	montoVES: number;
+}
+// Agregar esta interfaz para el plan
+export interface Plan {
+	id: string;
+	plan: string;
+	// Otros campos que pueda tener el plan
+}
 
 export interface Client {
 	id: string;
@@ -10,12 +24,19 @@ export interface Client {
 	identificacion: string;
 	telefonos: string;
 	sector: string;
-	router: string;
 	ipv4: string;
-	plan: string;
-	saldo: number;
+	router: string;
 	estado: string;
+	saldo: number;
+	plan?: string;
+
 	// Add other client properties as needed
+}
+
+export interface IClientPayment extends Client {
+	fechaCorte: string;
+	direccion: string;
+	ultimosPagos: IPaymentHistory[];
 }
 
 export interface LastPays {
@@ -51,10 +72,6 @@ interface ClientStats {
 	retirados: boolean;
 }
 
-export interface ClientsResponse {
-	clients: Client[];
-	total: number;
-}
 export interface ClientStatsFiltered {
 	todos: boolean;
 	solventes: boolean;

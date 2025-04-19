@@ -1,8 +1,16 @@
 import { createContext } from 'react';
-import { CLIENTS } from '../config/clients';
+
+interface ClientListContextType {
+	clientList: string;
+	// Corregir el tipo de handleClientChange para no usar e como parámetro
+	// sino directamente el nombre del cliente
+	handleClientChange: (client: string) => void;
+}
 
 // Create the context
-export const ClientListContext = createContext({
-	clientList: CLIENTS.ABDO77.name,
-	handleClientChange: (e: string) => {},
+const ClientListContext = createContext<ClientListContextType>({
+	clientList: 'ABDO77', // Valor inicial por defecto
+	handleClientChange: () => {}, // Función de cambio de cliente
 });
+
+export default ClientListContext;

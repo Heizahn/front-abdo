@@ -25,14 +25,8 @@ import {
 	AttachMoney as AttachMoneyIcon,
 } from '@mui/icons-material';
 import { useState } from 'react';
-interface IPaymentHistory {
-	fecha: string;
-	tipoPago: string;
-	referencia: string;
-	motivo: string;
-	monto: number;
-	montoVES: number;
-}
+import { IPaymentHistory } from '../../../interfaces/Interfaces';
+
 const PaymentHistory = ({ pagos = [] }: { pagos: IPaymentHistory[] }) => {
 	const [open, setOpen] = useState(true);
 

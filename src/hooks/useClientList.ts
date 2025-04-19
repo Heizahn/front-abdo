@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ClientListContext } from '../context/ClientListContext';
+import ClientListContext from '../context/ClientListContext';
 
 // Custom hook for using the client list context
 export const useClientList = () => {

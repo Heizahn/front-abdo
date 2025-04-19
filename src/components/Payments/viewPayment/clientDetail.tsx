@@ -29,13 +29,20 @@ import PaymentHistory from './paymentHistory';
 import { CLIENTS } from '../../../config/clients';
 import SimpleModalWrapper from '../../common/ContainerForm';
 import SuspendedClient from '../../common/SuspendedClient';
+import { useNotification } from '../../../context/NotificationContext';
+import { IClientPayment } from '../../../interfaces/Interfaces';
+import { isValidClientList } from '../../../services/getClient';
 
-const ClientDetail = ({ client }) => {
+const ClientDetail = ({ client }: { client: IClientPayment }) => {
 	const [sendingPayment, setSendingPayment] = useState(false);
 	const { clientList } = useClientList();
+	const { notifyError } = useNotification();
 
 	// Enviar último pago
 	const handleSendLastPayment = async () => {
+		if (!isValidClientList(clientList)) {
+			throw new Error(`Cliente "${clientList}" no encontrado`);
+		}
 		try {
 			setSendingPayment(true);
 
@@ -44,7 +51,7 @@ const ClientDetail = ({ client }) => {
 			);
 
 			if (res.data.length === 0) {
-				showSnackbar('No hay pagos para enviar');
+				notifyError('No hay pagos para enviar');
 				return;
 			}
 
@@ -139,7 +146,7 @@ const ClientDetail = ({ client }) => {
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								<strong>Teléfono:</strong> {client.telefono || 'No asignado'}
+								<strong>Teléfono:</strong> {client.telefonos || 'No asignado'}
 							</Typography>
 						</Grid>
 
@@ -155,7 +162,7 @@ const ClientDetail = ({ client }) => {
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								<strong>Dirección:</strong> {client.direccion}
+								<strong>Dirección:</strong> {client.direccion || 'No asignado'}
 							</Typography>
 						</Grid>
 
@@ -207,9 +214,7 @@ const ClientDetail = ({ client }) => {
 						>
 							<Chip
 								icon={<MoneyIcon />}
-								label={`Saldo: ${parseFloat(client.saldo || 0).toFixed(
-									2,
-								)} USD`}
+								label={`Saldo: ${(client.saldo || 0).toFixed(2)} USD`}
 								color={getSaldoColor(client.saldo)}
 								variant='outlined'
 							/>

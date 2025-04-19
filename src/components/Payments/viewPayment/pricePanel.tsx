@@ -6,7 +6,13 @@ import {
 	Diamond as DiamondIcon,
 } from '@mui/icons-material';
 
-export default function PricePanel({ bcvData }) {
+interface PricePanelProps {
+	bcvData: {
+		precio: number;
+		fecha: string;
+	};
+}
+export default function PricePanel({ bcvData }: PricePanelProps) {
 	// Verificar si tenemos datos válidos
 	const dollarPrice = bcvData?.precio || 0;
 	const fecha = bcvData?.fecha || 'No disponible';
