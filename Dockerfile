@@ -16,12 +16,12 @@ COPY . .
 # Los argumentos se pasarán desde Coolify
 ARG VITE_HOST_API
 ARG VITE_HOST_BCV
-ARG VITE_HOST_BCV_G
+ARG VITE_HOST_API_G
 
 # Crear archivo .env con las variables
 RUN echo "VITE_HOST_API=${VITE_HOST_API}" > .env
 RUN echo "VITE_HOST_BCV=${VITE_HOST_BCV}" >> .env
-RUN echo "VITE_HOST_BCV_G=${VITE_HOST_BCV_G}" >> .env
+RUN echo "VITE_HOST_API_G=${VITE_HOST_API_G}" >> .env
 
 # Construir la aplicación
 RUN npm run build
