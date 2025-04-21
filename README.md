@@ -1,54 +1,109 @@
-# React + TypeScript + Vite
+# Front-Abdo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación web desarrollada con React, TypeScript y Vite para la gestión de abdominales.
 
-Currently, two official plugins are available:
+## 🚀 Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- ⚡️ Desarrollo rápido con Vite
+- 🔒 TypeScript para type-safety
+- 🎨 Diseño moderno y responsive
+- 🔄 Estado global con Context API
+- 📱 Optimizado para dispositivos móviles
+- 🛠️ Configuración de ESLint para calidad de código
 
-## Expanding the ESLint configuration
+## 📋 Prerrequisitos
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js (versión 18 o superior)
+- npm o yarn
+- Git
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🔧 Instalación
+
+1. Clona el repositorio:
+```bash
+git clone https://github.com/Heizahn/front-abdo.git
+cd front-abdo
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+2. Instala las dependencias:
+```bash
+npm install
+# o
+yarn install
 ```
+
+3. Configura las variables de entorno:
+```bash
+cp .env.example .env.local
+# Edita .env.local con tus configuraciones
+```
+
+4. Inicia el servidor de desarrollo:
+```bash
+npm run dev
+# o
+yarn dev
+```
+
+## 🏗️ Estructura del Proyecto
+
+```
+src/
+├── assets/         # Recursos estáticos
+├── components/     # Componentes reutilizables
+├── config/         # Configuraciones
+├── constants/      # Constantes de la aplicación
+├── context/        # Contextos de React
+├── hooks/          # Custom hooks
+├── interfaces/     # Interfaces TypeScript
+├── layouts/        # Layouts de la aplicación
+├── pages/          # Páginas de la aplicación
+├── router/         # Configuración de rutas
+├── services/       # Servicios y llamadas a API
+└── theme/          # Configuración de temas
+```
+
+## 🧪 Testing
+
+Para ejecutar las pruebas:
+
+```bash
+npm test
+# o
+yarn test
+```
+
+## 🏗️ Construcción
+
+Para crear una versión de producción:
+
+```bash
+npm run build
+# o
+yarn build
+```
+
+## 📦 Despliegue
+
+La aplicación está configurada para ser desplegada en Docker:
+
+```bash
+docker build -t front-abdo .
+docker run -p 3000:3000 front-abdo
+```
+
+## 🤝 Contribución
+
+1. Haz un Fork del proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+
+## 📞 Contacto
+
+Proyecto Link: [https://github.com/Heizahn/front-abdo](https://github.com/Heizahn/front-abdo)
