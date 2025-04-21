@@ -23,7 +23,9 @@ export async function getClient(searchTerm: string, clientList: string) {
 	}
 
 	try {
-		const response = await axios.get(`${CLIENTS[clientList].url}/searchClient/${searchTerm}`);
+		const response = await axios.get(
+			`${CLIENTS[clientList].url}/clientByIdentity/${searchTerm}`,
+		);
 
 		if (!response.data) {
 			return [];
