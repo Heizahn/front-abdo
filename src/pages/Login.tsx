@@ -14,11 +14,12 @@ import { useNavigate } from "react-router-dom";
 import authService from "../services/authServices";
 import { useAuth } from "../context/AuthContext";
 import { useNotification } from "../context/NotificationContext";
+import { useEmailFormat } from "../hooks/useEmailFormat";
 import logo from "../assets/logo.svg";
 
 const Login = () => {
+	const { email, handleEmailChange, getFormattedEmail } = useEmailFormat();
 	const [credentials, setCredentials] = useState({
-		email: "",
 		password: "",
 	});
 	const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +43,6 @@ const Login = () => {
 					navigate("/");
 				} catch (error) {
 					console.error("Error verificando autenticación:", error);
-					// Limpiar estado si hay error de autenticación
 					await authService.logout();
 				}
 			}
@@ -60,10 +60,10 @@ const Login = () => {
 		let isValid = true;
 
 		// Validar email
-		if (!credentials.email) {
+		if (!email) {
 			errors.email = "El correo es requerido";
 			isValid = false;
-		} else if (!/\S+@\S+\.\S+/.test(credentials.email)) {
+		} else if (!getFormattedEmail().includes("@")) {
 			errors.email = "Ingrese un correo válido";
 			isValid = false;
 		}
@@ -78,17 +78,28 @@ const Login = () => {
 		return isValid;
 	};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setCredentials((prev) => ({
-			...prev,
-			[name]: value,
-		}));
+	const handleEmailInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		handleEmailChange(e.target.value);
 		// Limpiar error del campo cuando el usuario empieza a escribir
-		if (formErrors[name as keyof typeof formErrors]) {
+		if (formErrors.email) {
 			setFormErrors((prev) => ({
 				...prev,
-				[name]: "",
+				email: "",
+				general: "",
+			}));
+		}
+	};
+
+	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setCredentials((prev) => ({
+			...prev,
+			password: e.target.value,
+		}));
+		// Limpiar error del campo cuando el usuario empieza a escribir
+		if (formErrors.password) {
+			setFormErrors((prev) => ({
+				...prev,
+				password: "",
 				general: "",
 			}));
 		}
@@ -107,26 +118,22 @@ const Login = () => {
 		setFormErrors({ email: "", password: "", general: "" });
 
 		try {
-			// Intentar login
-			await authService.login(credentials.email, credentials.password);
+			// Usar el correo formateado para el login
+			const formattedEmail = getFormattedEmail();
+			await authService.login(formattedEmail, credentials.password);
 
 			// Esperar a que el token se establezca
 			await new Promise((resolve) => setTimeout(resolve, 100));
 
 			try {
-				// Intentar cargar el perfil
 				await loadUser();
-
-				// Si llegamos aquí, el login fue exitoso
 				notifySuccess(
 					"¡Bienvenido de nuevo!",
 					"Inicio de sesión exitoso"
 				);
 				navigate("/");
 			} catch (profileError) {
-				// Si hay error al cargar el perfil, pero el login fue exitoso
 				console.error("Error al cargar el perfil:", profileError);
-				// Aún así navegamos porque el login fue exitoso
 				notifySuccess(
 					"¡Bienvenido de nuevo!",
 					"Inicio de sesión exitoso"
@@ -134,7 +141,6 @@ const Login = () => {
 				navigate("/");
 			}
 		} catch (error) {
-			// Manejar diferentes tipos de errores de login
 			let errorMessage = "Error al iniciar sesión";
 
 			if (error instanceof Error) {
@@ -157,7 +163,6 @@ const Login = () => {
 
 			notifyError(errorMessage, "Error de autenticación");
 
-			// Limpiar la contraseña en caso de error
 			setCredentials((prev) => ({
 				...prev,
 				password: "",
@@ -202,8 +207,8 @@ const Login = () => {
 						name="email"
 						autoComplete="email"
 						autoFocus
-						value={credentials.email}
-						onChange={handleChange}
+						value={email}
+						onChange={handleEmailInputChange}
 						error={!!formErrors.email}
 						helperText={formErrors.email}
 						disabled={loading}
@@ -226,7 +231,7 @@ const Login = () => {
 						id="password"
 						autoComplete="current-password"
 						value={credentials.password}
-						onChange={handleChange}
+						onChange={handlePasswordChange}
 						error={!!formErrors.password}
 						helperText={formErrors.password}
 						disabled={loading}
@@ -260,11 +265,11 @@ const Login = () => {
 						type="submit"
 						fullWidth
 						variant="contained"
-						sx={{ mt: 3, mb: 2, py: 1.5 }}
+						sx={{ mt: 3, mb: 2 }}
 						disabled={loading}
 					>
 						{loading ? (
-							<CircularProgress size={24} />
+							<CircularProgress size={24} color="inherit" />
 						) : (
 							"Iniciar Sesión"
 						)}

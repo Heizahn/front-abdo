@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { CLIENTS } from '../config/clients';
+import { clientSearchSchema, validateData } from '../validations/schemas';
+
 // Definición de tipos para CLIENTS
 export type ClientListType = 'ABDO77' | 'Gianni'; // Las claves exactas de tu objeto CLIENTS
 
@@ -8,19 +10,30 @@ export function isValidClientList(clientList: string): clientList is ClientListT
 	return clientList === 'ABDO77' || clientList === 'Gianni';
 }
 
-export async function getClient(str: string, clientList: string) {
+interface ValidationError {
+	validationErrors: Record<string, string>;
+}
+
+export async function getClient(searchTerm: string, clientList: string) {
+	// Validar los datos de entrada
+	await validateData(clientSearchSchema, { searchTerm, clientList });
+
 	if (!isValidClientList(clientList)) {
 		throw new Error(`Cliente "${clientList}" no encontrado`);
 	}
+
 	try {
-		const response = await axios.get(`${CLIENTS[clientList].url}/clientByIdentity/${str}`);
+		const response = await axios.get(`${CLIENTS[clientList].url}/searchClient/${searchTerm}`);
 
 		if (!response.data) {
 			return [];
 		}
 
 		return response.data;
-	} catch (error) {
+	} catch (error: unknown) {
+		if (error && typeof error === 'object' && 'validationErrors' in error) {
+			throw error as ValidationError;
+		}
 		console.error('Error al buscar cliente:', error);
 		throw error;
 	}
