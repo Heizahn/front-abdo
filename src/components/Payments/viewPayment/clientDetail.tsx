@@ -72,6 +72,10 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 		}
 	};
 
+	if (!isValidClientList(clientList)) {
+		throw new Error(`Cliente "${clientList}" no encontrado`);
+	}
+
 	return (
 		<>
 			<Card sx={{ mb: 4 }}>
@@ -235,6 +239,7 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 									clientName={client.nombre}
 									clientesId={client.id}
 									onCancel={() => {}}
+									url={CLIENTS[clientList].url}
 								/>
 							</SimpleModalWrapper>
 
