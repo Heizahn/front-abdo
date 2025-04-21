@@ -1,20 +1,19 @@
-# Front-Abdo
+# Front-ABDO77
 
-Aplicación web desarrollada con React, TypeScript y Vite para la gestión de abdominales.
+Aplicación web desarrollada con React, TypeScript y Vite para la gestión de clientes.
 
 ## 🚀 Características
 
 - ⚡️ Desarrollo rápido con Vite
 - 🔒 TypeScript para type-safety
-- 🎨 Diseño moderno y responsive
+- 🎨 Diseño moderno
 - 🔄 Estado global con Context API
-- 📱 Optimizado para dispositivos móviles
 - 🛠️ Configuración de ESLint para calidad de código
 
 ## 📋 Prerrequisitos
 
 - Node.js (versión 18 o superior)
-- npm o yarn
+- npm
 - Git
 
 ## 🔧 Instalación
@@ -28,8 +27,6 @@ cd front-abdo
 2. Instala las dependencias:
 ```bash
 npm install
-# o
-yarn install
 ```
 
 3. Configura las variables de entorno:
@@ -41,8 +38,6 @@ cp .env.example .env.local
 4. Inicia el servidor de desarrollo:
 ```bash
 npm run dev
-# o
-yarn dev
 ```
 
 ## 🏗️ Estructura del Proyecto
@@ -63,24 +58,12 @@ src/
 └── theme/          # Configuración de temas
 ```
 
-## 🧪 Testing
-
-Para ejecutar las pruebas:
-
-```bash
-npm test
-# o
-yarn test
-```
-
 ## 🏗️ Construcción
 
 Para crear una versión de producción:
 
 ```bash
 npm run build
-# o
-yarn build
 ```
 
 ## 📦 Despliegue
