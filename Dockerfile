@@ -41,12 +41,12 @@ RUN npm install -g serve@14.2.1
 # Copiar los archivos de build
 COPY --from=build /app/dist .
 
+# Crear archivo de configuración para serve
+RUN echo '{"rewrites": [{"source": "**", "destination": "/index.html"}]}' > serve.json
+
 # Crear usuario no root
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
-
-# Crear archivo de configuración para serve
-RUN echo '{"rewrites": [{"source": "**", "destination": "/index.html"}]}' > serve.json
 
 # Exponer el puerto
 EXPOSE 80
