@@ -9,6 +9,7 @@ import axios from 'axios';
 import { HOST_API } from '../config/env';
 import { useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useBuildParams } from './useBuildParams';
 
 // Añadir abortController para cancelar peticiones si el componente se desmonta
 export function useFetchData<T>(
@@ -18,13 +19,15 @@ export function useFetchData<T>(
 ): UseQueryResult<T, Error> {
 	const { isAuthenticated } = useAuth();
 
+	const buildParams = useBuildParams();
+
 	// Memoizar la función de consulta
 	const fetchData = useCallback(async (): Promise<T> => {
 		const controller = new AbortController();
 		const signal = controller.signal;
 
 		try {
-			const response = await axios.get<T>(`${HOST_API}${endpoint}`, {
+			const response = await axios.get<T>(`${HOST_API}${endpoint}${buildParams}`, {
 				signal,
 				// Añadir caché para recursos estáticos
 				headers: {
@@ -38,7 +41,7 @@ export function useFetchData<T>(
 			}
 			throw error;
 		}
-	}, [endpoint]);
+	}, [endpoint, buildParams]);
 
 	return useQuery<T, Error, T>({
 		queryKey: [queryKey],

@@ -1,13 +1,19 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
-import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import EditableInfoField from '../common/EditableInfoField';
 import { useFetchData } from '../../../hooks/useQuery';
 import { SelectList } from '../../../interfaces/types';
 import EditableSelectField from '../common/EditableSelectfield';
 
-const LocationInfo = ({ data }: { data: ClientDetails }) => {
+interface LocationInfoProps {
+	data: {
+		sector: string;
+		direccion: string;
+		coordenadas: string;
+	};
+}
+const LocationInfo = ({ data }: LocationInfoProps) => {
 	const { isEditing } = useClientDetailsContext();
 
 	const { data: sectoresList } = useFetchData<SelectList[]>('/sectorsList', 'sectorsList');
@@ -19,9 +25,23 @@ const LocationInfo = ({ data }: { data: ClientDetails }) => {
 			</Typography>
 			{!isEditing ? (
 				<>
-					<InfoField label='Sector' value={data.sector?.nombre || 'No asignado'} />
+					<InfoField label='Sector' value={data.sector || 'No asignado'} />
 					<InfoField label='Dirección' value={data.direccion} />
-					<InfoField label='Coordenadas' value={data.coordenadas || 'N/A'} />
+					<InfoField
+						label='Coordenadas'
+						value={
+							data.coordenadas ? (
+								<Link
+									href={`https://maps.google.com/?q=${data.coordenadas}`}
+									target='_blank'
+								>
+									{data.coordenadas}
+								</Link>
+							) : (
+								'N/A'
+							)
+						}
+					/>
 				</>
 			) : (
 				<>
@@ -29,7 +49,7 @@ const LocationInfo = ({ data }: { data: ClientDetails }) => {
 						label='Sector'
 						name='sectoresId'
 						selectList={sectoresList || []}
-						valueInitial={data.sector?.nombre}
+						valueInitial={data.sector}
 					/>
 					<EditableInfoField
 						label='Dirección'

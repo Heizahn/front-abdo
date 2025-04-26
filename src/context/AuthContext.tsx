@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext, createContext, useCallback } from 'react';
 import authService from '../services/authServices';
 import { User } from '../interfaces/Interfaces';
+import { queryClient } from '../query-client';
 
 // Definimos las constantes para los roles
 export const ROLES = {
 	SUPERADMIN: 0,
-	ADMIN: 1,
+	ACCOUNTANT: 1,
 	PAYMENT_USER: 2,
+	PROVIDER: 3,
 } as const;
 
 // Definimos el tipo para los roles
@@ -63,6 +65,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const logout = useCallback(() => {
 		setUser(null);
 		authService.logout();
+		// Limpiar toda la caché de TanStack Query
+		queryClient.removeQueries();
 		// No redirigir aquí, esto lo maneja el botón de logout
 	}, []);
 

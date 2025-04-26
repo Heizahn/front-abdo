@@ -80,11 +80,12 @@ export interface ClientDetails {
 	editadoPor: string | null;
 	fechaEdicion: string | null;
 	fechaRetiro: string | null;
-	routers: Router;
-	sector: Sector;
-	plan: Plan;
-	facturas: Factura[];
-	pagosTabla: Pago[];
+	sector: string;
+	plan: string;
+	router: string;
+	suspendidoPor: string;
+	fechaSuspension: string | null;
+	retiradoPor: string | null;
 }
 
 export interface ClientStats {

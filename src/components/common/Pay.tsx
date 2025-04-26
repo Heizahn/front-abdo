@@ -27,20 +27,19 @@ import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
 import { queryClient } from '../../query-client';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
 
 export default function Pay({
 	clientesId,
 	clientName,
 	onCancel,
 	closeModal,
-	url,
+	onPaymentSuccess,
 }: {
 	clientesId: string;
 	clientName: string;
 	onCancel: () => void;
 	closeModal?: () => void;
-	url?: string;
+	onPaymentSuccess?: () => void;
 }) {
 	const { user } = useAuth();
 	const [paymentData, setPaymentData] = useState<PaymentDataForm>({
@@ -69,15 +68,15 @@ export default function Pay({
 	const queryKeys = [
 		'clientsStats',
 		'clientsPieChart',
-		'paysBarChart0',
 		'lastPays',
-		'paysPieChart0-' + clientesId,
 		`client-${clientesId}`,
 		'clientsList',
 		'paysListSimple',
 		'paysList',
 		'all-clients',
 		`invoices-${clientesId}`,
+		`paysPieChart0-${clientesId}`,
+		`payments-${clientesId}`,
 	];
 
 	const mutationWithInvoice = useMutateDate<PaymentDTO, PaymentDTO>(
@@ -91,6 +90,10 @@ export default function Pay({
 						predicate: (query) => query.queryKey.includes(key),
 					});
 				});
+
+				if (onPaymentSuccess) {
+					onPaymentSuccess();
+				}
 			},
 			onError: (err) => {
 				if (err instanceof Error) {
@@ -109,6 +112,10 @@ export default function Pay({
 					predicate: (query) => query.queryKey.includes(key),
 				});
 			});
+
+			if (onPaymentSuccess) {
+				onPaymentSuccess();
+			}
 		},
 		onError: (err) => {
 			if (err instanceof Error) {
@@ -226,8 +233,8 @@ export default function Pay({
 	};
 
 	const handleConfirm = async () => {
-		setShowConfirmation(false);
 		setSendingPayment(true);
+		setShowConfirmation(false);
 
 		try {
 			const Payment: PaymentDTO = {
@@ -247,58 +254,23 @@ export default function Pay({
 				Payment.comentario = paymentData.comentario;
 			}
 
-			if (url) {
-				try {
-					if (paymentData.facturaId) {
-						await axios.post(
-							url + '/paysClient0/factura/' + paymentData.facturaId,
-							Payment,
-						);
-					} else {
-						await axios.post(url + '/paysClient0', Payment);
-					}
-
-					notifySuccess('El pago se ha creado correctamente', 'Pago creado');
-				} catch (error) {
-					if (error instanceof Error) {
-						notifyError(error.message, 'Error al crear el pago');
-					}
-				}
+			if (paymentData.facturaId) {
+				await mutationWithInvoice.mutateAsync(Payment);
 			} else {
-				if (paymentData.facturaId) {
-					mutationWithInvoice
-						.mutateAsync(Payment)
-						.then(() => {
-							notifySuccess('El pago se ha creado correctamente', 'Pago creado');
-							refetchClients();
-							if (closeModal) closeModal();
-						})
-						.catch((error) => {
-							if (error instanceof Error) {
-								notifyError(error.message, 'Error al crear el pago');
-							}
-						});
-				} else {
-					mutation
-						.mutateAsync(Payment)
-						.then(() => {
-							notifySuccess('El pago se ha creado correctamente', 'Pago creado');
-							refetchClients();
-							if (closeModal) closeModal();
-						})
-						.catch((error) => {
-							if (error instanceof Error) {
-								notifyError(error.message, 'Error al crear el pago');
-							}
-						});
-				}
+				await mutation.mutateAsync(Payment);
 			}
+
+			notifySuccess('El pago se ha creado correctamente', 'Pago creado');
+			refetchClients();
+			if (closeModal) closeModal();
 		} catch (error) {
 			if (error instanceof Error) {
 				notifyError(error.message, 'Error al crear el pago');
 			}
 		} finally {
-			setSendingPayment(false);
+			new Promise((resolve) => setTimeout(resolve, 150)).then(() => {
+				setSendingPayment(false);
+			});
 		}
 	};
 
@@ -589,7 +561,7 @@ export default function Pay({
 							variant='outlined'
 							color='secondary'
 							onClick={handleCancel}
-							// Ahora el botón de cancelar siempre está habilitado
+							disabled={sendingPayment}
 						>
 							Cancelar
 						</Button>

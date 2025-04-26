@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
 	Box,
 	TextField,
@@ -8,10 +8,6 @@ import {
 	IconButton,
 	InputAdornment,
 	CircularProgress,
-	FormControl,
-	Select,
-	MenuItem,
-	SelectChangeEvent,
 } from '@mui/material';
 import {
 	Search as SearchIcon,
@@ -20,20 +16,35 @@ import {
 } from '@mui/icons-material';
 import ClientDetail from './clientDetail';
 import { getClient } from '../../../services/getClient';
-import { useClientList } from '../../../hooks/useClientList';
 import { getBCV } from '../../../services/BCBService';
 import PricePanel from './pricePanel';
 import { useQuery } from '@tanstack/react-query';
 import { IClientPayment } from '../../../interfaces/Interfaces';
+import { useBuildParams } from '../../../hooks/useBuildParams';
+import { ROLES, useAuth } from '../../../context/AuthContext';
+import Proveedor from './proveedor';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const SearchClient = () => {
-	const [identificacion, setIdentificacion] = useState('');
+	const navigate = useNavigate();
+	const location = useLocation();
+
+	// Obtener el valor de búsqueda de la URL al cargar el componente
+	const searchParams = new URLSearchParams(location.search);
+	const searchQuery = searchParams.get('search') || '';
+	const providerQuery = searchParams.get('provider') || '';
+
+	const [identificacion, setIdentificacion] = useState(searchQuery);
 	const [loading, setLoading] = useState(false);
 	const [clients, setClients] = useState<IClientPayment[]>([]);
 	const [error, setError] = useState('');
 	const [searching, setSearching] = useState(false);
 	const [bcvData, setBcvData] = useState<{ precio: number; fecha: string } | null>(null);
-	const { clientList, handleClientChange } = useClientList();
+	const [clientList, setClientList] = useState<string>(providerQuery);
+
+	const { user } = useAuth();
+
+	const buildParams = useBuildParams() || `?provider=${clientList}`;
 
 	const { data } = useQuery({
 		queryKey: ['bcvData'],
@@ -42,6 +53,21 @@ const SearchClient = () => {
 			return bcvData;
 		},
 	});
+
+	const handleClientChange = (client: string) => {
+		setClientList(client);
+
+		//Actualizar el parametro provider en la url
+		const params = new URLSearchParams(location.search);
+		params.set('provider', client);
+		navigate({ search: params.toString() }, { replace: true });
+	};
+
+	const disableButton = useMemo(() => {
+		if (user?.role !== ROLES.PROVIDER && !clientList) return true;
+
+		return false;
+	}, [user?.role, clientList]);
 
 	useEffect(() => {
 		try {
@@ -57,9 +83,15 @@ const SearchClient = () => {
 		}
 	}, [data]);
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e?.preventDefault();
+	// Efecto para realizar búsqueda automática si hay un valor en la URL
+	useEffect(() => {
+		if (searchQuery && (user?.role === ROLES.PROVIDER || clientList)) {
+			handleSearch();
+		}
+	}, []);
 
+	// Función separada para búsqueda que puede reutilizarse
+	const handleSearch = async () => {
 		if (!identificacion) {
 			setError('Por favor ingrese un nombre, cédula o identificación');
 			return;
@@ -71,7 +103,7 @@ const SearchClient = () => {
 		setError('');
 
 		try {
-			const response = await getClient(identificacion, clientList);
+			const response = await getClient(identificacion, buildParams);
 
 			if (response.length === 0) {
 				setError('No se encontraron clientes con esa búsqueda');
@@ -87,11 +119,34 @@ const SearchClient = () => {
 		}
 	};
 
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e?.preventDefault();
+
+		// Actualizar la URL con el valor de búsqueda
+		const params = new URLSearchParams(location.search);
+		params.set('search', identificacion);
+		navigate({ search: params.toString() }, { replace: true });
+
+		handleSearch();
+	};
+
 	const handleClear = () => {
 		setIdentificacion('');
 		setClients([]);
 		setError('');
 		setSearching(false);
+
+		// Eliminar el parámetro de búsqueda de la URL
+		const params = new URLSearchParams(location.search);
+		params.delete('search');
+		navigate({ search: params.toString() }, { replace: true });
+	};
+
+	const refetchSearch = (clients: IClientPayment[]) => {
+		setClients(clients);
+		setSearching(false);
+		setLoading(false);
+		setError('');
 	};
 
 	return (
@@ -101,7 +156,6 @@ const SearchClient = () => {
 
 			{/* Panel de búsqueda */}
 			<Paper
-				elevation={2}
 				sx={{
 					p: 3,
 					borderRadius: 2,
@@ -116,25 +170,12 @@ const SearchClient = () => {
 						mb: 2,
 					}}
 				>
-					<Typography component='h1' variant='h5'>
+					<Typography component='h2' variant='h5'>
 						Búsqueda de cliente
 					</Typography>
-					<FormControl sx={{ minWidth: 160, mr: 2 }} size='small'>
-						<Select
-							value={clientList}
-							onChange={(event: SelectChangeEvent<string>) =>
-								handleClientChange(event.target.value)
-							}
-							sx={{
-								borderRadius: 1,
-								'& .MuiSelect-icon': { color: 'white' },
-							}}
-							displayEmpty
-						>
-							<MenuItem value='ABDO77'>ABDO77</MenuItem>
-							<MenuItem value='Gianni'>Gianni</MenuItem>
-						</Select>
-					</FormControl>
+					{user?.role !== ROLES.PROVIDER && (
+						<Proveedor handleClientChange={handleClientChange} />
+					)}
 				</Box>
 				<Box component='form' onSubmit={handleSubmit}>
 					<TextField
@@ -180,7 +221,7 @@ const SearchClient = () => {
 							variant='contained'
 							color='primary'
 							startIcon={loading ? null : <SearchIcon />}
-							disabled={loading || !identificacion}
+							disabled={loading || !identificacion || disableButton}
 						>
 							{loading ? (
 								<CircularProgress size={24} color='inherit' />
@@ -215,7 +256,14 @@ const SearchClient = () => {
 			{/* Resultados de la búsqueda */}
 			{clients &&
 				clients.length > 0 &&
-				clients.map((client) => <ClientDetail key={client.id} client={client} />)}
+				clients.map((client) => (
+					<ClientDetail
+						key={client.id}
+						client={client}
+						refetchSearch={refetchSearch}
+						buildParams={buildParams}
+					/>
+				))}
 		</>
 	);
 };

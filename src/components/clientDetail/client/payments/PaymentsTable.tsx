@@ -28,6 +28,7 @@ import { useClientDetailsContext } from '../../../../context/ClientDetailContext
 import SimpleModalWrapper from '../../../common/ContainerForm';
 import PaymentDetails from './PaymentDetails';
 import SendPay from './SendPay';
+import { TableRowClickHandler } from '../../../common/TableRowClickHandler';
 
 interface PaymentsTableProps {
 	payments: Pago[];
@@ -68,11 +69,10 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 	const handleRowClick = (payment: Pago) => {
 		setSelectedPayment(payment);
 		// Activar programáticamente el modal después de que el estado se actualice
-		setTimeout(() => {
-			if (modalTriggerRef.current) {
-				modalTriggerRef.current.click();
-			}
-		}, 0);
+
+		if (modalTriggerRef.current) {
+			modalTriggerRef.current.click();
+		}
 	};
 
 	// Filter and sort payments
@@ -248,11 +248,19 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 							</TableRow>
 						) : filteredPayments.length > 0 ? (
 							filteredPayments.map((payment) => (
-								<TableRow
+								<TableRowClickHandler
 									key={payment._id}
-									hover
-									onClick={() => handleRowClick(payment)}
-									sx={{ cursor: 'pointer' }}
+									onRowClick={() => handleRowClick(payment)}
+									sx={{
+										cursor: 'pointer',
+										minHeight: 37,
+										height: 37,
+										maxHeight: 37,
+										paddingY: 1,
+										'&:hover': {
+											backgroundColor: 'rgba(0, 0, 0, 0.04)',
+										},
+									}}
 								>
 									<TableCell>{payment.motivo}</TableCell>
 									<TableCell>{payment.tipoPago}</TableCell>
@@ -289,17 +297,21 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 									<TableCell align='center'>
 										<Box
 											sx={{ display: 'flex', justifyContent: 'center' }}
-											onClick={(e) => e.stopPropagation()} // Prevenir que el clic en el botón active el modal
+											onClick={(e) => e.stopPropagation()}
 										>
 											<SendPay paymentId={payment._id} />
 											<Tooltip title='Descargar recibo'>
-												<IconButton size='small' color='primary'>
+												<IconButton
+													size='small'
+													color='primary'
+													disabled
+												>
 													<DownloadIcon />
 												</IconButton>
 											</Tooltip>
 										</Box>
 									</TableCell>
-								</TableRow>
+								</TableRowClickHandler>
 							))
 						) : (
 							<TableRow>

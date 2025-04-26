@@ -5,7 +5,8 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 // Definimos qué rutas están permitidas para cada rol
 const ROLE_ROUTES: Record<RoleType, string[]> = {
 	[ROLES.SUPERADMIN]: ['*'], // Superadmin tiene acceso a todas las rutas
-	[ROLES.ADMIN]: ['/clients', '/client', '/payments'], // Admin tiene acceso a estas rutas
+	[ROLES.ACCOUNTANT]: ['/clients', '/client', '/payments'], // Contador tiene acceso a estas rutas
+	[ROLES.PROVIDER]: ['/clients', '/client', '/payments'], // Provider tiene acceso a estas rutas
 	[ROLES.PAYMENT_USER]: ['/payments'], // Usuario de pagos solo tiene acceso a payments
 };
 
@@ -71,7 +72,7 @@ export default function ProtectedRouter({ requiredRoles = [] }: ProtectedRouterP
 	if (!hasRoleAccess()) {
 		return (
 			<Navigate
-				to={user?.role === ROLES.PAYMENT_USER ? '/payments' : '/home'}
+				to={user?.role === ROLES.PAYMENT_USER ? '/payments' : '/'}
 				replace
 				state={{ from: location }}
 			/>

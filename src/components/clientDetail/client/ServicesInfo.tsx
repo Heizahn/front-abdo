@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
-import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 import { Link } from '@mui/material';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import EditableSelectField from '../common/EditableSelectfield';
@@ -10,7 +9,11 @@ import { SelectList } from '../../../interfaces/types';
 import EditableInfoField from '../common/EditableInfoField';
 
 interface ServicesInfoProps {
-	data: ClientDetails | null;
+	data: {
+		router: string;
+		ipv4: string;
+		plan: string;
+	};
 }
 
 const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
@@ -26,7 +29,7 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 			</Typography>
 			{!isEditing ? (
 				<>
-					<InfoField label='Router' value={data?.routers?.nombre || 'N/A'} />
+					<InfoField label='Router' value={data.router || 'N/A'} />
 					<InfoField
 						label='IPv4'
 						value={
@@ -38,20 +41,20 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 							'N/A'
 						}
 					/>
-					<InfoField label='Plan' value={data?.plan?.nombre || 'N/A'} />
+					<InfoField label='Plan' value={data.plan || 'N/A'} />
 				</>
 			) : (
 				<>
 					<EditableSelectField
 						label='Router'
 						selectList={routerList || []}
-						valueInitial={data?.routers?.nombre || 'N/A'}
+						valueInitial={data.router || 'N/A'}
 						name='routersId'
 					/>
 
 					<EditableInfoField
 						label='IPv4'
-						valueInitial={data?.ipv4 || 'N/A'}
+						valueInitial={data.ipv4 || 'N/A'}
 						name='ipv4'
 					/>
 
@@ -59,7 +62,7 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 						label='Plan'
 						name='planesId'
 						selectList={planesList || []}
-						valueInitial={data?.plan?.nombre || 'N/A'}
+						valueInitial={data.plan || 'N/A'}
 					/>
 				</>
 			)}

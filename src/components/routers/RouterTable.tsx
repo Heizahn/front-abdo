@@ -19,6 +19,7 @@ import { useFetchData } from '../../hooks/useQuery';
 import SimpleModalWrapper from '../common/ContainerForm';
 import Create from './Create';
 import { useNavigate } from 'react-router-dom';
+import { TableRowClickHandler } from '../common/TableRowClickHandler';
 
 interface Router {
 	_id: string;
@@ -98,6 +99,25 @@ const RouterTable: React.FC = () => {
 				if (valueA == null && valueB == null) return 0;
 				if (valueA == null) return order === 'asc' ? -1 : 1;
 				if (valueB == null) return order === 'asc' ? 1 : -1;
+
+				if (orderBy === 'ip') {
+					const getIpOctets = (ip: string | number): number[] => {
+						if (typeof ip !== 'string') return [0, 0, 0, 0];
+						return ip.split('.').map((octet) => parseInt(octet, 10) || 0);
+					};
+
+					const octetsA = getIpOctets(valueA as string);
+					const octetsB = getIpOctets(valueB as string);
+
+					for (let i = 0; i < 4; i++) {
+						if (octetsA[i] !== octetsB[i]) {
+							return order === 'asc'
+								? octetsA[i] - octetsB[i]
+								: octetsB[i] - octetsA[i];
+						}
+					}
+					return 0;
+				}
 
 				if (typeof valueA === 'number' && typeof valueB === 'number') {
 					return order === 'asc' ? valueA - valueB : valueB - valueA;
@@ -275,17 +295,19 @@ const RouterTable: React.FC = () => {
 							) : visibleData.length > 0 ? (
 								<>
 									{visibleData.map((equipment) => (
-										<TableRow
+										<TableRowClickHandler
 											key={equipment._id}
-											hover
+											onRowClick={() => {
+												navigate(`/router/${equipment._id}`);
+											}}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
 													backgroundColor: 'rgba(0, 0, 0, 0.04)',
 												},
-											}}
-											onClick={() => {
-												navigate(`/router/${equipment._id}`);
+												'&:nth-of-type(odd)': {
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
+												},
 											}}
 										>
 											<TableCell>{equipment.nombre || '-'}</TableCell>
@@ -298,7 +320,7 @@ const RouterTable: React.FC = () => {
 													? renderEstadoChip(equipment.estado)
 													: '-'}
 											</TableCell>
-										</TableRow>
+										</TableRowClickHandler>
 									))}
 
 									{isLoadingMore && (

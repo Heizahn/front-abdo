@@ -33,7 +33,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 		'clientsPieChart',
 		`client-${clientId}`,
 		'all-clients',
-		'paysBarChart0',
+		`paysPieChart0-${clientId}`,
+		`payments-${clientId}`,
 		'lastPays',
 	];
 	const { user } = useAuth();
@@ -43,6 +44,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 		try {
 			await axios.patch(HOST_API + '/paysClient0/' + payment._id, {
 				estado: 'Anulado',
+				editadoPor: user?.id,
+				fechaEdicion: new Date().toISOString(),
 			});
 
 			queryKeys.forEach((key) => {
@@ -54,6 +57,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 			notifySuccess('El pago se ha anulado correctamente', 'Pago anulado');
 		} catch (error) {
 			if (error instanceof Error) {
+				console.log(error);
 				notifyError(error.message, 'Error al anular el pago');
 			}
 		}

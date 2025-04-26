@@ -17,7 +17,7 @@ export default function QuitRouterButton({ clientId }: { clientId: string }) {
 	// Hooks y parámetros
 	const { notifyError, notifyInfo } = useNotification();
 	const { id: routerId } = useParams();
-	const queryKeys = ['router-' + routerId, 'client-', 'all-clients'];
+	const queryKeys = ['router-' + routerId, 'client-', 'all-clients', 'routersList'];
 
 	// Acción principal
 	const removeClientFromRouter = async () => {

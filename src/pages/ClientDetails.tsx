@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, Breadcrumbs, Link, Typography } from '@mui/material';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import ClientHeader from '../components/clientDetail/layout/ClientHeader';
-import Navigation from '../components/clientDetail/layout/Navigation';
+import Navigation from '../components/common/Navigation';
 import ClientDetailsCard from '../components/clientDetail/client/ClientDetailCard';
 import ClientAccounts from '../components/clientDetail/client/Invoices/ClientAccounts';
 import ClientPayments from '../components/clientDetail/client/payments/ClientPayments';
@@ -15,6 +15,13 @@ const ClientDetails = () => {
 	const navigate = useNavigate();
 	// Estado para controlar qué pestaña está activa
 	const [activeTab, setActiveTab] = useState('details');
+
+	const tabs = [
+		{ label: 'Detalles del Cliente', value: 'details' },
+		{ label: 'Cuentas por Cobrar', value: 'accounts' },
+		{ label: 'Pagos', value: 'payments' },
+		{ label: 'Estadísticas', value: 'stats' },
+	];
 
 	// Manejador para cambios de pestaña
 	const handleTabChange = (tab: string) => {
@@ -66,10 +73,13 @@ const ClientDetails = () => {
 
 					<ClientHeader activeTab={activeTab} />
 
-					<Navigation activeTab={activeTab} onTabChange={handleTabChange} />
+					<Navigation
+						activeTab={activeTab}
+						onTabChange={handleTabChange}
+						tabs={tabs}
+					/>
 				</Box>
 
-				{/* Render el contenido de la pestaña activa */}
 				{renderTabContent()}
 			</ClientDetailsProvider>
 		</MainLayout>

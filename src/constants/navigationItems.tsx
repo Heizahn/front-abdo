@@ -18,13 +18,13 @@ export const navigationItems = [
 		text: 'Clientes',
 		icon: <PeopleIcon />,
 		path: '/clients',
-		allowedRoles: [ROLES.SUPERADMIN, ROLES.ADMIN], // Superadmin y admin pueden ver clientes
+		allowedRoles: [ROLES.SUPERADMIN, ROLES.ACCOUNTANT, ROLES.PROVIDER], // Superadmin y admin pueden ver clientes
 	},
 	{
 		text: 'Pagos',
 		icon: <AttachMoneyIcon />,
 		path: '/payments',
-		allowedRoles: [ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.PAYMENT_USER], // Todos pueden ver pagos
+		allowedRoles: [ROLES.SUPERADMIN, ROLES.ACCOUNTANT, ROLES.PAYMENT_USER, ROLES.PROVIDER], // Todos pueden ver pagos
 	},
 	{
 		text: 'Servicios',
@@ -47,12 +47,14 @@ export const navigationItems = [
 ];
 
 // Función de utilidad para filtrar items por rol
-export const getNavigationItemsByRole = (userRole: 0 | 1 | 2) => {
+export const getNavigationItemsByRole = (userRole: 0 | 1 | 2 | 3) => {
 	// Si el rol es undefined o null, no mostrar ningún ítem
 	if (userRole === undefined || userRole === null) {
 		return [];
 	}
 
 	// Filtrar los items que el rol del usuario puede ver
-	return navigationItems.filter((item) => item.allowedRoles.includes(userRole));
+	return navigationItems.filter((item) =>
+		(item.allowedRoles as (0 | 1 | 2 | 3)[]).includes(userRole),
+	);
 };

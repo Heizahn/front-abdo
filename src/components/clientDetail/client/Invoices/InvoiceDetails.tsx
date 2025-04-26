@@ -7,7 +7,7 @@ import { HOST_API } from '../../../../config/env';
 import { queryClient } from '../../../../query-client';
 import { useParams } from 'react-router-dom';
 import { useNotification } from '../../../../context/NotificationContext';
-
+import { useAuth } from '../../../../context/AuthContext';
 interface InvoiceDetailsProps {
 	invoice: Factura;
 	onClose?: () => void;
@@ -28,13 +28,21 @@ const formatDate = (dateString: string) => {
 
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose }) => {
 	const { id: clientId } = useParams();
-	const queryKeys = ['clientsPieChart', `client-${clientId}`, 'all-clients'];
+	const { user } = useAuth();
+	const queryKeys = [
+		'clientsPieChart',
+		`client-${clientId}`,
+		'all-clients',
+		'invoices-' + clientId,
+	];
 	const { notifyError, notifySuccess } = useNotification();
 
 	const handleAnular = async () => {
 		try {
 			await axios.patch(HOST_API + '/billsClient0/' + invoice._id, {
 				estado: 'Anulado',
+				editadoPor: user?.id,
+				fechaEdicion: new Date().toISOString(),
 			});
 
 			queryKeys.forEach((key) => {

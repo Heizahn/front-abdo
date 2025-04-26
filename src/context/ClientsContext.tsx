@@ -1,13 +1,6 @@
-import React, {
-	useState,
-	useContext,
-	createContext,
-	ReactNode,
-	useMemo,
-	useEffect,
-} from 'react';
+import React, { useState, useContext, createContext, ReactNode, useMemo } from 'react';
 import { useFetchData } from '../hooks/useQuery';
-import { Client, ClientsContextType, Plan } from '../interfaces/Interfaces';
+import { Client, ClientsContextType } from '../interfaces/Interfaces';
 import { useLocation } from 'react-router-dom';
 import { useDebounce } from '../hooks/useDebounce';
 
@@ -51,63 +44,31 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
 
 	const [clientStatsFiltered, setClientStatsFiltered] = useState(initialFilterState());
 	const debouncedSearchTerms = useDebounce(searchTerms, 300);
-	const [combinedClients, setCombinedClients] = useState<Client[]>([]);
 
-	// Usar el hook personalizado para obtener todos los datos de clientes
 	const {
-		data: clientsData,
+		data,
 		isLoading: isClientsLoading,
 		refetch: refetchClients,
 	} = useFetchData<Client[]>('/clientsAll', 'all-clients');
 
-	// Nuevo endpoint para obtener solo los planes
-	const { data: plansData, isLoading: isPlansLoading } = useFetchData<Plan[]>(
-		'/clientsAllPlansName',
-		'all-plans',
-	);
-
-	// Inicialmente, configurar los clientes sin esperar los planes
-	useEffect(() => {
-		if (clientsData) {
-			setCombinedClients(clientsData);
+	const clients = useMemo(() => {
+		if (data) {
+			return data;
 		}
-	}, [clientsData]);
-
-	// Cuando los planes estén disponibles, actualizar los clientes con nombres de planes
-	useEffect(() => {
-		if (clientsData && plansData) {
-			// Crear un mapa de planes para búsqueda rápida por ID de cliente
-			const plansMap = new Map<string | number, string>();
-			plansData.forEach((plan) => {
-				plansMap.set(plan.id, plan.plan);
-			});
-
-			// Actualizar los clientes con los nombres de planes
-			const updatedClients = clientsData.map((client) => {
-				const planName = plansMap.has(client.id)
-					? plansMap.get(client.id)
-					: client.plan;
-				return {
-					...client,
-					plan: planName,
-				};
-			});
-
-			setCombinedClients(updatedClients);
-		}
-	}, [clientsData, plansData]);
+		return [];
+	}, [data]);
 
 	const totalClients = useMemo(() => {
-		return combinedClients.length;
-	}, [combinedClients]);
+		return clients.length;
+	}, [clients]);
 
 	// Filtrar clientes según búsqueda y estado seleccionado
 	const filteredClients = useMemo(() => {
-		if (combinedClients.length === 0) {
+		if (clients.length === 0) {
 			return [];
 		}
 
-		let result = [...combinedClients];
+		let result = [...clients];
 
 		// Primero aplicar el filtro de búsqueda
 		if (debouncedSearchTerms) {
@@ -142,7 +103,7 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
 		}
 
 		return result;
-	}, [combinedClients, debouncedSearchTerms, clientStatsFiltered]);
+	}, [clients, debouncedSearchTerms, clientStatsFiltered]);
 
 	// Manejar cambio en la búsqueda
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,7 +111,7 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
 	};
 
 	// Determinar si se está cargando alguno de los datos
-	const loading = isClientsLoading || isPlansLoading;
+	const loading = isClientsLoading;
 
 	return (
 		<ClientsContext.Provider
@@ -160,7 +121,7 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
 				clientStatsFiltered,
 				setClientStatsFiltered,
 				handleSearchChange,
-				clients: combinedClients,
+				clients,
 				filteredClients,
 				loading,
 				totalClients,

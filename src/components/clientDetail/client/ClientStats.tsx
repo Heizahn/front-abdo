@@ -24,11 +24,25 @@ import {
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import { useFetchData } from '../../../hooks/useQuery';
 import { useParams } from 'react-router-dom';
-import { ClientStats as TipoPagoStat } from '../../../interfaces/InterfacesClientDetails';
+import {
+	Pago,
+	ClientStats as TipoPagoStat,
+} from '../../../interfaces/InterfacesClientDetails';
 
 const ClientStats = () => {
-	const { client, loading: clientLoading, error: clientError } = useClientDetailsContext();
+	const { client, isClientLoading, error: clientError } = useClientDetailsContext();
 	const { id } = useParams<{ id: string }>();
+
+	const { data, isLoading } = useFetchData<Pago[]>(
+		`/client/${id}/payments`,
+		'payments-' + id,
+	);
+
+	const payments = useMemo(() => {
+		if (!data) return [];
+
+		return data.filter((pago) => pago.estado === 'Activo');
+	}, [data]);
 
 	// Usando el hook useFetchData para obtener los datos de tipos de pago
 	const {
@@ -42,12 +56,12 @@ const ClientStats = () => {
 
 	// Generar datos para el gráfico de barras a partir de pagosTabla
 	const barChartData = useMemo(() => {
-		if (!client?.pagosTabla || client.pagosTabla.length === 0) return [];
+		if (!payments || payments.length === 0) return [];
 
 		// Contar pagos por día
 		const pagosPorDia: Record<string, number> = {};
 
-		client.pagosTabla.forEach((pago) => {
+		payments.forEach((pago) => {
 			// Extraer el día del mes de la fecha de pago
 			const fechaPago = new Date(pago.fecha);
 			const dia = fechaPago.getDate().toString();
@@ -60,7 +74,7 @@ const ClientStats = () => {
 		return Object.entries(pagosPorDia)
 			.map(([dia, pagos]) => ({ dia, pagos }))
 			.sort((a, b) => parseInt(a.dia) - parseInt(b.dia));
-	}, [client?.pagosTabla]);
+	}, [payments]);
 
 	// Generar datos para el gráfico de pie a partir de tiposPagoData
 	const pieChartData = useMemo(() => {
@@ -74,7 +88,7 @@ const ClientStats = () => {
 
 	// Calcular totales y porcentajes
 	const stats = useMemo(() => {
-		if (!tiposPagoData || !client?.pagosTabla) {
+		if (!tiposPagoData || !payments) {
 			return {
 				totalPagos: 0,
 				totalUSD: 0,
@@ -85,17 +99,14 @@ const ClientStats = () => {
 		}
 
 		// Calcular totales
-		const totalPagos = client.pagosTabla.length;
+		const totalPagos = payments.length;
 		const usdPayments =
 			tiposPagoData.find((item: { tipo: string }) => item.tipo === 'USD')?.count || 0;
 		const vesPayments =
 			tiposPagoData.find((item: { tipo: string }) => item.tipo === 'VES')?.count || 0;
 
 		// Calcular monto total en USD
-		const montoTotalUSD = client.pagosTabla.reduce(
-			(sum, pago) => sum + (pago.montoUSD || 0),
-			0,
-		);
+		const montoTotalUSD = payments.reduce((sum, pago) => sum + (pago.montoUSD || 0), 0);
 
 		// Calcular porcentajes para el gráfico
 		const total = usdPayments + vesPayments;
@@ -113,10 +124,10 @@ const ClientStats = () => {
 			montoTotalUSD,
 			percentages,
 		};
-	}, [client?.pagosTabla, tiposPagoData]);
+	}, [payments, tiposPagoData]);
 
 	// Mostrar loader mientras se cargan los datos
-	if (clientLoading || tiposLoading) {
+	if (isClientLoading || tiposLoading || isLoading) {
 		return (
 			<Box
 				sx={{

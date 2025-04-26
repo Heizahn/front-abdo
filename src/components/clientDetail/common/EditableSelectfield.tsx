@@ -15,7 +15,7 @@ import { SelectList } from '../../../interfaces/types';
 
 interface EditableInfoFieldProps {
 	label: string;
-	valueInitial: string | number | boolean;
+	valueInitial: string | number | boolean | string[];
 	name: string;
 	selectList: SelectList[];
 }
@@ -39,7 +39,13 @@ const EditableSelectField = ({
 
 	useEffect(() => {
 		if (selectList.length > 0) {
-			const selectedItem = selectList.filter((item) => item.nombre === valueInitial)[0];
+			let selectedItem;
+			if (Array.isArray(valueInitial)) {
+				selectedItem = selectList.find((item) => valueInitial.includes(item.nombre));
+			} else {
+				selectedItem = selectList.find((item) => item.nombre === valueInitial);
+			}
+
 			setClientUpdate((prevData: ClientUpdateType) => ({
 				...prevData,
 				[name]: selectedItem ? selectedItem._id : null,

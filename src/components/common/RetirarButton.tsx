@@ -25,24 +25,25 @@ export default function SuspendedClient({
 	const { refetchClients } = useClients();
 	const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 	const { user } = useAuth();
+
 	const handleStatus = async () => {
 		const newStatus: {
-			suspendidoPor?: string;
-			fechaSuspension?: string;
+			estado: string;
+			retiradoPor?: string;
+			fechaRetiro?: string;
 			editadoPor?: string;
 			fechaEdicion?: string;
-			estado: string;
 		} = {
 			estado: '',
 		};
 
-		if (clientStatus === 'Activo') {
-			newStatus.suspendidoPor = user?.id as string;
-			newStatus.fechaSuspension = new Date().toISOString();
-			newStatus.estado = 'Suspendido';
+		if (clientStatus === 'Suspendido') {
+			newStatus.retiradoPor = user?.id as string;
+			newStatus.fechaRetiro = new Date().toISOString();
+			newStatus.estado = 'Retirado';
 			newStatus.editadoPor = user?.id as string;
 			newStatus.fechaEdicion = new Date().toISOString();
-		} else if (clientStatus === 'Suspendido') {
+		} else if (clientStatus === 'Retirado') {
 			newStatus.editadoPor = user?.id as string;
 			newStatus.fechaEdicion = new Date().toISOString();
 			newStatus.estado = 'Activo';
@@ -55,7 +56,7 @@ export default function SuspendedClient({
 		if (status === 204) {
 			notifySuccess(
 				`El cliente se ha ${
-					clientStatus === 'Suspendido' ? 'activado' : 'suspendido'
+					clientStatus === 'Retirado' ? 'reactivado' : 'retirado'
 				} correctamente`,
 				'Cliente actualizado',
 			);
@@ -91,14 +92,14 @@ export default function SuspendedClient({
 	if (isButton) {
 		return (
 			<>
-				{clientStatus === 'Suspendido' ? (
+				{clientStatus === 'Retirado' ? (
 					<Button
 						size='medium'
 						color='success'
 						variant='contained'
 						onClick={handleShowConfirmation}
 					>
-						Activar
+						Reactivar
 					</Button>
 				) : (
 					<Button
@@ -107,7 +108,7 @@ export default function SuspendedClient({
 						variant='contained'
 						onClick={handleShowConfirmation}
 					>
-						Suspender
+						Retirar
 					</Button>
 				)}
 				{/* Confirmation Dialog */}
@@ -116,18 +117,18 @@ export default function SuspendedClient({
 					onClose={handleCancelConfirmation}
 					onConfirm={handleConfirm}
 					title={
-						clientStatus === 'Suspendido'
-							? 'Confirmar activación'
-							: 'Confirmar suspensión'
+						clientStatus === 'Retirado'
+							? 'Confirmar reactivación'
+							: 'Confirmar retirada'
 					}
 					message={
-						clientStatus === 'Suspendido'
-							? '¿Está seguro que desea activar este cliente?'
-							: '¿Está seguro que desea suspender este cliente?'
+						clientStatus === 'Retirado'
+							? '¿Está seguro que desea reactivar este cliente?'
+							: '¿Está seguro que desea retirar este cliente?'
 					}
-					confirmText={clientStatus === 'Suspendido' ? 'Activar' : 'Suspender'}
+					confirmText={clientStatus === 'Retirado' ? 'Reactivar' : 'Retirar'}
 					cancelText='Cancelar'
-					confirmColor={clientStatus === 'Suspendido' ? 'success' : 'error'}
+					confirmColor={clientStatus === 'Retirado' ? 'success' : 'error'}
 				/>
 			</>
 		);
@@ -135,14 +136,14 @@ export default function SuspendedClient({
 
 	return (
 		<>
-			{clientStatus === 'Suspendido' ? (
-				<Tooltip title='Activar cliente'>
+			{clientStatus === 'Retirado' ? (
+				<Tooltip title='Reactivar cliente'>
 					<IconButton size='medium' color='success' onClick={handleShowConfirmation}>
 						<CheckIcon fontSize='medium' color='success' />
 					</IconButton>
 				</Tooltip>
 			) : (
-				<Tooltip title='Suspender cliente'>
+				<Tooltip title='Retirar cliente'>
 					<IconButton size='medium' color='error' onClick={handleShowConfirmation}>
 						<SuspendeIcon fontSize='medium' color='error' />
 					</IconButton>
@@ -155,18 +156,18 @@ export default function SuspendedClient({
 				onClose={handleCancelConfirmation}
 				onConfirm={handleConfirm}
 				title={
-					clientStatus === 'Suspendido'
-						? 'Confirmar activación'
-						: 'Confirmar suspensión'
+					clientStatus === 'Retirado'
+						? 'Confirmar reactivación'
+						: 'Confirmar retirada'
 				}
 				message={
-					clientStatus === 'Suspendido'
-						? '¿Está seguro que desea activar este cliente?'
-						: '¿Está seguro que desea suspender este cliente?'
+					clientStatus === 'Retirado'
+						? '¿Está seguro que desea reactivar este cliente?'
+						: '¿Está seguro que desea retirar este cliente?'
 				}
-				confirmText={clientStatus === 'Suspendido' ? 'Activar' : 'Suspender'}
+				confirmText={clientStatus === 'Retirado' ? 'Reactivar' : 'Retirar'}
 				cancelText='Cancelar'
-				confirmColor={clientStatus === 'Suspendido' ? 'success' : 'error'}
+				confirmColor={clientStatus === 'Retirado' ? 'success' : 'error'}
 			/>
 		</>
 	);

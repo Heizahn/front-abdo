@@ -1,15 +1,12 @@
 // src/context/ClientDetailContext.tsx
 import React, { createContext, ReactNode, useContext, useState } from 'react';
-import { ClientDetails } from '../interfaces/InterfacesClientDetails';
-
 import { useParams } from 'react-router-dom';
-import { useFetchData, useMutateDate } from '../hooks/useQuery';
 import axios from 'axios';
 import { HOST_API } from '../config/env';
 import { useNotification } from './NotificationContext';
-import { Subscription } from '../interfaces/types';
 import { queryClient } from '../query-client';
-import authService from '../services/authServices';
+import { useFetchData } from '../hooks/useQuery';
+import { ClientDetails, Pago } from '../interfaces/InterfacesClientDetails';
 
 export interface ClientUpdateType {
 	nombre: string;
@@ -27,26 +24,30 @@ export interface ClientUpdateType {
 
 // Definir la interfaz del contexto
 interface ClientContextType {
-	client: ClientDetails | null;
 	clientUpdate: ClientUpdateType | null;
-	loading: boolean;
-	error: Error | null;
+	client: ClientDetails | null;
 	isEditing: boolean;
 	setIsEditing: (isEditing: boolean) => void;
 	setClientUpdate: React.Dispatch<React.SetStateAction<ClientUpdateType>>;
 	updateClient: () => void;
+	error: Error | null;
+	isClientLoading: boolean;
+	payments: Pago[];
+	uploadPayments: (payments: Pago[]) => void;
 }
 
 // Crear el contexto con valores iniciales
 const ClientContext = createContext<ClientContextType>({
-	client: null,
 	clientUpdate: null,
-	loading: true,
-	error: null,
+	client: null,
 	isEditing: false,
 	setIsEditing: () => {},
 	setClientUpdate: () => {},
 	updateClient: () => {},
+	error: null,
+	isClientLoading: false,
+	payments: [],
+	uploadPayments: () => {},
 });
 
 export const ClientDetailsProvider = ({ children }: { children: ReactNode }) => {
@@ -65,39 +66,13 @@ export const ClientDetailsProvider = ({ children }: { children: ReactNode }) => 
 		routersId: '',
 		fechaPago: 0,
 	});
+	const [payments, setPayments] = useState<Pago[]>([]);
 	const { notifySuccess, notifyError } = useNotification();
 
 	const queryKeys = [`client-${id}`, 'all-clients'];
 
-	const mutationSus = useMutateDate<
-		{
-			fecha: string;
-			creadoPor: string;
-			planesId: string;
-			clientesId: string;
-		},
-		Subscription
-	>('/suscripciones', {
-		onSuccess: () => {
-			notifySuccess('Cliente actualizado correctamente', 'Cliente actualizado');
-			queryKeys.forEach((key) => {
-				queryClient.invalidateQueries({
-					queryKey: [key],
-					predicate: (query) => query.queryKey.includes(key),
-				});
-			});
-		},
-		onError: (err) => {
-			if (err instanceof Error) {
-				notifyError(err.message, 'Error al agregar el plan');
-			}
-		},
-	});
 	const updateClient = async () => {
 		try {
-			console.log('updateClient');
-			console.log(clientUpdate);
-
 			if (clientUpdate) {
 				await axios.patch(`${HOST_API}/clientes/${id}`, {
 					nombre: clientUpdate.nombre,
@@ -109,54 +84,56 @@ export const ClientDetailsProvider = ({ children }: { children: ReactNode }) => 
 					coordenadas: clientUpdate.coordenadas,
 					ipv4: clientUpdate.ipv4,
 					routersId: clientUpdate.routersId,
+					subscription: clientUpdate.planesId,
 				});
 			} else {
 				throw new Error('No hay datos para actualizar');
 			}
 
-			await mutationSus.mutateAsync({
-				clientesId: id as string,
-				planesId: clientUpdate.planesId,
-				fecha: new Date().toISOString(),
-				creadoPor: (await authService.profile()).id,
+			queryKeys.forEach((key) => {
+				queryClient.invalidateQueries({
+					queryKey: [key],
+					predicate: (query) => query.queryKey.includes(key),
+				});
 			});
 
-			setIsEditing(false);
+			notifySuccess('Cliente actualizado correctamente', 'Cliente actualizado');
 		} catch (error) {
 			if (error instanceof Error) {
 				notifyError(error.message, 'Error al actualizar el cliente');
 			}
+		} finally {
+			setIsEditing(false);
 		}
 	};
 
 	const {
-		data,
-		isLoading: loading,
+		data: client,
+		isLoading: isClientLoading,
 		error,
-	} = useFetchData<ClientDetails[]>(`/client/${id}`, `client-${id}`, {
-		gcTime: 30000,
-	});
+	} = useFetchData<ClientDetails>(`/client/${id}/details`, 'client-' + id);
 
-	if (data) {
-		const client = data[0];
-
-		return (
-			<ClientContext.Provider
-				value={{
-					clientUpdate,
-					client,
-					loading,
-					error,
-					isEditing,
-					setIsEditing,
-					setClientUpdate,
-					updateClient,
-				}}
-			>
-				{children}
-			</ClientContext.Provider>
-		);
-	}
+	const uploadPayments = (payments: Pago[]) => {
+		setPayments(payments);
+	};
+	return (
+		<ClientContext.Provider
+			value={{
+				clientUpdate,
+				isEditing,
+				client: client ?? null,
+				setIsEditing,
+				setClientUpdate,
+				updateClient,
+				error,
+				isClientLoading,
+				payments,
+				uploadPayments,
+			}}
+		>
+			{children}
+		</ClientContext.Provider>
+	);
 };
 
 export const useClientDetailsContext = () => useContext(ClientContext);

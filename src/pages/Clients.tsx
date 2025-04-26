@@ -6,8 +6,10 @@ import FilterStatusList from '../components/clients/filterStatusList';
 import SearchInput from '../components/clients/SearchInput';
 import { ClientsProvider } from '../context/ClientsContext';
 import Create from '../components/clients/Create';
+import { useAuth, ROLES } from '../context/AuthContext';
 
 export default function Clients() {
+	const { user } = useAuth();
 	return (
 		<MainLayout title='Clientes'>
 			<ClientsProvider>
@@ -34,17 +36,18 @@ export default function Clients() {
 							<FilterStatusList />
 						</Box>
 
-						<Box>
-							<Create />
-						</Box>
+						{user?.role !== ROLES.PAYMENT_USER &&
+							user?.role !== ROLES.ACCOUNTANT && (
+								<Box>
+									<Create />
+								</Box>
+							)}
 					</Box>
 					<Box
 						sx={{
 							display: 'flex',
 							justifyContent: 'space-between',
 							alignItems: 'center',
-							px: 2,
-							py: 1,
 							bgcolor: 'background.default',
 						}}
 					>

@@ -1,20 +1,70 @@
-import { Box, Typography, Button, Avatar, Stack } from '@mui/material';
+import { Box, Typography, Button, Avatar, Stack, Skeleton } from '@mui/material';
 import { PersonRounded as PersonIcon } from '@mui/icons-material';
 import StatusBadge from '../common/StatusBadge';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import SuspendedClient from '../../common/SuspendedClient';
 import ConfirmDialog from '../../common/Confirm';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import RetirarButton from '../../common/RetirarButton';
 
 const ClientHeader = ({ activeTab }: { activeTab: string }) => {
-	const { client, isEditing, setIsEditing, updateClient } = useClientDetailsContext();
+	const { client, isEditing, setIsEditing, updateClient, isClientLoading, error } =
+		useClientDetailsContext();
 	const [showConfirmation, setShowConfirmation] = useState(false);
+	const navigate = useNavigate();
 
 	const handleConfirm = () => {
 		updateClient();
 		setShowConfirmation(false);
 	};
 
+	if (isClientLoading) {
+		return (
+			<Box
+				sx={{
+					py: 3,
+				}}
+			>
+				<Skeleton
+					variant='rectangular'
+					width='100%'
+					height={100}
+					sx={{ borderRadius: 3 }}
+				/>
+			</Box>
+		);
+	}
+
+	if (error) {
+		return (
+			<Box
+				sx={{
+					py: 3,
+				}}
+			>
+				<Typography variant='h5' component='h1'>
+					Error al cargar el cliente
+				</Typography>
+				{error.stack && error.stack.includes('403') ? (
+					<Typography variant='body2' color='error'>
+						No tienes permisos para ver este cliente
+					</Typography>
+				) : error.stack && error.stack.includes('404') ? (
+					<Typography variant='body2' color='error'>
+						Cliente no encontrado
+					</Typography>
+				) : (
+					<Typography variant='body2' color='error'>
+						(Bad Request) Formato del cliente no válido
+					</Typography>
+				)}
+				<Button onClick={() => navigate('/clients')} variant='outlined' sx={{ mt: 2 }}>
+					Volver Clientes
+				</Button>
+			</Box>
+		);
+	}
 	return (
 		<Box
 			sx={{
@@ -65,11 +115,22 @@ const ClientHeader = ({ activeTab }: { activeTab: string }) => {
 				)}
 
 				{!isEditing ? (
-					<SuspendedClient
-						clientId={client?.id as string}
-						isButton={true}
-						clientStatus={client?.estado as string}
-					/>
+					<>
+						{client?.estado !== 'Retirado' && (
+							<SuspendedClient
+								clientId={client?.id as string}
+								isButton={true}
+								clientStatus={client?.estado as string}
+							/>
+						)}
+						{client?.estado !== 'Activo' && (
+							<RetirarButton
+								clientId={client?.id as string}
+								isButton={true}
+								clientStatus={client?.estado as string}
+							/>
+						)}
+					</>
 				) : (
 					<Button
 						variant='contained'

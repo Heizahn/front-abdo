@@ -1,6 +1,5 @@
 import { Box, Card, CardContent, Divider, Grid, Typography } from '@mui/material';
 import {
-	AttachMoney as MoneyIcon,
 	Speed as SpeedIcon,
 	Wallet as WalletIcon,
 	Diamond as DiamondIcon,
@@ -24,7 +23,7 @@ export default function PricePanel({ bcvData }: PricePanelProps) {
 
 	return (
 		<Card variant='outlined' sx={{ mb: 3 }}>
-			<CardContent sx={{ p: 2 }}>
+			<CardContent sx={{ paddingX: 2 }}>
 				<Grid container spacing={2}>
 					<Grid item xs={12} md={3}>
 						<Box
@@ -32,7 +31,6 @@ export default function PricePanel({ bcvData }: PricePanelProps) {
 								display: 'flex',
 								flexDirection: 'column',
 								alignItems: 'center',
-								height: '100%',
 							}}
 						>
 							<Typography
@@ -47,10 +45,8 @@ export default function PricePanel({ bcvData }: PricePanelProps) {
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									mt: 1,
 								}}
 							>
-								<MoneyIcon color='primary' sx={{ mr: 1 }} />
 								<Typography variant='h5' fontWeight='bold'>
 									{dollarPrice.toFixed(4)} Bs
 								</Typography>
@@ -87,7 +83,7 @@ export default function PricePanel({ bcvData }: PricePanelProps) {
 										bgcolor: 'action.hover',
 									}}
 								>
-									<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+									<Box sx={{ display: 'flex', alignItems: 'center' }}>
 										<SpeedIcon
 											fontSize='small'
 											color='primary'
@@ -111,7 +107,7 @@ export default function PricePanel({ bcvData }: PricePanelProps) {
 										bgcolor: 'action.hover',
 									}}
 								>
-									<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+									<Box sx={{ display: 'flex', alignItems: 'center' }}>
 										<WalletIcon
 											fontSize='small'
 											color='primary'
@@ -135,7 +131,7 @@ export default function PricePanel({ bcvData }: PricePanelProps) {
 										bgcolor: 'action.hover',
 									}}
 								>
-									<Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+									<Box sx={{ display: 'flex', alignItems: 'center' }}>
 										<DiamondIcon
 											fontSize='small'
 											color='primary'

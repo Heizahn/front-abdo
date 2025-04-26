@@ -26,6 +26,7 @@ export interface SelectList {
 	id?: string;
 	_id?: string;
 	nombre: string;
+	tag?: string;
 }
 
 export interface SimpleModalWrapperProps {

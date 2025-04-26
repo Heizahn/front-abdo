@@ -21,6 +21,7 @@ import { useFetchData } from '../../hooks/useQuery';
 import SimpleModalWrapper from '../common/ContainerForm';
 import CreateServiceForm from './CreateService';
 import ServiceDetail from './ServiceDetail';
+import { TableRowClickHandler } from '../common/TableRowClickHandler';
 
 // Define the Plan interface based on your API schema
 interface Plan {
@@ -283,14 +284,16 @@ const PlansTable: React.FC = () => {
 							) : visibleData.length > 0 ? (
 								<>
 									{visibleData.map((plan) => (
-										<TableRow
+										<TableRowClickHandler
 											key={plan._id}
-											hover
-											onClick={() => handleRowClick(plan)}
+											onRowClick={() => handleRowClick(plan)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
 													backgroundColor: 'rgba(0, 0, 0, 0.04)',
+												},
+												'&:nth-of-type(odd)': {
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
 												},
 											}}
 										>
@@ -309,7 +312,7 @@ const PlansTable: React.FC = () => {
 											<TableCell>
 												{plan.estado ? renderEstado(plan.estado) : '-'}
 											</TableCell>
-										</TableRow>
+										</TableRowClickHandler>
 									))}
 
 									{isLoadingMore && (

@@ -1,25 +1,23 @@
 import { Tabs, Tab, Box } from '@mui/material';
-import { useClientDetailsContext } from '../../../context/ClientDetailContext';
+import { useClientDetailsContext } from '../../context/ClientDetailContext';
 
 interface NavigationProps {
 	activeTab: string;
 	onTabChange: (tab: string) => void;
+	tabs: { label: string; value: string }[];
 }
 
-const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
-	const { setIsEditing } = useClientDetailsContext();
+const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange, tabs }) => {
+	const { setIsEditing, error, isClientLoading } = useClientDetailsContext();
 
 	const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
 		onTabChange(newValue);
 		setIsEditing(false);
 	};
 
-	const tabs = [
-		{ label: 'Detalles del Cliente', value: 'details' },
-		{ label: 'Cuentas por Cobrar', value: 'accounts' },
-		{ label: 'Pagos', value: 'payments' },
-		{ label: 'Estadísticas', value: 'stats' },
-	];
+	if (error || isClientLoading) {
+		return null;
+	}
 
 	return (
 		<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>

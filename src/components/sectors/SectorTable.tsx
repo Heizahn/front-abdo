@@ -21,6 +21,7 @@ import SectorDetail from './SectorDetail'; // Import the detail component we'll 
 import SimpleModalWrapper from '../common/ContainerForm';
 import CreateSectorForm from './CreateSector';
 import { useFetchData } from '../../hooks/useQuery';
+import { TableRowClickHandler } from '../common/TableRowClickHandler';
 
 // Define the Sector interface based on your API schema
 interface Sector {
@@ -97,6 +98,14 @@ const SectorsTable: React.FC = () => {
 				if (valueA == null) return order === 'asc' ? -1 : 1;
 				if (valueB == null) return order === 'asc' ? 1 : -1;
 
+				// Manejo especial para el campo 'clientes'
+				if (orderBy === 'clientes') {
+					const numA = Number(valueA) || 0;
+					const numB = Number(valueB) || 0;
+					return order === 'asc' ? numA - numB : numB - numA;
+				}
+
+				// Para otros campos, mantener el ordenamiento alfabético
 				const strA = String(valueA).toLowerCase();
 				const strB = String(valueB).toLowerCase();
 				return order === 'asc' ? strA.localeCompare(strB) : strB.localeCompare(strA);
@@ -278,14 +287,16 @@ const SectorsTable: React.FC = () => {
 							) : visibleData.length > 0 ? (
 								<>
 									{visibleData.map((sector) => (
-										<TableRow
+										<TableRowClickHandler
 											key={sector._id}
-											hover
-											onClick={() => handleRowClick(sector)}
+											onRowClick={() => handleRowClick(sector)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
 													backgroundColor: 'rgba(0, 0, 0, 0.04)',
+												},
+												'&:nth-of-type(odd)': {
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
 												},
 											}}
 										>
@@ -297,17 +308,13 @@ const SectorsTable: React.FC = () => {
 													? formatDate(sector.fechaCreacion)
 													: '-'}
 											</TableCell>
-											<TableCell>
-												{sector.clientes !== undefined
-													? sector.clientes
-													: 0}
-											</TableCell>
+											<TableCell>{sector.clientes || 0}</TableCell>
 											<TableCell>
 												{sector.estado
 													? renderEstado(sector.estado)
 													: '-'}
 											</TableCell>
-										</TableRow>
+										</TableRowClickHandler>
 									))}
 
 									{isLoadingMore && (

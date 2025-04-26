@@ -13,51 +13,81 @@ import {
 	Link,
 } from '@mui/material';
 import {
-	Person as PersonIcon,
-	Phone as PhoneIcon,
-	Home as HomeIcon,
-	Router as RouterIcon,
-	MonetizationOn as MoneyIcon,
-	Assignment as DocumentIcon,
-	Send as SendIcon,
-	CalendarMonth,
+	PersonRounded as PersonIcon,
+	PhoneRounded as PhoneIcon,
+	HomeRounded as HomeIcon,
+	RouterRounded as RouterIcon,
+	MonetizationOnRounded as MoneyIcon,
+	AssignmentRounded as DocumentIcon,
+	SendRounded as SendIcon,
+	CalendarMonthRounded as CalendarMonth,
 } from '@mui/icons-material';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Pay from '../../common/Pay';
-import { useClientList } from '../../../hooks/useClientList';
 import PaymentHistory from './paymentHistory';
-import { CLIENTS } from '../../../config/clients';
 import SimpleModalWrapper from '../../common/ContainerForm';
 import SuspendedClient from '../../common/SuspendedClient';
 import { useNotification } from '../../../context/NotificationContext';
 import { IClientPayment } from '../../../interfaces/Interfaces';
-import { isValidClientList } from '../../../services/getClient';
+import { HOST_API } from '../../../config/env';
+import Navigation from '../../common/Navigation';
+import LastInvoices from './lastInvoices';
+import CreateInvoice from '../../clientDetail/client/Invoices/CreateInvoice';
+import { getClient } from '../../../services/getClient';
 
-const ClientDetail = ({ client }: { client: IClientPayment }) => {
+const ClientDetail = ({
+	client,
+	buildParams,
+	refetchSearch,
+}: {
+	client: IClientPayment;
+	buildParams: string;
+	refetchSearch: (clients: IClientPayment[]) => void;
+}) => {
 	const [sendingPayment, setSendingPayment] = useState(false);
-	const { clientList } = useClientList();
+	const [activeTab, setActiveTab] = useState('payments');
 	const { notifyError } = useNotification();
+
+	const tabs = [
+		{ label: 'Últimos Pagos', value: 'payments' },
+		{ label: 'Últimas Facturas', value: 'invoices' },
+	];
+
+	const handleTabChange = (tab: string) => {
+		setActiveTab(tab);
+	};
+	const renderTabContent = () => {
+		switch (activeTab) {
+			case 'payments':
+				return <PaymentHistory pagos={client.ultimosPagos} />;
+			case 'invoices':
+				return <LastInvoices invoices={client.ultimasFacturas} />;
+			default:
+				return <PaymentHistory pagos={client.ultimosPagos} />;
+		}
+	};
 
 	// Enviar último pago
 	const handleSendLastPayment = async () => {
-		if (!isValidClientList(clientList)) {
-			throw new Error(`Cliente "${clientList}" no encontrado`);
-		}
 		try {
 			setSendingPayment(true);
 
-			const res = await axios.get(
-				`${CLIENTS[clientList].url}/client/${client.id}/lastPay`,
-			);
+			const res = await axios.get(`${HOST_API}/client/${client.id}/lastPay`);
 
 			if (res.data.length === 0) {
 				notifyError('No hay pagos para enviar');
 				return;
 			}
 
-			await axios.get(`${CLIENTS[clientList].url}/send-pay/${res.data[0].id}`);
+			await axios.get(`${HOST_API}/send-pay/${res.data[0].id}`);
 		} catch (error) {
-			console.error('Error enviando el comprobante:', error);
+			if (error instanceof AxiosError) {
+				notifyError(error.message, 'Error');
+			} else if (error instanceof Error) {
+				notifyError(error.message, 'Error');
+			} else {
+				notifyError('Error enviando el comprobante\nerror desconocido', 'Error');
+			}
 		} finally {
 			setSendingPayment(false);
 		}
@@ -72,10 +102,6 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 		}
 	};
 
-	if (!isValidClientList(clientList)) {
-		throw new Error(`Cliente "${clientList}" no encontrado`);
-	}
-
 	return (
 		<>
 			<Card sx={{ mb: 4 }}>
@@ -85,11 +111,22 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 							display: 'flex',
 							justifyContent: 'space-between',
 							alignItems: 'center',
-							mb: 2,
+							mb: 1,
 						}}
 					>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
+							<Avatar
+								sx={{
+									bgcolor: `${
+										client.estado === 'Activo' && client.saldo >= 0
+											? 'success.main'
+											: client.estado === 'Suspendido'
+											? 'error.main'
+											: 'warning.main'
+									}`,
+									mr: 2,
+								}}
+							>
 								<PersonIcon />
 							</Avatar>
 							<Typography variant='h5' component='div'>
@@ -97,28 +134,11 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 							</Typography>
 						</Box>
 
-						<Box
-							sx={{
-								display: 'flex',
-								alignItems: 'center',
-								gap: 1,
-							}}
-						>
-							<Chip
-								label={client.estado}
-								color={
-									client.estado === 'Activo'
-										? 'success'
-										: client.estado === 'Suspendido'
-										? 'warning'
-										: 'error'
-								}
-							/>
-							<SuspendedClient
-								clientId={client.id}
-								clientStatus={client.estado}
-							/>
-						</Box>
+						<SuspendedClient
+							clientId={client.id}
+							clientStatus={client.estado}
+							isButton={true}
+						/>
 					</Box>
 
 					<Divider sx={{ mb: 2 }} />
@@ -166,7 +186,20 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								<strong>Dirección:</strong> {client.direccion || 'No asignado'}
+								{client.coordenadas ? (
+									<Link
+										href={`https://maps.google.com/?q=${client.coordenadas}`}
+										target='_blank'
+									>
+										<strong>Dirección:</strong>{' '}
+										{client.direccion || 'No asignado'}
+									</Link>
+								) : (
+									<>
+										<strong>Dirección:</strong>{' '}
+										{client.direccion || 'No asignado'}
+									</>
+								)}
 							</Typography>
 						</Grid>
 
@@ -231,6 +264,23 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 							}}
 						>
 							<SimpleModalWrapper
+								triggerButtonText='Crear Factura'
+								triggerButtonColor='primary'
+								showCloseButton={false}
+							>
+								<CreateInvoice
+									clientId={client.id}
+									onCancel={() => {}}
+									onInvoiceSuccess={async () => {
+										const res = await getClient(
+											client.nombre,
+											buildParams,
+										);
+										refetchSearch(res);
+									}}
+								/>
+							</SimpleModalWrapper>
+							<SimpleModalWrapper
 								triggerButtonText='Registrar Pago'
 								triggerButtonColor='primary'
 								showCloseButton={false}
@@ -239,7 +289,13 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 									clientName={client.nombre}
 									clientesId={client.id}
 									onCancel={() => {}}
-									url={CLIENTS[clientList].url}
+									onPaymentSuccess={async () => {
+										const res = await getClient(
+											client.nombre,
+											buildParams,
+										);
+										refetchSearch(res);
+									}}
 								/>
 							</SimpleModalWrapper>
 
@@ -258,10 +314,15 @@ const ClientDetail = ({ client }: { client: IClientPayment }) => {
 							</Button>
 						</Box>
 					</Box>
+
+					<Navigation
+						activeTab={activeTab}
+						onTabChange={handleTabChange}
+						tabs={tabs}
+					/>
 				</CardContent>
 
-				{/* Componente de Historial de Pagos */}
-				<PaymentHistory pagos={client.ultimosPagos} />
+				{renderTabContent()}
 			</Card>
 		</>
 	);

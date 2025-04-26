@@ -21,6 +21,7 @@ import CreateInvoice from './CreateInvoice';
 import { useParams } from 'react-router-dom';
 import { Factura } from '../../../../interfaces/InterfacesClientDetails';
 import InvoiceDetails from './InvoiceDetails';
+import { TableRowClickHandler } from '../../../common/TableRowClickHandler';
 
 interface InvoicesTableProps {
 	invoices: Factura[];
@@ -184,11 +185,18 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 							</TableRow>
 						) : filteredInvoices.length > 0 ? (
 							filteredInvoices.map((invoice) => (
-								<TableRow
+								<TableRowClickHandler
 									key={invoice._id}
-									hover
-									onClick={() => handleRowClick(invoice)}
-									sx={{ cursor: 'pointer' }}
+									onRowClick={() => handleRowClick(invoice)}
+									sx={{
+										cursor: 'pointer',
+										'&:hover': {
+											backgroundColor: 'rgba(0, 0, 0, 0.04)',
+										},
+										'&:nth-of-type(odd)': {
+											backgroundColor: 'rgba(0, 0, 0, 0.02)',
+										},
+									}}
 								>
 									<TableCell>{invoice.motivo}</TableCell>
 									<TableCell>{invoice.fecha}</TableCell>
@@ -216,7 +224,7 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 											{invoice.estado}
 										</Box>
 									</TableCell>
-								</TableRow>
+								</TableRowClickHandler>
 							))
 						) : (
 							<TableRow>

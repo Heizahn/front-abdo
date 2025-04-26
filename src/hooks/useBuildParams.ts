@@ -1,0 +1,17 @@
+import { useCallback } from 'react';
+import { useAuth, ROLES } from '../context/AuthContext';
+
+export const useBuildParams = () => {
+	const { user } = useAuth();
+
+	const buildParams = useCallback(() => {
+		switch (user?.role) {
+			case ROLES.PROVIDER:
+				return '?provider=' + user?.id;
+			default:
+				return '';
+		}
+	}, [user]);
+
+	return buildParams();
+};

@@ -1,9 +1,22 @@
 import { Box, Typography } from '@mui/material';
-import { useClientDetailsContext } from '../../../../context/ClientDetailContext';
 import PaymentsTable from './PaymentsTable';
+import { useFetchData } from '../../../../hooks/useQuery';
+import { Pago } from '../../../../interfaces/InterfacesClientDetails';
+import { useParams } from 'react-router-dom';
+import { useClientDetailsContext } from '../../../../context/ClientDetailContext';
 
 export default function ClientPayments() {
-	const { client, loading } = useClientDetailsContext();
+	const { id } = useParams();
+	const { uploadPayments } = useClientDetailsContext();
+
+	const { data: payments, isLoading } = useFetchData<Pago[]>(
+		`/client/${id}/payments`,
+		'payments-' + id,
+	);
+
+	if (!isLoading && payments) {
+		uploadPayments(payments);
+	}
 
 	return (
 		<Box
@@ -19,11 +32,7 @@ export default function ClientPayments() {
 				Historial de Pagos
 			</Typography>
 
-			{loading ? (
-				<Box sx={{ textAlign: 'center', py: 2 }}>Cargando...</Box>
-			) : (
-				<PaymentsTable payments={client?.pagosTabla || []} isLoading={loading} />
-			)}
+			<PaymentsTable payments={payments || []} isLoading={isLoading} />
 		</Box>
 	);
 }

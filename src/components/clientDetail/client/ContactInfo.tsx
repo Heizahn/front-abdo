@@ -1,10 +1,14 @@
 import { Box, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
-import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import EditableInfoField from '../common/EditableInfoField';
-
-const ContactInfo = ({ data }: { data: ClientDetails }) => {
+interface ContactInfoProps {
+	data: {
+		telefonos: string;
+		email: string;
+	};
+}
+const ContactInfo = ({ data }: ContactInfoProps) => {
 	const { isEditing } = useClientDetailsContext();
 	return (
 		<Box>

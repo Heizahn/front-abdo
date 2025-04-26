@@ -33,10 +33,12 @@ export default function CreateInvoice({
 	clientId,
 	onCancel,
 	closeModal,
+	onInvoiceSuccess,
 }: {
 	clientId: string;
 	onCancel: () => void;
 	closeModal?: () => void;
+	onInvoiceSuccess?: () => void;
 }) {
 	const [invoiceData, setInvoiceData] = useState(initialValues);
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -65,6 +67,10 @@ export default function CreateInvoice({
 					predicate: (query) => query.queryKey.includes(key),
 				});
 			});
+
+			if (onInvoiceSuccess) {
+				onInvoiceSuccess();
+			}
 		},
 		onError: (err) => {
 			if (err instanceof Error) {
@@ -137,6 +143,7 @@ export default function CreateInvoice({
 
 	const handleConfirm = async () => {
 		setSendingInvoice(true);
+		setShowConfirmation(false);
 
 		const Invoice: CreateInvoiceDTO = {
 			motivo: invoiceData.motivo,
@@ -149,7 +156,9 @@ export default function CreateInvoice({
 
 		await mutation.mutateAsync(Invoice);
 
-		setShowConfirmation(false);
+		new Promise((resolve) => setTimeout(resolve, 150)).then(() => {
+			setSendingInvoice(false);
+		});
 		// Cerrar el modal si existe la función closeModal
 		if (closeModal) {
 			closeModal();
@@ -245,7 +254,7 @@ export default function CreateInvoice({
 							variant='outlined'
 							color='secondary'
 							onClick={handleCancel}
-							// Ahora el botón de cancelar siempre está habilitado
+							disabled={sendingInvoice}
 						>
 							Cancelar
 						</Button>

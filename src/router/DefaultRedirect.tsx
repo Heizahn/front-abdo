@@ -27,9 +27,10 @@ export default function DefaultRedirect() {
 	switch (user.role) {
 		case ROLES.PAYMENT_USER:
 			return <Navigate to='/payments' />;
-		case ROLES.ADMIN:
+		case ROLES.ACCOUNTANT:
 			return <Navigate to='/clients' />;
-		case ROLES.SUPERADMIN:
+		case ROLES.PROVIDER:
+			return <Navigate to='/clients' />;
 		default:
 			return <Navigate to='/home' />;
 	}

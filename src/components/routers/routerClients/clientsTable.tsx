@@ -20,6 +20,7 @@ import SimpleModalWrapper from '../../common/ContainerForm';
 import AddClient from './AddClient';
 import QuitRouter from './QuitRouter';
 import { ClientRouterTable as Client } from '../../../interfaces/types';
+import { TableRowClickHandler } from '../../common/TableRowClickHandler';
 
 // Tipo para ordenar
 type Order = 'asc' | 'desc';
@@ -98,6 +99,25 @@ export default function ClientsTable({
 				if (valueA == null && valueB == null) return 0;
 				if (valueA == null) return order === 'asc' ? -1 : 1;
 				if (valueB == null) return order === 'asc' ? 1 : -1;
+
+				if (orderBy === 'ipv4') {
+					const getIpOctets = (ip: string | number): number[] => {
+						if (typeof ip !== 'string') return [0, 0, 0, 0];
+						return ip.split('.').map((octet) => parseInt(octet, 10) || 0);
+					};
+
+					const octetsA = getIpOctets(valueA as string);
+					const octetsB = getIpOctets(valueB as string);
+
+					for (let i = 0; i < 4; i++) {
+						if (octetsA[i] !== octetsB[i]) {
+							return order === 'asc'
+								? octetsA[i] - octetsB[i]
+								: octetsB[i] - octetsA[i];
+						}
+					}
+					return 0;
+				}
 
 				if (typeof valueA === 'number' && typeof valueB === 'number') {
 					return order === 'asc' ? valueA - valueB : valueB - valueA;
@@ -262,14 +282,16 @@ export default function ClientsTable({
 							{visibleData.length > 0 ? (
 								<>
 									{visibleData.map((client) => (
-										<TableRow
+										<TableRowClickHandler
 											key={client._id}
-											hover
-											onClick={() => handleRowClick(client)}
+											onRowClick={() => handleRowClick(client)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
 													backgroundColor: 'rgba(0, 0, 0, 0.04)',
+												},
+												'&:nth-of-type(odd)': {
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
 												},
 											}}
 										>
@@ -278,7 +300,6 @@ export default function ClientsTable({
 												{client.identificacion || '-'}
 											</TableCell>
 											<TableCell>{client.ipv4 || '-'}</TableCell>
-
 											<TableCell>
 												{client.estado
 													? renderEstadoChip(client.estado)
@@ -287,7 +308,7 @@ export default function ClientsTable({
 											<TableCell onClick={(e) => e.stopPropagation()}>
 												<QuitRouter clientId={client._id} />
 											</TableCell>
-										</TableRow>
+										</TableRowClickHandler>
 									))}
 
 									{isLoadingMore && (
@@ -349,7 +370,9 @@ export default function ClientsTable({
 					fullScreen={true}
 					maxWidth='lg'
 				>
-					<>{modalTriggerRef.current}</>
+					{modalTriggerRef.current && (
+						<span id='modal-trigger-element' ref={modalTriggerRef} />
+					)}
 				</SimpleModalWrapper>
 			)}
 		</Box>

@@ -19,6 +19,7 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import { useFetchData } from '../../hooks/useQuery';
 import SimpleModalWrapper from '../common/ContainerForm';
 import PaymentDetails from '../clientDetail/client/payments/PaymentDetails';
+import { TableRowClickHandler } from '../common/TableRowClickHandler';
 
 interface Pago {
 	_id: string;
@@ -328,14 +329,16 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 							) : visibleData.length > 0 ? (
 								<>
 									{visibleData.map((pago) => (
-										<TableRow
+										<TableRowClickHandler
 											key={pago._id}
-											hover
-											onClick={() => handleRowClick(pago)}
+											onRowClick={() => handleRowClick(pago)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {
 													backgroundColor: 'rgba(0, 0, 0, 0.04)',
+												},
+												'&:nth-of-type(odd)': {
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
 												},
 											}}
 										>
@@ -359,7 +362,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 													? renderEstadoChip(pago.estado)
 													: '-'}
 											</TableCell>
-										</TableRow>
+										</TableRowClickHandler>
 									))}
 
 									{isLoadingMore && (

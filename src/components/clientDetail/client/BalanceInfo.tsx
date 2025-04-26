@@ -1,10 +1,16 @@
 import { Box, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
-import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import EditableInfoField from '../common/EditableInfoField';
 
-const BalanceInfo = ({ data }: { data: ClientDetails }) => {
+interface BalanceInfoProps {
+	data: {
+		saldo: number;
+		fechaPago: number;
+	};
+}
+
+const BalanceInfo = ({ data }: BalanceInfoProps) => {
 	const { isEditing } = useClientDetailsContext();
 	return (
 		<Box>

@@ -1,10 +1,17 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { useClientDetailsContext } from '../../../../context/ClientDetailContext';
 import InvoicesTable from './InvoicesTable';
+import { Factura } from '../../../../interfaces/InterfacesClientDetails';
+import { useFetchData } from '../../../../hooks/useQuery';
+import { useParams } from 'react-router-dom';
 
 const ClientAccounts: React.FC = () => {
-	const { client, loading } = useClientDetailsContext();
+	const { id } = useParams();
+
+	const { data: invoices, isLoading } = useFetchData<Factura[]>(
+		`/client/${id}/invoices`,
+		'invoices-' + id,
+	);
 
 	return (
 		<Box
@@ -20,11 +27,7 @@ const ClientAccounts: React.FC = () => {
 				Cuentas por Cobrar
 			</Typography>
 
-			{loading ? (
-				<Box sx={{ textAlign: 'center', py: 2 }}>Cargando...</Box>
-			) : (
-				<InvoicesTable invoices={client?.facturas ?? []} isLoading={loading} />
-			)}
+			<InvoicesTable invoices={invoices ?? []} isLoading={isLoading} />
 		</Box>
 	);
 };

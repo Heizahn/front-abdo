@@ -11,6 +11,15 @@ export interface IPaymentHistory {
 	monto: number;
 	montoVES: number;
 }
+
+export interface ILastInvoice {
+	id: string;
+	fecha: string;
+	monto: number;
+	estado: string;
+	motivo: string;
+}
+
 // Agregar esta interfaz para el plan
 export interface Plan {
 	id: string;
@@ -29,6 +38,8 @@ export interface Client {
 	estado: string;
 	saldo: number;
 	plan?: string;
+	coordenadas?: string;
+	fechaPago?: string; // Fecha del último pago
 
 	// Add other client properties as needed
 }
@@ -37,6 +48,7 @@ export interface IClientPayment extends Client {
 	fechaCorte: string;
 	direccion: string;
 	ultimosPagos: IPaymentHistory[];
+	ultimasFacturas: ILastInvoice[];
 }
 
 export interface LastPays {
