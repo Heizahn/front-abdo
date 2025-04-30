@@ -13,7 +13,7 @@ export default function FilterStatusList() {
 		morosos: number;
 		suspendidos: number;
 		retirados: number;
-	}>('/clientsStats', 'clientsStats');
+	}>('/clients/stats', 'clients-stats');
 
 	if (isLoading) {
 		return (

@@ -158,7 +158,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 							sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}
 						>
 							{payment.estado === 'Activo' &&
-								user?.role !== ROLES.PAYMENT_USER && (
+								user?.nRole !== ROLES.PAYMENT_USER && (
 									<Button
 										onClick={() => setShowConfirmation(true)}
 										color='error'

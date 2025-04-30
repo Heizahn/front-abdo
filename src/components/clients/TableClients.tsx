@@ -1,9 +1,20 @@
-import { Box, Paper, Typography, LinearProgress, Link } from '@mui/material';
+import {
+	Box,
+	Paper,
+	Typography,
+	LinearProgress,
+	Link,
+	Table,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableBody,
+} from '@mui/material';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Client } from '../../interfaces/Interfaces';
 import { useClients } from '../../context/ClientsContext';
 import { ActionButtons } from './table/ActionButtons';
-import { TableBodyComponent } from './table/TableBodyComponent';
+// import { TableBodyComponent } from './table/TableBodyComponent';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import {
 	useReactTable,
@@ -13,6 +24,7 @@ import {
 	ColumnDef,
 	flexRender,
 } from '@tanstack/react-table';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 // Importar el componente de estado visual correctamente
 import { getStateComponent } from './ClientStatus';
@@ -32,19 +44,19 @@ export default function TableClients() {
 	const columns = useMemo<ColumnDef<Client>[]>(
 		() => [
 			{
-				accessorKey: 'nombre',
+				accessorKey: 'sName',
 				header: 'Nombre',
 				cell: (info) => String(info.getValue() ?? ''),
 				size: 280,
 			},
 			{
-				accessorKey: 'identificacion',
+				accessorKey: 'sDni',
 				header: 'Identificación',
 				cell: (info) => String(info.getValue() ?? ''),
 				size: 110,
 			},
 			{
-				accessorKey: 'telefonos',
+				accessorKey: 'sPhone',
 				header: 'Teléfono',
 				cell: (info) => String(info.getValue() ?? ''),
 				size: 100,
@@ -56,16 +68,12 @@ export default function TableClients() {
 				size: 130,
 			},
 			{
-				accessorKey: 'router',
-				header: 'Router',
-				cell: (info) => String(info.getValue() ?? ''),
-				size: 140,
-			},
-			{
-				accessorKey: 'ipv4',
+				accessorKey: 'sIp',
 				header: 'IPv4',
 				cell: (info) => {
 					const ip = info.getValue() as string;
+
+					if (!ip) return 'IP no asignada';
 					return (
 						<Link
 							href={`http://${ip}`}
@@ -83,8 +91,8 @@ export default function TableClients() {
 						return ip.split('.').map((octet) => parseInt(octet, 10) || 0);
 					};
 
-					const octetsA = getIpOctets(rowA.getValue('ipv4'));
-					const octetsB = getIpOctets(rowB.getValue('ipv4'));
+					const octetsA = getIpOctets(rowA.getValue('sIp'));
+					const octetsB = getIpOctets(rowB.getValue('sIp'));
 
 					for (let i = 0; i < 4; i++) {
 						if (octetsA[i] !== octetsB[i]) {
@@ -102,7 +110,7 @@ export default function TableClients() {
 				size: 130,
 			},
 			{
-				accessorKey: 'fechaPago',
+				accessorKey: 'nPayment',
 				header: 'Fecha límite',
 				size: 80,
 				cell: (info) => {
@@ -117,7 +125,7 @@ export default function TableClients() {
 				},
 			},
 			{
-				accessorKey: 'saldo',
+				accessorKey: 'nBalance',
 				header: 'Saldo',
 				cell: (info) => {
 					const saldo = info.getValue() as number | null | undefined;
@@ -137,11 +145,11 @@ export default function TableClients() {
 				size: 55,
 			},
 			{
-				accessorKey: 'estado',
+				accessorKey: 'sState',
 				header: 'Estado',
 				cell: (info) => {
 					const estado = info.getValue() as string;
-					const saldo = info.row.original.saldo;
+					const saldo = info.row.original.nBalance;
 					let realEstado = estado;
 					if (estado === 'Activo') {
 						realEstado = saldo < 0 ? 'Moroso' : 'Activo';
@@ -177,6 +185,13 @@ export default function TableClients() {
 		columnResizeMode: 'onChange',
 	});
 
+	const rowVirtualizer = useVirtualizer({
+		count: table.getRowModel().rows.length,
+		getScrollElement: () => tableContainerRef.current,
+		estimateSize: () => 48, // Altura estimada de cada fila (ajusta según tu diseño)
+		overscan: 10,
+	});
+
 	const renderTableContent = () => {
 		if (filteredClients.length === 0 && !loading) {
 			return (
@@ -201,26 +216,15 @@ export default function TableClients() {
 					position: 'relative',
 				}}
 			>
-				<table style={{ width: `${totalWidth}px`, tableLayout: 'fixed' }}>
-					<thead
-						style={{
-							backgroundColor: '#fafafa',
-							position: 'sticky',
-							top: 0,
-							zIndex: 1000,
-							width: '100%',
-						}}
-					>
+				<Table stickyHeader style={{ width: `${totalWidth}px`, tableLayout: 'fixed' }}>
+					<TableHead>
 						{table.getHeaderGroups().map((headerGroup) => (
-							<tr
+							<TableRow
 								key={headerGroup.id}
-								style={{
-									display: 'flex',
-									width: '100%',
-								}}
+								style={{ display: 'flex', width: '100%' }}
 							>
 								{headerGroup.headers.map((header) => (
-									<th
+									<TableCell
 										key={header.id}
 										style={{
 											display: 'flex',
@@ -262,18 +266,54 @@ export default function TableClients() {
 												/>
 											)}
 										</div>
-									</th>
+									</TableCell>
 								))}
-							</tr>
+							</TableRow>
 						))}
-					</thead>
-					<TableBodyComponent
-						table={table}
-						tableContainerRef={
-							tableContainerRef as React.RefObject<HTMLDivElement>
-						}
-					/>
-				</table>
+					</TableHead>
+					<TableBody>
+						<tr
+							style={{
+								height: `${rowVirtualizer.getTotalSize()}px`,
+								position: 'relative',
+								display: 'block',
+							}}
+						>
+							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+								const row = table.getRowModel().rows[virtualRow.index];
+								return (
+									<TableRow
+										key={row.id}
+										style={{
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											width: '100%',
+											transform: `translateY(${virtualRow.start}px)`,
+											display: 'flex',
+										}}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell
+												key={cell.id}
+												style={{
+													flex: 1,
+													minWidth: `${cell.column.getSize()}px`,
+													padding: '6px 4px',
+												}}
+											>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								);
+							})}
+						</tr>
+					</TableBody>
+				</Table>
 			</div>
 		);
 	};

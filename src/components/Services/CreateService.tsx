@@ -9,41 +9,38 @@ import { queryClient } from '../../query-client';
 
 // Define the interface for the service form data
 interface ServiceFormData {
-	nombre: string;
-	costo: string | number;
-	tipo: string;
-	descripcion: string;
+	sName: string;
+	nAmount: number;
+	nMBPS: number;
 }
 
 // Define the data transfer object for the API
-interface ServiceDataDTO {
-	nombre: string;
-	costo: number;
-	tipo: string;
-	descripcion: string;
-	estado: string;
-	creadoPor: string;
-	fechaCreacion: string;
+interface ServiceDataDTO extends ServiceFormData {
+	sState: string;
+	idCreator: string;
+	dCreation: string;
 }
 
 // Initial form values
 const valueInitial: ServiceFormData = {
-	nombre: '',
-	costo: '',
-	tipo: '',
-	descripcion: '',
+	sName: '',
+	nAmount: 0,
+	nMBPS: 0,
 };
 
 // Validation schema using Yup
 const validationSchema = yup.object({
-	nombre: yup.string().required('El nombre es obligatorio'),
-	costo: yup
+	sName: yup.string().required('El nombre es obligatorio'),
+	nAmount: yup
 		.number()
 		.typeError('El costo debe ser un número')
 		.positive('El costo debe ser mayor que 0')
 		.required('El costo es obligatorio'),
-	tipo: yup.string().required('El tipo de servicio es obligatorio'),
-	descripcion: yup.string(),
+	nMBPS: yup
+		.number()
+		.typeError('La velocidad debe ser un número')
+		.positive('La velocidad debe ser mayor que 0')
+		.required('La velocidad es obligatoria'),
 });
 
 interface CreateServiceFormProps {
@@ -63,10 +60,10 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ closeModal }) => 
 	const { notifySuccess, notifyError } = useNotification();
 
 	// Define query keys to invalidate after successful creation
-	const queryKeys = ['plansList'];
+	const queryKeys = ['plans'];
 
 	// Mutation for creating service
-	const mutation = useMutateDate<ServiceDataDTO, ServiceDataDTO>('/planes', {
+	const mutation = useMutateDate<ServiceDataDTO, ServiceDataDTO>('/plans', {
 		onSuccess: () => {
 			notifySuccess(
 				'El servicio se ha creado correctamente en el sistema',
@@ -158,16 +155,14 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ closeModal }) => 
 
 		if (user) {
 			const serviceData: ServiceDataDTO = {
-				nombre: formData.nombre,
-				costo: Number(formData.costo),
-				tipo: formData.tipo,
-				descripcion: formData.descripcion,
-				estado: 'Activo',
-				creadoPor: user.id,
-				fechaCreacion: new Date().toISOString(),
+				sName: formData.sName,
+				nAmount: Number(formData.nAmount),
+				nMBPS: Number(formData.nMBPS),
+				sState: 'Activo',
+				idCreator: user.id,
+				dCreation: new Date().toISOString(),
 			};
 
-			console.log('serviceData', serviceData);
 			await mutation.mutateAsync(serviceData);
 
 			// Reset form state
@@ -219,28 +214,28 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ closeModal }) => 
 				<TextField
 					required
 					fullWidth
-					id='nombre'
+					id='sName'
 					label='Nombre'
-					name='nombre'
-					value={formData.nombre}
+					name='sName'
+					value={formData.sName}
 					onChange={handleChange}
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.nombre)}
-					helperText={attemptedSubmit && errors.nombre}
+					error={Boolean(attemptedSubmit && errors.sName)}
+					helperText={attemptedSubmit && errors.sName}
 					size='small'
 				/>
 
 				<TextField
 					required
 					fullWidth
-					id='costo'
+					id='nAmount'
 					label='Costo (USD)'
-					name='costo'
-					value={formData.costo}
+					name='nAmount'
+					value={formData.nAmount}
 					onChange={handleChange}
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.costo)}
-					helperText={attemptedSubmit && errors.costo}
+					error={Boolean(attemptedSubmit && errors.nAmount)}
+					helperText={attemptedSubmit && errors.nAmount}
 					size='small'
 					inputProps={{
 						inputMode: 'decimal',
@@ -250,30 +245,16 @@ const CreateServiceForm: React.FC<CreateServiceFormProps> = ({ closeModal }) => 
 				<TextField
 					required
 					fullWidth
-					id='tipo'
-					label='Tipo de Servicio'
-					name='tipo'
-					value={formData.tipo}
+					id='nMBPS'
+					label='Velocidad (Mbps)'
+					name='nMBPS'
+					value={formData.nMBPS}
 					onChange={handleChange}
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.tipo)}
-					helperText={attemptedSubmit && errors.tipo}
+					error={Boolean(attemptedSubmit && errors.nMBPS)}
+					helperText={attemptedSubmit && errors.nMBPS}
 					size='small'
 				/>
-
-				<TextField
-					fullWidth
-					id='descripcion'
-					label='Descripción'
-					name='descripcion'
-					value={formData.descripcion}
-					onChange={handleChange}
-					margin='normal'
-					error={Boolean(attemptedSubmit && errors.descripcion)}
-					helperText={attemptedSubmit && errors.descripcion}
-					size='small'
-				/>
-
 				<Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
 					<Button variant='outlined' color='secondary' onClick={handleCancel}>
 						Cancelar

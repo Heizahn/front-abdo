@@ -25,14 +25,14 @@ import { TableRowClickHandler } from '../common/TableRowClickHandler';
 
 // Define the Sector interface based on your API schema
 interface Sector {
-	_id: string;
-	nombre: string;
-	estado: string;
-	creadoPor: string;
-	clientes?: number;
-	editadoPor?: string;
-	fechaCreacion: string;
-	fechaEdicion?: string;
+	id: string;
+	sName: string;
+	sState: string;
+	nClients: number;
+	creator: string;
+	dCreation: string;
+	editor?: string;
+	dEdition?: string;
 }
 
 // Type for sorting
@@ -42,7 +42,7 @@ type OrderBy = keyof Sector;
 const SectorsTable: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('asc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('nombre');
+	const [orderBy, setOrderBy] = useState<OrderBy>('sName');
 	const [visibleItems, setVisibleItems] = useState(100);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -52,10 +52,7 @@ const SectorsTable: React.FC = () => {
 	const [selectedSector, setSelectedSector] = useState<Sector | null>(null);
 
 	// Use TanStack Query to fetch data
-	const { data: sectors = [], isLoading } = useFetchData<Sector[]>(
-		'/sectorsList',
-		'sectorsList',
-	);
+	const { data: sectors = [], isLoading } = useFetchData<Sector[]>('/sectors', 'sectors');
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
@@ -87,8 +84,8 @@ const SectorsTable: React.FC = () => {
 			.filter(
 				(sector) =>
 					!searchTerm || // If no search term, include all
-					safeIncludes(sector.nombre, searchTerm) ||
-					safeIncludes(sector.estado, searchTerm),
+					safeIncludes(sector.sName, searchTerm) ||
+					safeIncludes(sector.sState, searchTerm),
 			)
 			.sort((a, b) => {
 				const valueA = a[orderBy];
@@ -99,7 +96,7 @@ const SectorsTable: React.FC = () => {
 				if (valueB == null) return order === 'asc' ? 1 : -1;
 
 				// Manejo especial para el campo 'clientes'
-				if (orderBy === 'clientes') {
+				if (orderBy === 'nClients') {
 					const numA = Number(valueA) || 0;
 					const numB = Number(valueB) || 0;
 					return order === 'asc' ? numA - numB : numB - numA;
@@ -241,36 +238,36 @@ const SectorsTable: React.FC = () => {
 							<TableRow>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'nombre'}
-										direction={orderBy === 'nombre' ? order : 'asc'}
-										onClick={createSortHandler('nombre')}
+										active={orderBy === 'sName'}
+										direction={orderBy === 'sName' ? order : 'asc'}
+										onClick={createSortHandler('sName')}
 									>
 										Nombre
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'fechaCreacion'}
-										direction={orderBy === 'fechaCreacion' ? order : 'asc'}
-										onClick={createSortHandler('fechaCreacion')}
+										active={orderBy === 'dCreation'}
+										direction={orderBy === 'dCreation' ? order : 'asc'}
+										onClick={createSortHandler('dCreation')}
 									>
 										Fecha de Creación
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'clientes'}
-										direction={orderBy === 'clientes' ? order : 'asc'}
-										onClick={createSortHandler('clientes')}
+										active={orderBy === 'nClients'}
+										direction={orderBy === 'nClients' ? order : 'asc'}
+										onClick={createSortHandler('nClients')}
 									>
 										Clientes
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'estado'}
-										direction={orderBy === 'estado' ? order : 'asc'}
-										onClick={createSortHandler('estado')}
+										active={orderBy === 'sState'}
+										direction={orderBy === 'sState' ? order : 'asc'}
+										onClick={createSortHandler('sState')}
 									>
 										Estado
 									</TableSortLabel>
@@ -288,7 +285,7 @@ const SectorsTable: React.FC = () => {
 								<>
 									{visibleData.map((sector) => (
 										<TableRowClickHandler
-											key={sector._id}
+											key={sector.id}
 											onRowClick={() => handleRowClick(sector)}
 											sx={{
 												cursor: 'pointer',
@@ -301,17 +298,17 @@ const SectorsTable: React.FC = () => {
 											}}
 										>
 											<TableCell component='th' scope='row'>
-												{sector.nombre || '-'}
+												{sector.sName || '-'}
 											</TableCell>
 											<TableCell>
-												{sector.fechaCreacion
-													? formatDate(sector.fechaCreacion)
+												{sector.dCreation
+													? formatDate(sector.dCreation)
 													: '-'}
 											</TableCell>
-											<TableCell>{sector.clientes || 0}</TableCell>
+											<TableCell>{sector.nClients || 0}</TableCell>
 											<TableCell>
-												{sector.estado
-													? renderEstado(sector.estado)
+												{sector.sState
+													? renderEstado(sector.sState)
 													: '-'}
 											</TableCell>
 										</TableRowClickHandler>

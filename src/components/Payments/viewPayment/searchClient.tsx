@@ -64,10 +64,10 @@ const SearchClient = () => {
 	};
 
 	const disableButton = useMemo(() => {
-		if (user?.role !== ROLES.PROVIDER && !clientList) return true;
+		if (user?.nRole !== ROLES.PROVIDER && !clientList) return true;
 
 		return false;
-	}, [user?.role, clientList]);
+	}, [user?.nRole, clientList]);
 
 	useEffect(() => {
 		try {
@@ -85,7 +85,7 @@ const SearchClient = () => {
 
 	// Efecto para realizar búsqueda automática si hay un valor en la URL
 	useEffect(() => {
-		if (searchQuery && (user?.role === ROLES.PROVIDER || clientList)) {
+		if (searchQuery && (user?.nRole === ROLES.PROVIDER || clientList)) {
 			handleSearch();
 		}
 	}, []);
@@ -173,7 +173,7 @@ const SearchClient = () => {
 					<Typography component='h2' variant='h5'>
 						Búsqueda de cliente
 					</Typography>
-					{user?.role !== ROLES.PROVIDER && (
+					{user?.nRole !== ROLES.PROVIDER && (
 						<Proveedor handleClientChange={handleClientChange} />
 					)}
 				</Box>

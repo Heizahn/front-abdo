@@ -21,19 +21,19 @@ import { useNotification } from '../../context/NotificationContext';
 
 // Define the interface for the sector detail data
 interface SectorDetailData {
-	_id: string;
-	nombre: string;
-	estado: string;
-	creadoPor: string;
-	editadoPor?: string;
-	fechaCreacion: string;
-	fechaEdicion?: string;
+	id: string;
+	sName: string;
+	sState: string;
+	creator: string;
+	dCreation: string;
+	editor?: string;
+	dEdition?: string;
 }
 
 // Validation schema using Yup
 const validationSchema = yup.object({
-	nombre: yup.string().required('El nombre es obligatorio'),
-	estado: yup.string().required('El estado es obligatorio'),
+	sName: yup.string().required('El nombre es obligatorio'),
+	sState: yup.string().required('El estado es obligatorio'),
 });
 
 interface SectorDetailProps {
@@ -129,20 +129,20 @@ const SectorDetail: React.FC<SectorDetailProps> = ({ sectorData, onClose }) => {
 	const handleConfirm = async () => {
 		// Prepare the payload for the API
 		const updatedSector = {
-			estado: formData.estado,
-			nombre: formData.nombre,
-			fechaEdicion: new Date().toISOString(),
-			editadoPor: user?.id,
+			sName: formData.sName,
+			sState: formData.sState,
+			idEditor: user?.id,
+			dEdition: new Date().toISOString(),
 		};
 
 		try {
-			await axios.patch(HOST_API + '/sectores/' + sectorData._id, updatedSector);
+			await axios.patch(HOST_API + '/sectors/' + sectorData.id, updatedSector);
 
 			notifySuccess('Sector actualizado correctamente', 'Sector actualizado');
 
 			queryClient.invalidateQueries({
-				queryKey: ['sectorsList'],
-				predicate: (query) => query.queryKey.includes('sectorsList'),
+				queryKey: ['sectors'],
+				predicate: (query) => query.queryKey.includes('sectors'),
 			});
 		} catch (error) {
 			if (error instanceof Error) {
@@ -201,14 +201,14 @@ const SectorDetail: React.FC<SectorDetailProps> = ({ sectorData, onClose }) => {
 				<TextField
 					required
 					fullWidth
-					id='nombre'
+					id='sName'
 					label='Nombre'
-					name='nombre'
-					value={formData.nombre}
+					name='sName'
+					value={formData.sName}
 					onChange={handleChange}
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.nombre)}
-					helperText={attemptedSubmit && errors.nombre}
+					error={Boolean(attemptedSubmit && errors.sName)}
+					helperText={attemptedSubmit && errors.sName}
 					size='small'
 				/>
 
@@ -216,23 +216,23 @@ const SectorDetail: React.FC<SectorDetailProps> = ({ sectorData, onClose }) => {
 					fullWidth
 					required
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.estado)}
+					error={Boolean(attemptedSubmit && errors.sState)}
 					size='small'
 				>
-					<InputLabel id='estado-label'>Estado</InputLabel>
+					<InputLabel id='sState-label'>Estado</InputLabel>
 					<Select
-						labelId='estado-label'
-						id='estado'
-						name='estado'
-						value={formData.estado}
+						labelId='sState-label'
+						id='sState'
+						name='sState'
+						value={formData.sState}
 						label='Estado'
 						onChange={handleSelectChange}
 					>
 						<MenuItem value='Activo'>Activo</MenuItem>
 						<MenuItem value='Inactivo'>Inactivo</MenuItem>
 					</Select>
-					{attemptedSubmit && errors.estado && (
-						<FormHelperText>{errors.estado}</FormHelperText>
+					{attemptedSubmit && errors.sState && (
+						<FormHelperText>{errors.sState}</FormHelperText>
 					)}
 				</FormControl>
 
@@ -242,18 +242,20 @@ const SectorDetail: React.FC<SectorDetailProps> = ({ sectorData, onClose }) => {
 						display='block'
 						sx={{ color: 'text.secondary' }}
 					>
-						Creado el: {formatDate(formData.fechaCreacion)}
-						{formData.creadoPor && ` por ${formData.creadoPor}`}
+						Creado el: {formatDate(formData.dCreation)}
+						{formData.creator &&
+							` por ${formData.creator.toString().toUpperCase()}`}
 					</Typography>
 
-					{formData.fechaEdicion && (
+					{formData.dEdition && (
 						<Typography
 							variant='caption'
 							display='block'
 							sx={{ color: 'text.secondary' }}
 						>
-							Última modificación: {formatDate(formData.fechaEdicion)}
-							{formData.editadoPor && ` por ${formData.editadoPor}`}
+							Última modificación: {formatDate(formData.dEdition)}
+							{formData.editor &&
+								` por ${formData.editor.toString().toUpperCase()}`}
 						</Typography>
 					)}
 				</Box>

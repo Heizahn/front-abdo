@@ -1,7 +1,7 @@
 export interface User {
 	id: string;
-	name: string;
-	role: number;
+	sName: string;
+	nRole: number;
 }
 export interface IPaymentHistory {
 	fecha: string;
@@ -29,19 +29,15 @@ export interface Plan {
 
 export interface Client {
 	id: string;
-	nombre: string;
-	identificacion: string;
-	telefonos: string;
+	sName: string;
+	sDni: string;
+	sPhone: string;
 	sector: string;
-	ipv4: string;
-	router: string;
-	estado: string;
-	saldo: number;
+	sIp: string;
+	sState: string;
+	nBalance: number;
 	plan?: string;
-	coordenadas?: string;
-	fechaPago?: string; // Fecha del último pago
-
-	// Add other client properties as needed
+	nPayment?: number;
 }
 
 export interface IClientPayment extends Client {

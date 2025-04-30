@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	// Nueva función para verificar si el usuario tiene un rol específico
 	const hasRole = useCallback(
 		(role: RoleType): boolean => {
-			return user !== null && user.role === role;
+			return user !== null && user.nRole === role;
 		},
 		[user],
 	);
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			if (requiredRoles.length === 0) return isAuthenticated();
 
 			// Verificar si el usuario tiene alguno de los roles requeridos
-			return user !== null && requiredRoles.includes(user.role as RoleType);
+			return user !== null && requiredRoles.includes(user.nRole as RoleType);
 		},
 		[user, isAuthenticated],
 	);

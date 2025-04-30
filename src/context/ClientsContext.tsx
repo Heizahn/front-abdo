@@ -49,7 +49,7 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
 		data,
 		isLoading: isClientsLoading,
 		refetch: refetchClients,
-	} = useFetchData<Client[]>('/clientsAll', 'all-clients');
+	} = useFetchData<Client[]>('/clients', 'clients-table');
 
 	const clients = useMemo(() => {
 		if (data) {
@@ -75,31 +75,30 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
 			const searchLower = debouncedSearchTerms.toLowerCase();
 			result = result.filter(
 				(client) =>
-					(client.nombre && client.nombre.toLowerCase().includes(searchLower)) ||
-					(client.identificacion &&
-						client.identificacion.toLowerCase().includes(searchLower)) ||
-					(client.telefonos &&
-						client.telefonos.toLowerCase().includes(searchLower)) ||
+					(client.sName && client.sName.toLowerCase().includes(searchLower)) ||
+					(client.sDni && client.sDni.toLowerCase().includes(searchLower)) ||
+					(client.sPhone && client.sPhone.toLowerCase().includes(searchLower)) ||
 					(client.sector && client.sector.toLowerCase().includes(searchLower)) ||
-					(client.ipv4 && client.ipv4.toLowerCase().includes(searchLower)) ||
-					(client.router && client.router.toLowerCase().includes(searchLower)) ||
+					(client.sIp && client.sIp.toLowerCase().includes(searchLower)) ||
 					(client.plan && client.plan.toLowerCase().includes(searchLower)),
 			);
 		}
 
 		// Luego aplicar el filtro de estado
 		if (clientStatsFiltered.todos) {
-			result = result.filter((client) => client.estado !== 'Retirado');
+			result = result.filter((client) => client.sState !== 'Retirado');
 		} else if (clientStatsFiltered.solventes) {
 			result = result.filter(
-				(client) => client.estado === 'Activo' && client.saldo >= 0,
+				(client) => client.sState === 'Activo' && client.nBalance >= 0,
 			);
 		} else if (clientStatsFiltered.morosos) {
-			result = result.filter((client) => client.estado === 'Activo' && client.saldo < 0);
+			result = result.filter(
+				(client) => client.sState === 'Activo' && client.nBalance < 0,
+			);
 		} else if (clientStatsFiltered.suspendidos) {
-			result = result.filter((client) => client.estado === 'Suspendido');
+			result = result.filter((client) => client.sState === 'Suspendido');
 		} else if (clientStatsFiltered.retirados) {
-			result = result.filter((client) => client.estado === 'Retirado');
+			result = result.filter((client) => client.sState === 'Retirado');
 		}
 
 		return result;

@@ -9,25 +9,24 @@ import { queryClient } from '../../query-client';
 
 // Define the interface for the sector form data
 interface SectorFormData {
-	nombre: string;
+	sName: string;
 }
 
 // Define the data transfer object for the API
-interface SectorDataDTO {
-	nombre: string;
-	estado: string;
-	creadoPor: string;
-	fechaCreacion: string;
+interface SectorDataDTO extends SectorFormData {
+	sState: string;
+	idCreator: string;
+	dCreation: string;
 }
 
 // Initial form values
 const valueInitial: SectorFormData = {
-	nombre: '',
+	sName: '',
 };
 
 // Validation schema using Yup
 const validationSchema = yup.object({
-	nombre: yup.string().required('El nombre es obligatorio'),
+	sName: yup.string().required('El nombre es obligatorio'),
 });
 
 interface CreateSectorFormProps {
@@ -47,10 +46,10 @@ const CreateSectorForm: React.FC<CreateSectorFormProps> = ({ closeModal }) => {
 	const { notifySuccess, notifyError } = useNotification();
 
 	// Define query keys to invalidate after successful creation
-	const queryKeys = ['sectorsList'];
+	const queryKeys = ['sectors'];
 
 	// Mutation for creating sector
-	const mutation = useMutateDate<SectorDataDTO, SectorDataDTO>('/sectores', {
+	const mutation = useMutateDate<SectorDataDTO, SectorDataDTO>('/sectors', {
 		onSuccess: () => {
 			notifySuccess(
 				'El sector se ha creado correctamente en el sistema',
@@ -143,13 +142,12 @@ const CreateSectorForm: React.FC<CreateSectorFormProps> = ({ closeModal }) => {
 		if (user) {
 			const createDate = new Date().toISOString();
 			const sectorData: SectorDataDTO = {
-				nombre: formData.nombre,
-				estado: 'Activo',
-				creadoPor: user.id,
-				fechaCreacion: createDate,
+				sName: formData.sName,
+				sState: 'Activo',
+				idCreator: user.id,
+				dCreation: createDate,
 			};
 
-			console.log('sectorData', sectorData);
 			await mutation.mutateAsync(sectorData);
 
 			// Reset form state
@@ -201,14 +199,14 @@ const CreateSectorForm: React.FC<CreateSectorFormProps> = ({ closeModal }) => {
 				<TextField
 					required
 					fullWidth
-					id='nombre'
+					id='sName'
 					label='Nombre'
-					name='nombre'
-					value={formData.nombre}
+					name='sName'
+					value={formData.sName}
 					onChange={handleChange}
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.nombre)}
-					helperText={attemptedSubmit && errors.nombre}
+					error={Boolean(attemptedSubmit && errors.sName)}
+					helperText={attemptedSubmit && errors.sName}
 					size='small'
 				/>
 

@@ -3,7 +3,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import LayersIcon from '@mui/icons-material/Layers';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import RouterIcon from '@mui/icons-material/Router';
+// import RouterIcon from '@mui/icons-material/Router';
 import { ROLES } from '../context/AuthContext'; // Importa las constantes de roles
 
 // Modificamos la estructura para incluir los roles permitidos para cada ítem
@@ -38,12 +38,12 @@ export const navigationItems = [
 		path: '/sectors',
 		allowedRoles: [ROLES.SUPERADMIN], // Solo superadmin puede ver sectores
 	},
-	{
-		text: 'Routers',
-		icon: <RouterIcon />,
-		path: '/routers',
-		allowedRoles: [ROLES.SUPERADMIN], // Solo superadmin puede ver routers
-	},
+	// {
+	// 	text: 'Routers',
+	// 	icon: <RouterIcon />,
+	// 	path: '/routers',
+	// 	allowedRoles: [ROLES.SUPERADMIN], // Solo superadmin puede ver routers
+	// },
 ];
 
 // Función de utilidad para filtrar items por rol

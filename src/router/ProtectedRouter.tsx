@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth, ROLES, RoleType } from '../context/AuthContext';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import DefaultRedirect from './DefaultRedirect';
 
 // Definimos qué rutas están permitidas para cada rol
 const ROLE_ROUTES: Record<RoleType, string[]> = {
@@ -24,13 +25,13 @@ export default function ProtectedRouter({ requiredRoles = [] }: ProtectedRouterP
 		if (requiredRoles.length === 0) return true;
 
 		// Si el usuario no tiene rol definido, no permitimos acceso
-		if (!user || typeof user.role !== 'number') return false;
+		if (!user || typeof user.nRole !== 'number') return false;
 
 		// Verificamos si el rol del usuario está entre los roles permitidos
-		if (requiredRoles.includes(user.role as RoleType)) return true;
+		if (requiredRoles.includes(user.nRole as RoleType)) return true;
 
 		// Verificamos si la ruta actual está permitida para el rol del usuario
-		const allowedRoutes = ROLE_ROUTES[user.role as RoleType] || [];
+		const allowedRoutes = ROLE_ROUTES[user.nRole as RoleType] || [];
 
 		// Si el rol tiene acceso a todas las rutas
 		if (allowedRoutes.includes('*')) return true;
@@ -68,15 +69,9 @@ export default function ProtectedRouter({ requiredRoles = [] }: ProtectedRouterP
 		return <Navigate to='/login' />;
 	}
 
-	// Si el usuario está autenticado pero no tiene el rol requerido
+	//Si el usuario no tiene el rol requerido, redirigimos a su ruta por defecto
 	if (!hasRoleAccess()) {
-		return (
-			<Navigate
-				to={user?.role === ROLES.PAYMENT_USER ? '/payments' : '/'}
-				replace
-				state={{ from: location }}
-			/>
-		);
+		return <DefaultRedirect />;
 	}
 
 	// Si está autenticado y tiene el rol correcto, mostramos el contenido

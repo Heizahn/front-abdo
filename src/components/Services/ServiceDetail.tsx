@@ -10,6 +10,7 @@ import {
 	MenuItem,
 	FormHelperText,
 	SelectChangeEvent,
+	Grid,
 } from '@mui/material';
 import ConfirmDialog from '../common/Confirm'; // Adjust path as needed
 import * as yup from 'yup';
@@ -21,29 +22,23 @@ import { queryClient } from '../../query-client';
 
 // Define the interface for the service form data
 interface ServiceDetailData {
-	_id: string;
-	nombre: string;
-	costo: string | number;
-	tipo: string;
-	descripcion: string;
-	estado: string;
-	creadoPor?: string;
-	editadoPor?: string;
-	fechaCreacion?: string;
-	fechaEdicion?: string;
+	id: string;
+	sName: string;
+	nAmount: number;
+	nMBPS: number;
+	sState: string;
+	creator: string;
+	dCreation: string;
+	editor: string;
+	dEdition: string;
 }
 
 // Validation schema using Yup
 const validationSchema = yup.object({
-	nombre: yup.string().required('El nombre es obligatorio'),
-	costo: yup
-		.number()
-		.typeError('El costo debe ser un número')
-		.positive('El costo debe ser mayor que 0')
-		.required('El costo es obligatorio'),
-	tipo: yup.string().required('El tipo de servicio es obligatorio'),
-	estado: yup.string().required('El estado es obligatorio'),
-	descripcion: yup.string(),
+	sName: yup.string().required('El nombre es obligatorio'),
+	nAmount: yup.number().required('El costo es obligatorio'),
+	nMBPS: yup.number().required('La velocidad es obligatoria'),
+	sState: yup.string().required('El estado es obligatorio'),
 });
 
 interface ServiceDetailProps {
@@ -139,22 +134,21 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceData, onClose }) =
 	const handleConfirm = async () => {
 		// Prepare the payload for the API
 		const updatedService = {
-			nombre: formData.nombre,
-			costo: Number(formData.costo),
-			tipo: formData.tipo,
-			descripcion: formData.descripcion,
-			estado: formData.estado,
-			fechaEdicion: new Date().toISOString(),
-			editadoPor: user?.id,
+			sName: formData.sName,
+			nAmount: Number(formData.nAmount),
+			nMBPS: Number(formData.nMBPS),
+			sState: formData.sState,
+			idEditor: user?.id,
+			dEdition: new Date().toISOString(),
 		};
 
 		try {
-			await axios.patch(`${HOST_API}/planes/${serviceData._id}`, updatedService);
+			await axios.patch(`${HOST_API}/plans/${serviceData.id}`, updatedService);
 
 			notifySuccess('Servicio actualizado correctamente', 'Servicio actualizado');
 
 			queryClient.invalidateQueries({
-				queryKey: ['plansList'],
+				queryKey: ['plans'],
 			});
 		} catch (error) {
 			if (error instanceof Error) {
@@ -204,104 +198,96 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ serviceData, onClose }) =
 				<TextField
 					required
 					fullWidth
-					id='nombre'
+					id='sName'
 					label='Nombre'
-					name='nombre'
-					value={formData.nombre}
+					name='sName'
+					value={formData.sName}
 					onChange={handleChange}
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.nombre)}
-					helperText={attemptedSubmit && errors.nombre}
+					error={Boolean(attemptedSubmit && errors.sName)}
+					helperText={attemptedSubmit && errors.sName}
 					size='small'
 				/>
-
-				<TextField
-					required
-					fullWidth
-					id='costo'
-					label='Costo ($)'
-					name='costo'
-					value={formData.costo}
-					onChange={handleChange}
-					margin='normal'
-					error={Boolean(attemptedSubmit && errors.costo)}
-					helperText={attemptedSubmit && errors.costo}
-					size='small'
-					inputProps={{
-						inputMode: 'decimal',
-					}}
-				/>
-
-				<TextField
-					required
-					fullWidth
-					id='tipo'
-					label='Tipo de Servicio'
-					name='tipo'
-					value={formData.tipo}
-					onChange={handleChange}
-					margin='normal'
-					error={Boolean(attemptedSubmit && errors.tipo)}
-					helperText={attemptedSubmit && errors.tipo}
-					size='small'
-				/>
-
-				<TextField
-					fullWidth
-					id='descripcion'
-					label='Descripción'
-					name='descripcion'
-					value={formData.descripcion}
-					onChange={handleChange}
-					margin='normal'
-					error={Boolean(attemptedSubmit && errors.descripcion)}
-					helperText={attemptedSubmit && errors.descripcion}
-					size='small'
-				/>
+				<Grid container spacing={2}>
+					<Grid item xs={6}>
+						<TextField
+							required
+							fullWidth
+							id='nAmount'
+							label='Costo ($)'
+							name='nAmount'
+							value={formData.nAmount}
+							onChange={handleChange}
+							margin='normal'
+							error={Boolean(attemptedSubmit && errors.nAmount)}
+							helperText={attemptedSubmit && errors.nAmount}
+							size='small'
+							inputProps={{
+								inputMode: 'decimal',
+							}}
+						/>
+					</Grid>
+					<Grid item xs={6}>
+						<TextField
+							required
+							fullWidth
+							id='nMBPS'
+							label='Velocidad (Mbps)'
+							name='nMBPS'
+							value={formData.nMBPS}
+							onChange={handleChange}
+							margin='normal'
+							error={Boolean(attemptedSubmit && errors.nMBPS)}
+							helperText={attemptedSubmit && errors.nMBPS}
+							size='small'
+						/>
+					</Grid>
+				</Grid>
 
 				<FormControl
 					fullWidth
 					required
 					margin='normal'
-					error={Boolean(attemptedSubmit && errors.estado)}
+					error={Boolean(attemptedSubmit && errors.sState)}
 					size='small'
 				>
-					<InputLabel id='estado-label'>Estado</InputLabel>
+					<InputLabel id='sState-label'>Estado</InputLabel>
 					<Select
-						labelId='estado-label'
-						id='estado'
-						name='estado'
-						value={formData.estado}
+						labelId='sState-label'
+						id='sState'
+						name='sState'
+						value={formData.sState}
 						label='Estado'
 						onChange={handleSelectChange}
 					>
 						<MenuItem value='Activo'>Activo</MenuItem>
 						<MenuItem value='Inactivo'>Inactivo</MenuItem>
 					</Select>
-					{attemptedSubmit && errors.estado && (
-						<FormHelperText>{errors.estado}</FormHelperText>
+					{attemptedSubmit && errors.sState && (
+						<FormHelperText>{errors.sState}</FormHelperText>
 					)}
 				</FormControl>
 
-				{formData.fechaCreacion && (
+				{formData.dCreation && (
 					<Typography
 						variant='caption'
 						display='block'
 						sx={{ mt: 1, color: 'text.secondary' }}
 					>
-						Creado el: {new Date(formData.fechaCreacion).toLocaleString()}
-						{formData.creadoPor && ` por ${formData.creadoPor}`}
+						Creado el: {new Date(formData.dCreation).toLocaleString()}
+						{formData.creator &&
+							` por ${formData.creator.toString().toUpperCase()}`}
 					</Typography>
 				)}
 
-				{formData.fechaEdicion && (
+				{formData.dEdition && (
 					<Typography
 						variant='caption'
 						display='block'
 						sx={{ color: 'text.secondary' }}
 					>
-						Última modificación: {new Date(formData.fechaEdicion).toLocaleString()}
-						{formData.editadoPor && ` por ${formData.editadoPor}`}
+						Última modificación: {new Date(formData.dEdition).toLocaleString()}
+						{formData.editor && ` por ${formData.editor.toString().toUpperCase()}`}
 					</Typography>
 				)}
 

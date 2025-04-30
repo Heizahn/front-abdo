@@ -20,11 +20,11 @@ export default function DefaultRedirect() {
 	}
 
 	// Si no hay usuario o no tiene rol definido, redirigir al login
-	if (!user || user.role === undefined) {
+	if (!user || user.nRole === undefined) {
 		return <Navigate to='/login' />;
 	}
 
-	switch (user.role) {
+	switch (user.nRole) {
 		case ROLES.PAYMENT_USER:
 			return <Navigate to='/payments' />;
 		case ROLES.ACCOUNTANT:

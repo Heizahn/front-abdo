@@ -36,8 +36,8 @@ export default function Clients() {
 							<FilterStatusList />
 						</Box>
 
-						{user?.role !== ROLES.PAYMENT_USER &&
-							user?.role !== ROLES.ACCOUNTANT && (
+						{user?.nRole !== ROLES.PAYMENT_USER &&
+							user?.nRole !== ROLES.ACCOUNTANT && (
 								<Box>
 									<Create />
 								</Box>

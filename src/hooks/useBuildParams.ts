@@ -5,7 +5,7 @@ export const useBuildParams = () => {
 	const { user } = useAuth();
 
 	const buildParams = useCallback(() => {
-		switch (user?.role) {
+		switch (user?.nRole) {
 			case ROLES.PROVIDER:
 				return '?provider=' + user?.id;
 			default:

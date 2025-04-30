@@ -25,17 +25,16 @@ import { TableRowClickHandler } from '../common/TableRowClickHandler';
 
 // Define the Plan interface based on your API schema
 interface Plan {
-	_id: string;
-	nombre: string;
-	costo: number;
-	tipo: string;
-	descripcion: string;
-	estado: string;
-	clientes?: number;
-	creadoPor: string;
-	editadoPor: string;
-	fechaCreacion: string;
-	fechaEdicion: string;
+	id: string;
+	sName: string;
+	nAmount: number;
+	nMBPS: number;
+	sState: string;
+	nClients?: number;
+	creator: string;
+	dCreation: string;
+	editor: string;
+	dEdition: string;
 }
 
 // Type for sorting
@@ -45,7 +44,7 @@ type OrderBy = keyof Plan;
 const PlansTable: React.FC = () => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('asc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('nombre');
+	const [orderBy, setOrderBy] = useState<OrderBy>('sName');
 	const [visibleItems, setVisibleItems] = useState(100);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -55,7 +54,7 @@ const PlansTable: React.FC = () => {
 	const [selectedService, setSelectedService] = useState<Plan | null>(null);
 
 	// Use TanStack Query to fetch data
-	const { data: plans = [], isLoading } = useFetchData<Plan[]>('/plansList', 'plansList');
+	const { data: plans = [], isLoading } = useFetchData<Plan[]>('/plans', 'plans');
 
 	const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(event.target.value);
@@ -87,12 +86,32 @@ const PlansTable: React.FC = () => {
 			.filter(
 				(plan) =>
 					!searchTerm || // If no search term, include all
-					safeIncludes(plan.nombre, searchTerm) ||
-					safeIncludes(plan.tipo, searchTerm) ||
-					safeIncludes(plan.descripcion, searchTerm) ||
-					safeIncludes(plan.estado, searchTerm),
+					safeIncludes(plan.sName, searchTerm) ||
+					safeIncludes(plan.nAmount, searchTerm) ||
+					safeIncludes(plan.sState, searchTerm),
 			)
 			.sort((a, b) => {
+				if (orderBy === 'sName') {
+					// Extraer el nombre base y la velocidad
+					const getPlanInfo = (plan: Plan) => {
+						const name = plan.sName || '';
+						const mbps = plan.nMBPS || 0;
+						return { name, mbps };
+					};
+
+					const planA = getPlanInfo(a);
+					const planB = getPlanInfo(b);
+
+					// Primero comparar por nombre
+					const nameCompare = planA.name.localeCompare(planB.name);
+					if (nameCompare !== 0) {
+						return order === 'asc' ? nameCompare : -nameCompare;
+					}
+
+					// Si los nombres son iguales, comparar por velocidad
+					return order === 'asc' ? planA.mbps - planB.mbps : planB.mbps - planA.mbps;
+				}
+
 				const valueA = a[orderBy];
 				const valueB = b[orderBy];
 
@@ -229,45 +248,37 @@ const PlansTable: React.FC = () => {
 							<TableRow>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'nombre'}
-										direction={orderBy === 'nombre' ? order : 'asc'}
-										onClick={createSortHandler('nombre')}
+										active={orderBy === 'sName'}
+										direction={orderBy === 'sName' ? order : 'asc'}
+										onClick={createSortHandler('sName')}
 									>
 										Nombre
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'tipo'}
-										direction={orderBy === 'tipo' ? order : 'asc'}
-										onClick={createSortHandler('tipo')}
-									>
-										Tipo
-									</TableSortLabel>
-								</TableCell>
-								<TableCell>
-									<TableSortLabel
-										active={orderBy === 'clientes'}
-										direction={orderBy === 'clientes' ? order : 'asc'}
-										onClick={createSortHandler('clientes')}
-									>
-										Clientes
-									</TableSortLabel>
-								</TableCell>
-								<TableCell>
-									<TableSortLabel
-										active={orderBy === 'costo'}
-										direction={orderBy === 'costo' ? order : 'asc'}
-										onClick={createSortHandler('costo')}
+										active={orderBy === 'nAmount'}
+										direction={orderBy === 'nAmount' ? order : 'asc'}
+										onClick={createSortHandler('nAmount')}
 									>
 										Costo
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'estado'}
-										direction={orderBy === 'estado' ? order : 'asc'}
-										onClick={createSortHandler('estado')}
+										active={orderBy === 'nClients'}
+										direction={orderBy === 'nClients' ? order : 'asc'}
+										onClick={createSortHandler('nClients')}
+									>
+										Clientes
+									</TableSortLabel>
+								</TableCell>
+
+								<TableCell>
+									<TableSortLabel
+										active={orderBy === 'sState'}
+										direction={orderBy === 'sState' ? order : 'asc'}
+										onClick={createSortHandler('sState')}
 									>
 										Estado
 									</TableSortLabel>
@@ -285,7 +296,7 @@ const PlansTable: React.FC = () => {
 								<>
 									{visibleData.map((plan) => (
 										<TableRowClickHandler
-											key={plan._id}
+											key={plan.id}
 											onRowClick={() => handleRowClick(plan)}
 											sx={{
 												cursor: 'pointer',
@@ -297,20 +308,24 @@ const PlansTable: React.FC = () => {
 												},
 											}}
 										>
-											<TableCell>{plan.nombre || '-'}</TableCell>
-											<TableCell>{plan.tipo || '-'}</TableCell>
 											<TableCell>
-												{plan.clientes !== undefined
-													? plan.clientes
-													: 0}
-											</TableCell>
-											<TableCell>
-												{plan.costo !== undefined
-													? `${plan.costo}$`
+												{plan.sName && plan.nMBPS
+													? `${plan.sName} (${
+															plan.nMBPS.toString().length < 2
+																? '0' + plan.nMBPS.toString()
+																: plan.nMBPS.toString()
+													  } Mbps)`
 													: '-'}
 											</TableCell>
 											<TableCell>
-												{plan.estado ? renderEstado(plan.estado) : '-'}
+												{plan.nAmount !== undefined
+													? `${plan.nAmount}`
+													: '-'}
+											</TableCell>
+											<TableCell>{plan.nClients ?? '-'}</TableCell>
+
+											<TableCell>
+												{plan.sState ? renderEstado(plan.sState) : '-'}
 											</TableCell>
 										</TableRowClickHandler>
 									))}

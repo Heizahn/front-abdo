@@ -33,7 +33,7 @@ const MainLayout = ({
 	const { user } = useAuth(); // Obtenemos el usuario del contexto de autenticación
 
 	// Filtramos los items de navegación según el rol del usuario
-	const filteredNavigationItems = getNavigationItemsByRole(user?.role as 0 | 1 | 2);
+	const filteredNavigationItems = getNavigationItemsByRole(user?.nRole as 0 | 1 | 2);
 
 	const handleNavigation = (path: string) => {
 		navigate(path);
