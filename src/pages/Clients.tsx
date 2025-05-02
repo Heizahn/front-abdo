@@ -35,13 +35,6 @@ export default function Clients() {
 						<Box sx={{ display: 'flex', mb: 1, gap: 1 }}>
 							<FilterStatusList />
 						</Box>
-
-						{user?.nRole !== ROLES.PAYMENT_USER &&
-							user?.nRole !== ROLES.ACCOUNTANT && (
-								<Box>
-									<Create />
-								</Box>
-							)}
 					</Box>
 					<Box
 						sx={{
@@ -49,10 +42,28 @@ export default function Clients() {
 							justifyContent: 'space-between',
 							alignItems: 'center',
 							bgcolor: 'background.default',
+							paddingY: 1,
+							paddingX: 2,
 						}}
 					>
 						<Typography variant='h6'>Clientes</Typography>
-						<SearchInput />
+
+						<Box
+							sx={{
+								display: 'flex',
+								gap: 4,
+								alignItems: 'center',
+								justifyContent: 'center',
+							}}
+						>
+							{user?.nRole !== ROLES.PAYMENT_USER &&
+								user?.nRole !== ROLES.ACCOUNTANT && (
+									<Box>
+										<Create />
+									</Box>
+								)}
+							<SearchInput />
+						</Box>
 					</Box>
 
 					<TableClients />

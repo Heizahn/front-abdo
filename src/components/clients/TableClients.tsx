@@ -2,13 +2,14 @@ import {
 	Box,
 	Paper,
 	Typography,
-	LinearProgress,
 	Link,
 	Table,
 	TableHead,
 	TableRow,
 	TableCell,
 	TableBody,
+	TableContainer,
+	LinearProgress,
 } from '@mui/material';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Client } from '../../interfaces/Interfaces';
@@ -47,32 +48,27 @@ export default function TableClients() {
 				accessorKey: 'sName',
 				header: 'Nombre',
 				cell: (info) => String(info.getValue() ?? ''),
-				size: 280,
 			},
 			{
 				accessorKey: 'sDni',
 				header: 'Identificación',
 				cell: (info) => String(info.getValue() ?? ''),
-				size: 110,
 			},
 			{
 				accessorKey: 'sPhone',
 				header: 'Teléfono',
 				cell: (info) => String(info.getValue() ?? ''),
-				size: 100,
 			},
 			{
 				accessorKey: 'sector',
 				header: 'Sector',
 				cell: (info) => String(info.getValue() ?? ''),
-				size: 130,
 			},
 			{
 				accessorKey: 'sIp',
 				header: 'IPv4',
 				cell: (info) => {
 					const ip = info.getValue() as string;
-
 					if (!ip) return 'IP no asignada';
 					return (
 						<Link
@@ -90,10 +86,8 @@ export default function TableClients() {
 						if (!ip) return [0, 0, 0, 0];
 						return ip.split('.').map((octet) => parseInt(octet, 10) || 0);
 					};
-
 					const octetsA = getIpOctets(rowA.getValue('sIp'));
 					const octetsB = getIpOctets(rowB.getValue('sIp'));
-
 					for (let i = 0; i < 4; i++) {
 						if (octetsA[i] !== octetsB[i]) {
 							return octetsA[i] - octetsB[i];
@@ -101,28 +95,23 @@ export default function TableClients() {
 					}
 					return 0;
 				},
-				size: 100,
 			},
 			{
 				accessorKey: 'plan',
 				header: 'Plan',
 				cell: (info) => String(info.getValue() ?? ''),
-				size: 130,
 			},
 			{
 				accessorKey: 'nPayment',
 				header: 'Fecha límite',
-				size: 80,
-				cell: (info) => {
-					return (
-						<Typography
-							sx={{ fontSize: '0.8rem', textAlign: 'center', width: '100%' }}
-							component='span'
-						>
-							{String(info.getValue() ?? '')}
-						</Typography>
-					);
-				},
+				cell: (info) => (
+					<Typography
+						sx={{ fontSize: '0.8rem', textAlign: 'center', width: '100%' }}
+						component='span'
+					>
+						{String(info.getValue() ?? '')}
+					</Typography>
+				),
 			},
 			{
 				accessorKey: 'nBalance',
@@ -134,15 +123,12 @@ export default function TableClients() {
 						<Typography
 							variant='body2'
 							component='span'
-							style={{
-								color: saldoValido < 0 ? '#d32f2f' : '#2e7d32',
-							}}
+							sx={{ color: saldoValido < 0 ? '#d32f2f' : '#2e7d32' }}
 						>
 							{saldoValido % 1 === 0 ? saldoValido : saldoValido.toFixed(2)}
 						</Typography>
 					);
 				},
-				size: 55,
 			},
 			{
 				accessorKey: 'sState',
@@ -156,7 +142,6 @@ export default function TableClients() {
 					}
 					return getStateComponent(realEstado);
 				},
-				size: 100,
 			},
 			{
 				id: 'acciones',
@@ -169,7 +154,6 @@ export default function TableClients() {
 						<ActionButtons client={info.row.original} />
 					</Box>
 				),
-				size: 50,
 			},
 		],
 		[],
@@ -182,61 +166,189 @@ export default function TableClients() {
 		onSortingChange: setSorting,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
-		columnResizeMode: 'onChange',
 	});
 
 	const rowVirtualizer = useVirtualizer({
 		count: table.getRowModel().rows.length,
 		getScrollElement: () => tableContainerRef.current,
-		estimateSize: () => 48, // Altura estimada de cada fila (ajusta según tu diseño)
+		estimateSize: () => 48,
 		overscan: 10,
 	});
 
-	const renderTableContent = () => {
-		if (filteredClients.length === 0 && !loading) {
-			return (
-				<Box sx={{ p: 3, textAlign: 'center' }}>
-					<Typography variant='subtitle1'>No se encontraron clientes</Typography>
-				</Box>
-			);
-		}
+	// const renderTableContent = () => {
+	// 	if (filteredClients.length === 0 && !loading) {
+	// 		return (
+	// 			<Box sx={{ p: 3, textAlign: 'center' }}>
+	// 				<Typography variant='subtitle1'>No se encontraron clientes</Typography>
+	// 			</Box>
+	// 		);
+	// 	}
 
-		// Calcular el ancho total de la tabla
-		const totalWidth = table
-			.getAllColumns()
-			.reduce((acc, column) => acc + column.getSize(), 0);
+	// 	return (
+	// 		<div
+	// 			ref={tableContainerRef}
+	// 			style={{
+	// 				height: 'calc(100vh - 15.5rem)',
+	// 				overflow: 'auto',
+	// 				width: '100%',
+	// 			}}
+	// 		>
+	// 			<TableContainer sx={{ maxHeight: 860 }}>
+	// 				<Table stickyHeader size='small' aria-label='tabla de clientes'>
+	// 					<TableHead>
+	// 						{table.getHeaderGroups().map((headerGroup) => (
+	// 							<TableRow key={headerGroup.id}>
+	// 								{headerGroup.headers.map((header) => (
+	// 									<TableCell key={header.id}>
+	// 										<div
+	// 											{...{
+	// 												onClick:
+	// 													header.column.getToggleSortingHandler(),
+	// 												style: {
+	// 													cursor: header.column.getCanSort()
+	// 														? 'pointer'
+	// 														: 'default',
+	// 													display: 'flex',
+	// 													alignItems: 'center',
+	// 												},
+	// 											}}
+	// 										>
+	// 											{flexRender(
+	// 												header.column.columnDef.header,
+	// 												header.getContext(),
+	// 											)}
+	// 											{header.column.getIsSorted() === 'asc' && (
+	// 												<ArrowUpward
+	// 													sx={{ fontSize: '1rem', ml: 0.5 }}
+	// 												/>
+	// 											)}
+	// 											{header.column.getIsSorted() === 'desc' && (
+	// 												<ArrowDownward
+	// 													sx={{ fontSize: '1rem', ml: 0.5 }}
+	// 												/>
+	// 											)}
+	// 										</div>
+	// 									</TableCell>
+	// 								))}
+	// 							</TableRow>
+	// 						))}
+	// 					</TableHead>
+	// 					<TableBody>
+	// 						{loading ? (
+	// 							<TableRow>
+	// 								<TableCell colSpan={columns.length} align='center'>
+	// 									<CircularProgress size={40} sx={{ my: 2 }} />
+	// 								</TableCell>
+	// 							</TableRow>
+	// 						) : rowVirtualizer.getVirtualItems().length > 0 ? (
+	// 							<>
+	// 								{/* Espaciador superior */}
+	// 								{rowVirtualizer.getVirtualItems()[0].start > 0 && (
+	// 									<TableRow
+	// 										style={{
+	// 											height: rowVirtualizer.getVirtualItems()[0]
+	// 												.start,
+	// 										}}
+	// 									>
+	// 										<TableCell
+	// 											colSpan={columns.length}
+	// 											style={{ padding: 0, border: 0 }}
+	// 										/>
+	// 									</TableRow>
+	// 								)}
+	// 								{/* Filas virtualizadas */}
+	// 								{rowVirtualizer
+	// 									.getVirtualItems()
+	// 									.map((virtualRow) => {
+	// 										const row =
+	// 											table.getRowModel().rows[virtualRow.index];
+	// 										return (
+	// 											<TableRow
+	// 												key={row.id}
+	// 												hover
+	// 												sx={{
+	// 													cursor: 'pointer',
+	// 													'&:hover': {
+	// 														backgroundColor:
+	// 															'rgba(0, 0, 0, 0.04)',
+	// 													},
+	// 													'&:nth-of-type(odd)': {
+	// 														backgroundColor:
+	// 															'rgba(0, 0, 0, 0.02)',
+	// 													},
+	// 												}}
+	// 											>
+	// 												{row.getVisibleCells().map((cell) => (
+	// 													<TableCell key={cell.id}>
+	// 														{flexRender(
+	// 															cell.column.columnDef.cell,
+	// 															cell.getContext(),
+	// 														)}
+	// 													</TableCell>
+	// 												))}
+	// 											</TableRow>
+	// 										);
+	// 									})}
+	// 								{/* Espaciador inferior */}
+	// 								<TableRow
+	// 									style={{
+	// 										height:
+	// 											rowVirtualizer.getTotalSize() -
+	// 											(rowVirtualizer.getVirtualItems().at(-1)
+	// 												?.end ?? 0),
+	// 									}}
+	// 								>
+	// 									<TableCell
+	// 										colSpan={columns.length}
+	// 										style={{ padding: 0, border: 0 }}
+	// 									/>
+	// 								</TableRow>
+	// 							</>
+	// 						) : (
+	// 							<TableRow>
+	// 								<TableCell colSpan={columns.length} align='center'>
+	// 									No se encontraron clientes
+	// 								</TableCell>
+	// 							</TableRow>
+	// 						)}
+	// 					</TableBody>
+	// 				</Table>
+	// 			</TableContainer>
+	// 		</div>
+	// 	);
+	// };
 
-		return (
-			<div
-				ref={tableContainerRef}
-				style={{
-					height: 'calc(100vh - 15.5rem)',
-					overflow: 'auto',
-					width: '100%',
-					position: 'relative',
+	return (
+		<Paper
+			sx={{
+				flexGrow: 1,
+				overflow: 'hidden',
+				boxShadow: 'none',
+				border: '1px solid rgba(224, 224, 224, 1)',
+				display: 'flex',
+				flexDirection: 'column',
+				borderBottomRightRadius: 8,
+				borderBottomLeftRadius: 8,
+				height: '100%',
+				minHeight: '0',
+			}}
+		>
+			<TableContainer
+				sx={{
+					flex: 1,
+					height: '100%', // <--- El TableContainer también ocupa todo el alto
+					maxHeight: '100%',
 				}}
+				ref={tableContainerRef}
 			>
-				<Table stickyHeader style={{ width: `${totalWidth}px`, tableLayout: 'fixed' }}>
+				<Table stickyHeader size='small' aria-label='tabla de clientes'>
 					<TableHead>
 						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow
-								key={headerGroup.id}
-								style={{ display: 'flex', width: '100%' }}
-							>
+							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => (
 									<TableCell
 										key={header.id}
-										style={{
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'flex-start',
-											flex: 1,
-											minWidth: `${header.getSize()}px`,
-											padding: '6px 4px',
-											fontWeight: 600,
-											fontSize: '1.1rem',
-											color: 'rgba(0, 0, 0, 0.87)',
-										}}
+										sx={{ fontSize: 16, fontWeight: 'bold' }}
 									>
 										<div
 											{...{
@@ -272,70 +384,74 @@ export default function TableClients() {
 						))}
 					</TableHead>
 					<TableBody>
-						<tr
-							style={{
-								height: `${rowVirtualizer.getTotalSize()}px`,
-								position: 'relative',
-								display: 'block',
-							}}
-						>
-							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-								const row = table.getRowModel().rows[virtualRow.index];
-								return (
+						{rowVirtualizer.getVirtualItems().length > 0 ? (
+							<>
+								{/* Espaciador superior */}
+								{rowVirtualizer.getVirtualItems()[0].start > 0 && (
 									<TableRow
-										key={row.id}
 										style={{
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											width: '100%',
-											transform: `translateY(${virtualRow.start}px)`,
-											display: 'flex',
+											height: rowVirtualizer.getVirtualItems()[0].start,
 										}}
 									>
-										{row.getVisibleCells().map((cell) => (
-											<TableCell
-												key={cell.id}
-												style={{
-													flex: 1,
-													minWidth: `${cell.column.getSize()}px`,
-													padding: '6px 4px',
-												}}
-											>
-												{flexRender(
-													cell.column.columnDef.cell,
-													cell.getContext(),
-												)}
-											</TableCell>
-										))}
+										<TableCell
+											colSpan={columns.length}
+											style={{ padding: 0, border: 0 }}
+										/>
 									</TableRow>
-								);
-							})}
-						</tr>
+								)}
+								{/* Filas virtualizadas */}
+								{rowVirtualizer.getVirtualItems().map((virtualRow) => {
+									const row = table.getRowModel().rows[virtualRow.index];
+									return (
+										<TableRow
+											key={row.id}
+											hover
+											sx={{
+												cursor: 'pointer',
+												'&:hover': {
+													backgroundColor: 'rgba(0, 0, 0, 0.04)',
+												},
+												'&:nth-of-type(odd)': {
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
+												},
+											}}
+										>
+											{row.getVisibleCells().map((cell) => (
+												<TableCell key={cell.id}>
+													{flexRender(
+														cell.column.columnDef.cell,
+														cell.getContext(),
+													)}
+												</TableCell>
+											))}
+										</TableRow>
+									);
+								})}
+								{/* Espaciador inferior */}
+								<TableRow
+									style={{
+										height:
+											rowVirtualizer.getTotalSize() -
+											(rowVirtualizer.getVirtualItems().at(-1)?.end ??
+												0),
+									}}
+								>
+									<TableCell
+										colSpan={columns.length}
+										style={{ padding: 0, border: 0 }}
+									/>
+								</TableRow>
+							</>
+						) : (
+							<TableRow>
+								<TableCell colSpan={columns.length} align='center'>
+									No se encontraron clientes
+								</TableCell>
+							</TableRow>
+						)}
 					</TableBody>
 				</Table>
-			</div>
-		);
-	};
-
-	return (
-		<Paper
-			sx={{
-				overflow: 'hidden',
-				boxShadow: 'none',
-				display: 'flex',
-				flexDirection: 'column',
-				position: 'relative',
-				padding: 0,
-				borderTopLeftRadius: 0,
-				borderTopRightRadius: 0,
-				borderBottomLeftRadius: 4,
-				borderBottomRightRadius: 4,
-			}}
-		>
-			{/* Cuerpo de la tabla */}
-			<Box sx={{ overflow: 'hidden', padding: 0 }}>{renderTableContent()}</Box>
-
+			</TableContainer>
 			{/* Indicador sutil en la parte inferior */}
 			<Box
 				sx={{

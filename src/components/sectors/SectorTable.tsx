@@ -236,7 +236,7 @@ const SectorsTable: React.FC = () => {
 					<Table stickyHeader size='small' aria-label='tabla de sectores'>
 						<TableHead>
 							<TableRow>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'sName'}
 										direction={orderBy === 'sName' ? order : 'asc'}
@@ -245,7 +245,7 @@ const SectorsTable: React.FC = () => {
 										Nombre
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'dCreation'}
 										direction={orderBy === 'dCreation' ? order : 'asc'}
@@ -254,7 +254,7 @@ const SectorsTable: React.FC = () => {
 										Fecha de Creación
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'nClients'}
 										direction={orderBy === 'nClients' ? order : 'asc'}
@@ -263,7 +263,7 @@ const SectorsTable: React.FC = () => {
 										Clientes
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'sState'}
 										direction={orderBy === 'sState' ? order : 'asc'}

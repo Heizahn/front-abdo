@@ -43,6 +43,9 @@ export default function SendLastPay({ clientesId }: { clientesId: string }) {
 				color='primary'
 				onClick={handleSendLastPay}
 				disabled={sendingLastPay}
+				sx={{
+					padding: 0,
+				}}
 			>
 				<SendIcon fontSize='medium' color={sendingLastPay ? 'disabled' : 'primary'} />
 			</IconButton>

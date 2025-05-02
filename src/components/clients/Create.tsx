@@ -91,7 +91,7 @@ const ClientsPage: React.FC = () => {
 	};
 
 	return (
-		<Box sx={{ my: 2 }}>
+		<Box>
 			<SimpleModalWrapper
 				triggerButtonText='Crear'
 				triggerButtonColor='primary'

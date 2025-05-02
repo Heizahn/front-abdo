@@ -246,7 +246,7 @@ const PlansTable: React.FC = () => {
 					<Table stickyHeader size='small' aria-label='tabla de servicios'>
 						<TableHead>
 							<TableRow>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'sName'}
 										direction={orderBy === 'sName' ? order : 'asc'}
@@ -255,7 +255,7 @@ const PlansTable: React.FC = () => {
 										Nombre
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'nAmount'}
 										direction={orderBy === 'nAmount' ? order : 'asc'}
@@ -264,7 +264,7 @@ const PlansTable: React.FC = () => {
 										Costo
 									</TableSortLabel>
 								</TableCell>
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'nClients'}
 										direction={orderBy === 'nClients' ? order : 'asc'}
@@ -274,7 +274,7 @@ const PlansTable: React.FC = () => {
 									</TableSortLabel>
 								</TableCell>
 
-								<TableCell>
+								<TableCell sx={{ fontSize: 16, fontWeight: 'bold' }}>
 									<TableSortLabel
 										active={orderBy === 'sState'}
 										direction={orderBy === 'sState' ? order : 'asc'}

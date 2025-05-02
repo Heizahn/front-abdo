@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Box, IconButton, Tooltip, Menu } from '@mui/material';
-import { PaidRounded as PaidIcon, MoreVertRounded as MoreIcon } from '@mui/icons-material';
+import { Box, IconButton, Tooltip } from '@mui/material';
+import { PaidRounded as PaidIcon } from '@mui/icons-material';
 import SimpleModalWrapper from '../../common/ContainerForm';
 import Pay from '../../common/Pay';
 import SendLastPay from '../SendLastPay';
@@ -13,63 +12,33 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons = ({ client }: ActionButtonsProps) => {
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-	const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-
-	const handleClose = () => {
-		setAnchorEl(null);
-	};
-
 	return (
-		<Box onClick={(e) => e.stopPropagation()}>
-			<Tooltip title='Botones de acción'>
-				<IconButton onClick={handleClick}>
-					<MoreIcon />
-				</IconButton>
-			</Tooltip>
-			<Menu
-				anchorEl={anchorEl}
-				open={Boolean(anchorEl)}
-				onClose={handleClose}
-				anchorOrigin={{
-					vertical: 'bottom',
-					horizontal: 'right',
-				}}
-				transformOrigin={{
-					vertical: 'top',
-					horizontal: 'right',
+		<Box onClick={(e) => e.stopPropagation()} sx={{ padding: 0 }}>
+			<SimpleModalWrapper
+				triggerButtonText=''
+				triggerButtonColor='primary'
+				showCloseButton={false}
+				triggerComponent={
+					<Tooltip title='Cargar pago'>
+						<IconButton color='primary' sx={{ padding: 0 }}>
+							<PaidIcon />
+						</IconButton>
+					</Tooltip>
+				}
+				triggerButtonSx={{
+					padding: 0,
 				}}
 			>
-				<SimpleModalWrapper
-					triggerButtonText=''
-					triggerButtonColor='primary'
-					showCloseButton={false}
-					triggerComponent={
-						<Tooltip title='Cargar pago'>
-							<IconButton color='primary'>
-								<PaidIcon />
-							</IconButton>
-						</Tooltip>
-					}
-				>
-					<Pay
-						clientesId={client.id}
-						clientName={client.nombre}
-						onCancel={() => {}}
-					/>
-				</SimpleModalWrapper>
+				<Pay clientesId={client.id} clientName={client.sName} onCancel={() => {}} />
+			</SimpleModalWrapper>
 
-				<SendLastPay clientesId={client.id} />
-				{client.estado !== 'Retirado' && (
-					<SuspendedClient clientStatus={client.estado} clientId={client.id} />
-				)}
-				{client.estado !== 'Activo' && (
-					<RetirarButton clientStatus={client.estado} clientId={client.id} />
-				)}
-			</Menu>
+			<SendLastPay clientesId={client.id} />
+			{client.sState !== 'Retirado' && (
+				<SuspendedClient clientStatus={client.sState} clientId={client.id} />
+			)}
+			{client.sState !== 'Activo' && (
+				<RetirarButton clientStatus={client.sState} clientId={client.id} />
+			)}
 		</Box>
 	);
 };
