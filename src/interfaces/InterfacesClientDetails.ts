@@ -1,3 +1,5 @@
+import { Client } from './Interfaces';
+
 export interface Sector {
 	_id: string;
 	nombre: string;
@@ -63,29 +65,22 @@ export interface Pago {
 	motivo: string;
 }
 
-export interface ClientDetails {
-	id: string;
-	nombre: string;
-	identificacion: string;
-	telefonos: string;
-	estado: string;
-	ipv4: string;
-	saldo: number;
-	email: string;
-	direccion: string;
-	coordenadas: string;
-	fechaCreacion: string;
-	fechaPago: number;
-	creadoPor: string;
-	editadoPor: string | null;
-	fechaEdicion: string | null;
-	fechaRetiro: string | null;
-	sector: string;
-	plan: string;
-	router: string;
-	suspendidoPor: string;
-	fechaSuspension: string | null;
-	retiradoPor: string | null;
+export interface ClientDetails extends Client {
+	sSn: string;
+	sMac: string;
+	sType: string;
+	sAddress: string;
+	sCommentary: string;
+	idSector: string;
+	idSubscription: string;
+	idEditor: string;
+	dCreation: string;
+	dSuspension: string;
+	dEdition: string;
+	creator: string;
+	editor: string;
+	installer: string;
+	suspender: string;
 }
 
 export interface ClientStats {

@@ -36,10 +36,12 @@ export interface Client {
 	sPhone: string;
 	sector: string;
 	sIp?: string;
+	sGps?: string;
 	sState: string;
 	nBalance: number;
 	plan?: string;
 	nPayment?: number;
+	nMBPS?: number;
 }
 
 export interface IClientPayment extends Client {

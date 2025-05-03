@@ -5,7 +5,6 @@ import EditableInfoField from '../common/EditableInfoField';
 interface ContactInfoProps {
 	data: {
 		telefonos: string;
-		email: string;
 	};
 }
 const ContactInfo = ({ data }: ContactInfoProps) => {
@@ -18,16 +17,14 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
 			{!isEditing ? (
 				<>
 					<InfoField label='Teléfono' value={data.telefonos} />
-					<InfoField label='Email' value={data.email} />
 				</>
 			) : (
 				<>
 					<EditableInfoField
 						label='Teléfono'
 						valueInitial={data.telefonos}
-						name='telefonos'
+						name='sPhone'
 					/>
-					<EditableInfoField label='Email' valueInitial={data.email} name='email' />
 				</>
 			)}
 		</Box>

@@ -28,7 +28,7 @@ const BalanceInfo = ({ data }: BalanceInfoProps) => {
 				<EditableInfoField
 					label='Día de Pago'
 					valueInitial={data.fechaPago}
-					name='fechaPago'
+					name='nPayment'
 					type='number'
 				/>
 			)}

@@ -1,15 +1,14 @@
 import { ChangeEvent, useEffect } from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
-import {
-	ClientUpdateType,
-	useClientDetailsContext,
-} from '../../../context/ClientDetailContext';
+import { useClientDetailsContext } from '../../../context/ClientDetailContext';
+import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 
 interface EditableInfoFieldProps {
 	label: string;
 	valueInitial: string | number | boolean;
 	name: string;
 	type?: 'text' | 'email' | 'number';
+	multiline?: boolean;
 }
 
 const EditableInfoField = ({
@@ -17,6 +16,7 @@ const EditableInfoField = ({
 	valueInitial,
 	name,
 	type = 'text',
+	multiline = false,
 }: EditableInfoFieldProps) => {
 	const { setClientUpdate, clientUpdate } = useClientDetailsContext();
 
@@ -34,11 +34,11 @@ const EditableInfoField = ({
 			...prevData,
 			[name]: valueInitial,
 		}));
-	}, [name, setClientUpdate, valueInitial]);
+	}, []);
 
 	const currentValue = clientUpdate
 		? name in clientUpdate
-			? (clientUpdate as ClientUpdateType)[name as keyof ClientUpdateType]
+			? (clientUpdate as Partial<ClientDetails>)[name as keyof Partial<ClientDetails>]
 			: valueInitial
 		: valueInitial;
 
@@ -53,6 +53,7 @@ const EditableInfoField = ({
 				<TextField
 					fullWidth // Added for consistency with select field
 					size='small'
+					multiline={multiline}
 					type={type}
 					name={name}
 					value={currentValue}

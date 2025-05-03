@@ -7,15 +7,13 @@ import {
 	SelectChangeEvent,
 	Typography,
 } from '@mui/material';
-import {
-	ClientUpdateType,
-	useClientDetailsContext,
-} from '../../../context/ClientDetailContext';
+import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import { SelectList } from '../../../interfaces/types';
+import { ClientDetails } from '../../../interfaces/InterfacesClientDetails';
 
 interface EditableInfoFieldProps {
 	label: string;
-	valueInitial: string | number | boolean | string[];
+	valueInitial: string | number | boolean;
 	name: string;
 	selectList: SelectList[];
 }
@@ -31,7 +29,7 @@ const EditableSelectField = ({
 	const handleChange = (e: SelectChangeEvent) => {
 		const { name, value } = e.target;
 
-		setClientUpdate((prevData: ClientUpdateType) => ({
+		setClientUpdate((prevData: Partial<ClientDetails>) => ({
 			...prevData,
 			[name]: value,
 		}));
@@ -39,19 +37,16 @@ const EditableSelectField = ({
 
 	useEffect(() => {
 		if (selectList.length > 0) {
-			let selectedItem;
-			if (Array.isArray(valueInitial)) {
-				selectedItem = selectList.find((item) => valueInitial.includes(item.nombre));
-			} else {
-				selectedItem = selectList.find((item) => item.nombre === valueInitial);
-			}
+			const selectedItem = selectList.find(
+				(item) => String(item.id) === String(valueInitial),
+			);
 
-			setClientUpdate((prevData: ClientUpdateType) => ({
+			setClientUpdate((prevData: Partial<ClientDetails>) => ({
 				...prevData,
-				[name]: selectedItem ? selectedItem._id : null,
+				[name]: selectedItem ? selectedItem.id : null,
 			}));
 		}
-	}, [name, selectList, setClientUpdate, valueInitial]);
+	}, []);
 
 	return (
 		<Grid container spacing={1} sx={{ mb: 2 }}>
@@ -67,15 +62,17 @@ const EditableSelectField = ({
 						name={name}
 						value={
 							(clientUpdate &&
-								clientUpdate[name as keyof ClientUpdateType]?.toString()) ||
+								clientUpdate[
+									name as keyof Partial<ClientDetails>
+								]?.toString()) ||
 							''
 						}
 						onChange={handleChange}
 						variant='standard'
 					>
 						{selectList.map((item) => (
-							<MenuItem key={item._id} value={item._id}>
-								{item.nombre}
+							<MenuItem key={item.id} value={item.id}>
+								{item.sName}
 							</MenuItem>
 						))}
 					</Select>

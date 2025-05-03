@@ -11,12 +11,13 @@ interface LocationInfoProps {
 		sector: string;
 		direccion: string;
 		coordenadas: string;
+		idSector: string;
 	};
 }
 const LocationInfo = ({ data }: LocationInfoProps) => {
 	const { isEditing } = useClientDetailsContext();
 
-	const { data: sectoresList } = useFetchData<SelectList[]>('/sectorsList', 'sectorsList');
+	const { data: sectoresList } = useFetchData<SelectList[]>('/sectors/list', 'sectors-list');
 
 	return (
 		<Box>
@@ -47,19 +48,20 @@ const LocationInfo = ({ data }: LocationInfoProps) => {
 				<>
 					<EditableSelectField
 						label='Sector'
-						name='sectoresId'
+						name='idSector'
 						selectList={sectoresList || []}
-						valueInitial={data.sector}
+						valueInitial={data.idSector}
 					/>
 					<EditableInfoField
 						label='Dirección'
 						valueInitial={data.direccion}
-						name='direccion'
+						name='sAddress'
+						multiline={true}
 					/>
 					<EditableInfoField
 						label='Coordenadas'
 						valueInitial={data.coordenadas || 'N/A'}
-						name='coordenadas'
+						name='sGps'
 					/>
 				</>
 			)}

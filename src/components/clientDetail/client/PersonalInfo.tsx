@@ -3,7 +3,7 @@ import InfoField from '../common/InfoField';
 import { useClientDetailsContext } from '../../../context/ClientDetailContext';
 import EditableInfoField from '../common/EditableInfoField';
 
-const PersonalInfo = ({ data }: { data: { nombre: string; identificacion: string } }) => {
+const PersonalInfo = ({ data }: { data: { nombre: string; dni: string; rif: string } }) => {
 	const { isEditing } = useClientDetailsContext();
 	return (
 		<Box>
@@ -13,19 +13,22 @@ const PersonalInfo = ({ data }: { data: { nombre: string; identificacion: string
 			{!isEditing ? (
 				<>
 					<InfoField label='Nombre' value={data.nombre} />
-					<InfoField label='C.I' value={data.identificacion} />
+					<InfoField
+						label={data.dni ? 'C.I.' : 'RIF'}
+						value={data.dni || data.rif}
+					/>
 				</>
 			) : (
 				<>
 					<EditableInfoField
 						label='Nombre'
 						valueInitial={data.nombre}
-						name='nombre'
+						name='sName'
 					/>
 					<EditableInfoField
-						label='C.I'
-						valueInitial={data.identificacion}
-						name='identificacion'
+						label={data.dni ? 'C.I.' : 'RIF'}
+						valueInitial={data.dni || data.rif}
+						name={data.dni ? 'sDni' : 'sRif'}
 					/>
 				</>
 			)}

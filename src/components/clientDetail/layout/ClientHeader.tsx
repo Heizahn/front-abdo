@@ -81,17 +81,18 @@ const ClientHeader = ({ activeTab }: { activeTab: string }) => {
 				<Box>
 					<Stack direction='row' spacing={1} alignItems='center'>
 						<Typography variant='h5' component='h1'>
-							{client && client.nombre}
+							{client && client.sName}
 						</Typography>
 						<StatusBadge
-							status={client && client.estado}
-							saldo={client && client.saldo}
+							status={client && client.sState}
+							saldo={client && client.nBalance}
 						/>
 					</Stack>
 					<Typography
 						variant='body2'
 						sx={{
-							color: client && client.saldo >= 0 ? 'success.main' : 'error.main',
+							color:
+								client && client.nBalance >= 0 ? 'success.main' : 'error.main',
 							fontWeight: 'bold',
 							fontSize: '1rem',
 							textAlign: 'start',
@@ -99,7 +100,7 @@ const ClientHeader = ({ activeTab }: { activeTab: string }) => {
 							alignItems: 'center',
 						}}
 					>
-						Saldo: {client && client.saldo}$
+						Saldo: {client && client.nBalance}$
 					</Typography>
 				</Box>
 			</Stack>
@@ -116,18 +117,18 @@ const ClientHeader = ({ activeTab }: { activeTab: string }) => {
 
 				{!isEditing ? (
 					<>
-						{client?.estado !== 'Retirado' && (
+						{client?.sState !== 'Retirado' && (
 							<SuspendedClient
 								clientId={client?.id as string}
 								isButton={true}
-								clientStatus={client?.estado as string}
+								clientStatus={client?.sState as string}
 							/>
 						)}
-						{client?.estado !== 'Activo' && (
+						{client?.sState !== 'Activo' && (
 							<RetirarButton
 								clientId={client?.id as string}
 								isButton={true}
-								clientStatus={client?.estado as string}
+								clientStatus={client?.sState as string}
 							/>
 						)}
 					</>

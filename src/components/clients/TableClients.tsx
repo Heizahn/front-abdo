@@ -26,6 +26,7 @@ import {
 	flexRender,
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { useNavigate } from 'react-router-dom';
 
 // Importar el componente de estado visual correctamente
 import { getStateComponent } from './ClientStatus';
@@ -35,12 +36,17 @@ export default function TableClients() {
 	const [sorting, setSorting] = useState<SortingState>([{ id: 'sName', desc: false }]);
 	const [isInitialLoad, setIsInitialLoad] = useState(true);
 	const tableContainerRef = useRef<HTMLDivElement>(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (filteredClients.length > 0 && isInitialLoad) {
 			setIsInitialLoad(false);
 		}
 	}, [filteredClients, isInitialLoad]);
+
+	const handleRowClick = (clientId: string) => {
+		navigate(`/client/${clientId}`);
+	};
 
 	const columns = useMemo<ColumnDef<Client>[]>(
 		() => [
@@ -103,7 +109,11 @@ export default function TableClients() {
 			{
 				accessorKey: 'plan',
 				header: 'Plan',
-				cell: (info) => String(info.getValue() ?? ''),
+				cell: (info) => {
+					const plan = info.getValue() as string;
+					const velocity = info.row.original.nMBPS;
+					return `${plan} (${velocity} Mbps)`;
+				},
 			},
 			{
 				accessorKey: 'nPayment',
@@ -267,6 +277,7 @@ export default function TableClients() {
 										<TableRow
 											key={row.id}
 											hover
+											onClick={() => handleRowClick(row.original.id)}
 											sx={{
 												cursor: 'pointer',
 												'&:hover': {

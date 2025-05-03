@@ -58,16 +58,16 @@ const ClientDetailsCard = () => {
 				<Grid item xs={12} md={4}>
 					<PersonalInfo
 						data={{
-							nombre: data?.nombre ?? '',
-							identificacion: data?.identificacion ?? '',
+							nombre: data?.sName ?? '',
+							dni: data?.sDni ?? '',
+							rif: data?.sRif ?? '',
 						}}
 					/>
 				</Grid>
 				<Grid item xs={12} md={4}>
 					<ContactInfo
 						data={{
-							telefonos: data?.telefonos ?? '',
-							email: data?.email ?? '',
+							telefonos: data?.sPhone ?? '',
 						}}
 					/>
 				</Grid>
@@ -75,41 +75,46 @@ const ClientDetailsCard = () => {
 					<LocationInfo
 						data={{
 							sector: data?.sector ?? '',
-							direccion: data?.direccion ?? '',
-							coordenadas: data?.coordenadas ?? '',
+							direccion: data?.sAddress ?? '',
+							coordenadas: data?.sCommentary ?? '',
+							idSector: data?.idSector ?? '',
 						}}
 					/>
 				</Grid>
 				<Grid item xs={12} md={4}>
 					<ServicesInfo
 						data={{
-							router: data?.router ?? '',
-							ipv4: data?.ipv4 ?? '',
-							plan: data?.plan ?? '',
+							type: data?.sType as 'RF' | 'FO',
+							mac: data?.sMac ?? '',
+							sn: data?.sSn ?? '',
+							ipv4: data?.sIp ?? '',
+							plan:
+								data?.plan && data?.nMBPS
+									? `${data?.plan} (${data?.nMBPS} Mbps)`
+									: '',
+							idSubscription: data?.idSubscription ?? '',
 						}}
 					/>
 				</Grid>
 				<Grid item xs={12} md={4}>
 					<BalanceInfo
 						data={{
-							saldo: data?.saldo ?? 0,
-							fechaPago: data?.fechaPago ?? 0,
+							saldo: data?.nBalance ?? 0,
+							fechaPago: data?.nPayment ?? 0,
 						}}
 					/>
 				</Grid>
 				<Grid item xs={12} md={4}>
 					<StatusInfo
 						data={{
-							saldo: data?.saldo ?? 0,
-							estado: data?.estado ?? '',
-							creadoPor: data?.creadoPor ?? '',
-							fechaCreacion: data?.fechaCreacion ?? '',
-							editadoPor: data?.editadoPor ?? '',
-							fechaEdicion: data?.fechaEdicion ?? '',
-							suspendidoPor: data?.suspendidoPor,
-							fechaSuspension: data?.fechaSuspension ?? '',
-							retiradoPor: data?.retiradoPor ?? '',
-							fechaRetiro: data?.fechaRetiro ?? '',
+							saldo: data?.nBalance ?? 0,
+							estado: data?.sState ?? '',
+							creadoPor: data?.creator ?? '',
+							fechaCreacion: data?.dCreation ?? '',
+							editadoPor: data?.editor ?? '',
+							fechaEdicion: data?.dEdition ?? '',
+							suspendidoPor: data?.suspender ?? '',
+							fechaSuspension: data?.dSuspension ?? '',
 						}}
 					/>
 				</Grid>

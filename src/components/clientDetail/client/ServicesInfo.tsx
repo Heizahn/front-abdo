@@ -10,17 +10,19 @@ import EditableInfoField from '../common/EditableInfoField';
 
 interface ServicesInfoProps {
 	data: {
-		router: string;
 		ipv4: string;
 		plan: string;
+		idSubscription: string;
+		type: string;
+		mac: string;
+		sn: string;
 	};
 }
 
 const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 	const { isEditing } = useClientDetailsContext();
 
-	const { data: routerList } = useFetchData<SelectList[]>('/routersList', 'routersList');
-	const { data: planesList } = useFetchData<SelectList[]>('/plansList', 'plansList');
+	const { data: planesList } = useFetchData<SelectList[]>('/plans/list', 'plans-list');
 
 	return (
 		<Box>
@@ -29,7 +31,12 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 			</Typography>
 			{!isEditing ? (
 				<>
-					<InfoField label='Router' value={data.router || 'N/A'} />
+					<InfoField label='Plan' value={data.plan || 'N/A'} />
+					<InfoField
+						label='Tipo'
+						value={data.type === 'RF' ? 'Radio Frecuencia' : 'Fibra Óptica'}
+					/>
+					{data.sn && data.type === 'FO' && <InfoField label='SN' value={data.sn} />}
 					<InfoField
 						label='IPv4'
 						value={
@@ -41,29 +48,35 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 							'N/A'
 						}
 					/>
-					<InfoField label='Plan' value={data.plan || 'N/A'} />
+					{data.mac && <InfoField label='MAC' value={data.mac} />}
 				</>
 			) : (
 				<>
 					<EditableSelectField
-						label='Router'
-						selectList={routerList || []}
-						valueInitial={data.router || 'N/A'}
-						name='routersId'
+						label='Plan'
+						name='idSubscription'
+						selectList={planesList || []}
+						valueInitial={data.idSubscription}
 					/>
-
+					<EditableSelectField
+						label='Tipo'
+						valueInitial={data.type}
+						name='sType'
+						selectList={[
+							{ sName: 'Fibra Óptica', id: 'FO' },
+							{ sName: 'Radio Frecuencia', id: 'RF' },
+						]}
+					/>
+					{data.type === 'FO' && (
+						<EditableInfoField label='SN' valueInitial={data.sn} name='sSn' />
+					)}
 					<EditableInfoField
 						label='IPv4'
 						valueInitial={data.ipv4 || 'N/A'}
-						name='ipv4'
+						name='sIp'
 					/>
 
-					<EditableSelectField
-						label='Plan'
-						name='planesId'
-						selectList={planesList || []}
-						valueInitial={data.plan || 'N/A'}
-					/>
+					<EditableInfoField label='MAC' valueInitial={data.mac} name='sMac' />
 				</>
 			)}
 		</Box>
