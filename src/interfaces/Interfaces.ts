@@ -2,6 +2,7 @@ export interface User {
 	id: string;
 	sName: string;
 	nRole: number;
+	idOwner?: string;
 }
 export interface IPaymentHistory {
 	fecha: string;
@@ -31,9 +32,10 @@ export interface Client {
 	id: string;
 	sName: string;
 	sDni: string;
+	sRif?: string;
 	sPhone: string;
 	sector: string;
-	sIp: string;
+	sIp?: string;
 	sState: string;
 	nBalance: number;
 	plan?: string;

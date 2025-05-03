@@ -32,7 +32,7 @@ import { getStateComponent } from './ClientStatus';
 
 export default function TableClients() {
 	const { filteredClients, loading } = useClients();
-	const [sorting, setSorting] = useState<SortingState>([{ id: 'nombre', desc: false }]);
+	const [sorting, setSorting] = useState<SortingState>([{ id: 'sName', desc: false }]);
 	const [isInitialLoad, setIsInitialLoad] = useState(true);
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +52,11 @@ export default function TableClients() {
 			{
 				accessorKey: 'sDni',
 				header: 'Identificación',
-				cell: (info) => String(info.getValue() ?? ''),
+				cell: (info) => {
+					const dni = info.getValue();
+					const rif = info.row.original.sRif;
+					return dni && dni !== '' ? dni : rif || '';
+				},
 			},
 			{
 				accessorKey: 'sPhone',
@@ -174,149 +178,6 @@ export default function TableClients() {
 		estimateSize: () => 48,
 		overscan: 10,
 	});
-
-	// const renderTableContent = () => {
-	// 	if (filteredClients.length === 0 && !loading) {
-	// 		return (
-	// 			<Box sx={{ p: 3, textAlign: 'center' }}>
-	// 				<Typography variant='subtitle1'>No se encontraron clientes</Typography>
-	// 			</Box>
-	// 		);
-	// 	}
-
-	// 	return (
-	// 		<div
-	// 			ref={tableContainerRef}
-	// 			style={{
-	// 				height: 'calc(100vh - 15.5rem)',
-	// 				overflow: 'auto',
-	// 				width: '100%',
-	// 			}}
-	// 		>
-	// 			<TableContainer sx={{ maxHeight: 860 }}>
-	// 				<Table stickyHeader size='small' aria-label='tabla de clientes'>
-	// 					<TableHead>
-	// 						{table.getHeaderGroups().map((headerGroup) => (
-	// 							<TableRow key={headerGroup.id}>
-	// 								{headerGroup.headers.map((header) => (
-	// 									<TableCell key={header.id}>
-	// 										<div
-	// 											{...{
-	// 												onClick:
-	// 													header.column.getToggleSortingHandler(),
-	// 												style: {
-	// 													cursor: header.column.getCanSort()
-	// 														? 'pointer'
-	// 														: 'default',
-	// 													display: 'flex',
-	// 													alignItems: 'center',
-	// 												},
-	// 											}}
-	// 										>
-	// 											{flexRender(
-	// 												header.column.columnDef.header,
-	// 												header.getContext(),
-	// 											)}
-	// 											{header.column.getIsSorted() === 'asc' && (
-	// 												<ArrowUpward
-	// 													sx={{ fontSize: '1rem', ml: 0.5 }}
-	// 												/>
-	// 											)}
-	// 											{header.column.getIsSorted() === 'desc' && (
-	// 												<ArrowDownward
-	// 													sx={{ fontSize: '1rem', ml: 0.5 }}
-	// 												/>
-	// 											)}
-	// 										</div>
-	// 									</TableCell>
-	// 								))}
-	// 							</TableRow>
-	// 						))}
-	// 					</TableHead>
-	// 					<TableBody>
-	// 						{loading ? (
-	// 							<TableRow>
-	// 								<TableCell colSpan={columns.length} align='center'>
-	// 									<CircularProgress size={40} sx={{ my: 2 }} />
-	// 								</TableCell>
-	// 							</TableRow>
-	// 						) : rowVirtualizer.getVirtualItems().length > 0 ? (
-	// 							<>
-	// 								{/* Espaciador superior */}
-	// 								{rowVirtualizer.getVirtualItems()[0].start > 0 && (
-	// 									<TableRow
-	// 										style={{
-	// 											height: rowVirtualizer.getVirtualItems()[0]
-	// 												.start,
-	// 										}}
-	// 									>
-	// 										<TableCell
-	// 											colSpan={columns.length}
-	// 											style={{ padding: 0, border: 0 }}
-	// 										/>
-	// 									</TableRow>
-	// 								)}
-	// 								{/* Filas virtualizadas */}
-	// 								{rowVirtualizer
-	// 									.getVirtualItems()
-	// 									.map((virtualRow) => {
-	// 										const row =
-	// 											table.getRowModel().rows[virtualRow.index];
-	// 										return (
-	// 											<TableRow
-	// 												key={row.id}
-	// 												hover
-	// 												sx={{
-	// 													cursor: 'pointer',
-	// 													'&:hover': {
-	// 														backgroundColor:
-	// 															'rgba(0, 0, 0, 0.04)',
-	// 													},
-	// 													'&:nth-of-type(odd)': {
-	// 														backgroundColor:
-	// 															'rgba(0, 0, 0, 0.02)',
-	// 													},
-	// 												}}
-	// 											>
-	// 												{row.getVisibleCells().map((cell) => (
-	// 													<TableCell key={cell.id}>
-	// 														{flexRender(
-	// 															cell.column.columnDef.cell,
-	// 															cell.getContext(),
-	// 														)}
-	// 													</TableCell>
-	// 												))}
-	// 											</TableRow>
-	// 										);
-	// 									})}
-	// 								{/* Espaciador inferior */}
-	// 								<TableRow
-	// 									style={{
-	// 										height:
-	// 											rowVirtualizer.getTotalSize() -
-	// 											(rowVirtualizer.getVirtualItems().at(-1)
-	// 												?.end ?? 0),
-	// 									}}
-	// 								>
-	// 									<TableCell
-	// 										colSpan={columns.length}
-	// 										style={{ padding: 0, border: 0 }}
-	// 									/>
-	// 								</TableRow>
-	// 							</>
-	// 						) : (
-	// 							<TableRow>
-	// 								<TableCell colSpan={columns.length} align='center'>
-	// 									No se encontraron clientes
-	// 								</TableCell>
-	// 							</TableRow>
-	// 						)}
-	// 					</TableBody>
-	// 				</Table>
-	// 			</TableContainer>
-	// 		</div>
-	// 	);
-	// };
 
 	return (
 		<Paper

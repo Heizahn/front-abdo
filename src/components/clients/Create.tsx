@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { ClientDataDTO, ClientFormData, Subscription } from '../../interfaces/types';
+import { ClientDataDTO, ClientFormData } from '../../interfaces/types';
 import SimpleModalWrapper from '../common/ContainerForm';
 import ClientFormWithConfirmation from './FormNewClient';
 import { useAuth } from '../../context/AuthContext';
@@ -7,40 +7,18 @@ import { useMutateDate } from '../../hooks/useQuery';
 import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
 import { queryClient } from '../../query-client';
+import { AxiosError } from 'axios';
 
 const ClientsPage: React.FC = () => {
 	const { user } = useAuth();
 	const { refetchClients } = useClients();
 	const { notifySuccess, notifyError } = useNotification();
 
-	type extend = Omit<ClientFormData, 'planesId'> & {
-		id: string;
-	};
+	const queryKeys = ['clientsPieChart', 'clients-stats', 'clients'];
 
-	const queryKeys = ['clientsPieChart', 'clientsStats', 'clients', 'all-clients'];
-
-	const mutation = useMutateDate<extend, ClientDataDTO>('/clientes', {
-		onError: (err) => {
-			if (err instanceof Error) {
-				notifyError(err.message, 'Error al crear el cliente');
-			}
-		},
-	});
-
-	const mutationSus = useMutateDate<
-		{
-			fecha: string;
-			creadoPor: string;
-			planesId: string;
-			clientesId: string;
-		},
-		Subscription
-	>('/suscripciones', {
+	const mutation = useMutateDate<ClientDataDTO, ClientDataDTO>('/clients', {
 		onSuccess: () => {
-			notifySuccess(
-				'El cliente se ha creado correctamente en el sistema',
-				'Cliente creado',
-			);
+			notifySuccess('El cliente se ha creado correctamente', 'Cliente creado');
 			queryKeys.forEach((key) => {
 				queryClient.invalidateQueries({
 					queryKey: [key],
@@ -49,42 +27,67 @@ const ClientsPage: React.FC = () => {
 			});
 		},
 		onError: (err) => {
-			if (err instanceof Error) {
-				notifyError(err.message, 'Error al agregar el plan');
+			if (err instanceof AxiosError) {
+				console.log(err.response?.data);
+				notifyError(err.response?.data.error.message, 'Error al crear el cliente');
 			}
 		},
 	});
 
 	const handleClientCreated = async (data: ClientFormData) => {
-		const { planesId } = data;
 		const CreateDate = new Date().toISOString();
+		let newClientData: Partial<ClientDataDTO> = {};
+
+		newClientData = {
+			sName: data.sName,
+			sPhone: data.sPhone,
+			sAddress: data.sAddress,
+			sGps: data.sGps,
+			sIp: data.sIp,
+			idSector: data.idSector,
+			idSubscription: data.idSubscription,
+			sState: 'Activo',
+			dCreation: CreateDate,
+			nPayment: 7,
+			sType: data.sType,
+		};
+
+		if (data.typeDni === 'J') {
+			newClientData = {
+				...newClientData,
+				sRif: `J-${data.sDni}`,
+			};
+		} else {
+			newClientData = {
+				...newClientData,
+				sDni: `${data.typeDni}-${data.sDni}`,
+			};
+		}
+
 		if (user) {
-			const newClientData: ClientDataDTO = {
-				nombre: data.nombre,
-				email: data.email,
-				telefonos: data.telefonos,
-				direccion: data.direccion,
-				coordenadas: data.coordenadas,
-				identificacion: data.identificacion,
-				ipv4: data.ipv4,
-				routersId: data.routersId,
-				sectoresId: data.sectoresId,
-				estado: 'Activo',
-				creadoPor: user.id,
-				fechaCreacion: CreateDate,
-				fechaPago: 7,
-				saldo: 0,
+			if (user.nRole === 3) {
+				newClientData = {
+					...newClientData,
+					idOwner: user.id,
+				};
+			} else if (user.nRole === 5) {
+				newClientData = {
+					...newClientData,
+					idOwner: user.idOwner,
+				};
+			} else {
+				newClientData = {
+					...newClientData,
+					idOwner: data.idOwner,
+				};
+			}
+
+			newClientData = {
+				...newClientData,
+				idCreator: user.id,
 			};
 
-			console.log('newClientData', newClientData);
-			const res = await mutation.mutateAsync(newClientData);
-
-			await mutationSus.mutateAsync({
-				clientesId: res.id,
-				planesId,
-				fecha: CreateDate,
-				creadoPor: user.id,
-			});
+			await mutation.mutateAsync(newClientData as ClientDataDTO);
 
 			refetchClients();
 		}

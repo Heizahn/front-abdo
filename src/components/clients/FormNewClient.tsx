@@ -18,6 +18,7 @@ import { useFetchData } from '../../hooks/useQuery';
 import { ClientFormData, SelectList } from '../../interfaces/types';
 import { validationSchema, valueInitial } from './Validate';
 import * as yup from 'yup';
+import { useAuth } from '../../context/AuthContext';
 
 interface ClientFormProps {
 	onSubmit: (data: ClientFormData) => void;
@@ -36,8 +37,6 @@ const ClientFormWithConfirmation: React.FC<ClientFormProps> = ({
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	// Estado para controlar si el formulario es válido
 	const [isValid, setIsValid] = useState<boolean>(false);
-	// Estado para controlar si se ha intentado enviar el formulario
-	const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 	// Estado para controlar el diálogo de confirmación
 	const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 	// Estado para manejar cambios pendientes (para el botón cancelar)
@@ -45,11 +44,16 @@ const ClientFormWithConfirmation: React.FC<ClientFormProps> = ({
 	// Estado para el diálogo de confirmación de cancelar
 	const [showCancelConfirmation, setShowCancelConfirmation] = useState<boolean>(false);
 
+	const { user } = useAuth();
+
 	// Validar formulario cada vez que cambian los datos
 	useEffect(() => {
 		const validateForm = async () => {
 			try {
-				await validationSchema.validate(formData, { abortEarly: false });
+				await validationSchema.validate(formData, {
+					abortEarly: false,
+					context: { userRole: user?.nRole, sType: formData.sType },
+				});
 				setErrors({});
 				setIsValid(true);
 			} catch (error) {
@@ -78,7 +82,7 @@ const ClientFormWithConfirmation: React.FC<ClientFormProps> = ({
 		);
 
 		setHasChanges(hasAnyChanges);
-	}, [formData]);
+	}, [formData, user?.nRole]);
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -99,10 +103,12 @@ const ClientFormWithConfirmation: React.FC<ClientFormProps> = ({
 
 	const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setAttemptedSubmit(true);
 
 		try {
-			await validationSchema.validate(formData, { abortEarly: false });
+			await validationSchema.validate(formData, {
+				abortEarly: false,
+				context: { userRole: user?.nRole, sType: formData.sType },
+			});
 			setShowConfirmation(true);
 		} catch (error) {
 			if (error instanceof yup.ValidationError) {
@@ -162,22 +168,22 @@ const ClientFormWithConfirmation: React.FC<ClientFormProps> = ({
 
 	// Usar hooks personalizados para cargar los datos
 	const {
-		data: routerList,
-		isLoading: loadingRouters,
-		error: errorRouters,
-	} = useFetchData<SelectList[]>('/routersList', 'routersList');
-
-	const {
 		data: planesList,
 		isLoading: loadingPlanes,
 		error: errorPlanes,
-	} = useFetchData<SelectList[]>('/plansList', 'plansList');
+	} = useFetchData<SelectList[]>('/plans/list', 'plans-list');
 
 	const {
 		data: sectoresList,
 		isLoading: loadingSectors,
 		error: errorSectors,
-	} = useFetchData<SelectList[]>('/sectorsList', 'sectorsList');
+	} = useFetchData<SelectList[]>('/sectors/list', 'sectors-list');
+
+	const {
+		data: ownersList,
+		isLoading: loadingOwners,
+		error: errorOwners,
+	} = useFetchData<SelectList[]>('/users/providers', 'providers-list');
 
 	return (
 		<>
@@ -190,208 +196,343 @@ const ClientFormWithConfirmation: React.FC<ClientFormProps> = ({
 						<TextField
 							required
 							fullWidth
-							id='nombre'
-							label='Nombre'
-							name='nombre'
-							value={formData.nombre}
+							id='sName'
+							label='Razón Social'
+							name='sName'
+							value={formData.sName}
 							onChange={handleChange}
 							margin='normal'
-							error={Boolean(attemptedSubmit && errors.nombre)}
-							helperText={attemptedSubmit && errors.nombre}
+							placeholder='Nombre de la empresa o persona'
+							error={Boolean(errors.sName)}
+							helperText={
+								errors.sName !== 'Este campo es obligatorio'
+									? errors.sName
+									: ''
+							}
 						/>
+					</Grid>
+					<Grid container spacing={2}>
+						<Grid item xs={6}>
+							<Grid container spacing={1}>
+								<Grid item xs={3}>
+									<FormControl
+										fullWidth
+										required
+										margin='normal'
+										error={Boolean(errors.typeDni)}
+									>
+										<InputLabel id='type-dni-label'>Tipo</InputLabel>
+										<Select
+											labelId='type-dni-label'
+											id='typeDni'
+											name='typeDni'
+											value={formData.typeDni}
+											onChange={handleSelectChange}
+											label='Tipo'
+										>
+											<MenuItem value='V'>V-</MenuItem>
+											<MenuItem value='E'>E-</MenuItem>
+											<MenuItem value='J'>J-</MenuItem>
+										</Select>
+										{errors.typeDni && (
+											<FormHelperText>
+												{errors.typeDni !== 'Este campo es obligatorio'
+													? errors.typeDni
+													: ''}
+											</FormHelperText>
+										)}
+									</FormControl>
+								</Grid>
+								<Grid item xs={9}>
+									<TextField
+										required
+										fullWidth
+										id='sDni'
+										label='Documento de Identidad'
+										name='sDni'
+										value={formData.sDni}
+										onChange={handleChange}
+										margin='normal'
+										placeholder='Número de documento'
+										error={Boolean(errors.sDni)}
+										helperText={
+											errors.sDni !== 'Este campo es obligatorio'
+												? errors.sDni
+												: ''
+										}
+									/>
+								</Grid>
+							</Grid>
+						</Grid>
+						<Grid item xs={6}>
+							<TextField
+								required
+								fullWidth
+								id='sPhone'
+								label='Teléfono'
+								name='sPhone'
+								value={formData.sPhone}
+								onChange={handleChange}
+								margin='normal'
+								placeholder='58123456789'
+								error={Boolean(errors.sPhone)}
+								helperText={
+									errors.sPhone !== 'Este campo es obligatorio'
+										? errors.sPhone
+										: ''
+								}
+							/>
+						</Grid>
 					</Grid>
 					<Grid item xs={12}>
 						<TextField
 							required
 							fullWidth
-							id='identificacion'
-							label='Documento de Identidad'
-							name='identificacion'
-							value={formData.identificacion}
-							onChange={handleChange}
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.identificacion)}
-							helperText={attemptedSubmit && errors.identificacion}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							required
-							fullWidth
-							id='telefonos'
-							label='Teléfono'
-							name='telefonos'
-							value={formData.telefonos}
-							onChange={handleChange}
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.telefonos)}
-							helperText={attemptedSubmit && errors.telefonos}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							required
-							fullWidth
-							id='direccion'
+							id='sAddress'
 							label='Dirección'
-							name='direccion'
-							value={formData.direccion}
+							name='sAddress'
+							value={formData.sAddress}
 							onChange={handleChange}
 							margin='normal'
-							error={Boolean(attemptedSubmit && errors.direccion)}
-							helperText={attemptedSubmit && errors.direccion}
+							placeholder='Calle 123, Barrio Centro, Carabobo, Venezuela'
+							error={Boolean(errors.sAddress)}
+							helperText={
+								errors.sAddress !== 'Este campo es obligatorio'
+									? errors.sAddress
+									: ''
+							}
 						/>
+					</Grid>
+					<Grid container spacing={2}>
+						<Grid item xs={user?.nRole === 3 ? 12 : 6}>
+							<TextField
+								fullWidth
+								id='sGps'
+								label='Coordenadas'
+								name='sGps'
+								value={formData.sGps}
+								onChange={handleChange}
+								margin='normal'
+								placeholder='10.1234567, -66.1234567'
+								error={Boolean(errors.sGps)}
+								helperText={
+									errors.sGps !== 'Este campo es obligatorio'
+										? errors.sGps
+										: ''
+								}
+							/>
+						</Grid>
+						{user?.nRole !== 3 && (
+							<Grid item xs={6}>
+								<FormControl
+									fullWidth
+									required
+									margin='normal'
+									error={Boolean(errors.idOwner)}
+								>
+									<InputLabel id='owner-label'>Proveedor</InputLabel>
+									<Select
+										labelId='owner-label'
+										id='idOwner'
+										name='idOwner'
+										value={formData.idOwner}
+										onChange={handleSelectChange}
+										label='Proveedor'
+									>
+										{loadingOwners ? (
+											<MenuItem disabled>
+												<CircularProgress size={20} /> Cargando...
+											</MenuItem>
+										) : (
+											ownersList &&
+											!errorOwners &&
+											ownersList.map((owner) => (
+												<MenuItem key={owner.id} value={owner.id}>
+													{owner.tag}
+												</MenuItem>
+											))
+										)}
+										{errors.idOwner && (
+											<FormHelperText>
+												{errors.idOwner !== 'Este campo es obligatorio'
+													? errors.idOwner
+													: ''}
+											</FormHelperText>
+										)}
+									</Select>
+								</FormControl>
+							</Grid>
+						)}
+					</Grid>
+					<Grid container spacing={2}>
+						<Grid item xs={6}>
+							<FormControl
+								fullWidth
+								required
+								margin='normal'
+								error={Boolean(errors.idSector)}
+							>
+								<InputLabel id='sector-label'>Sector</InputLabel>
+								<Select
+									labelId='sector-label'
+									id='idSector'
+									name='idSector'
+									value={formData.idSector}
+									onChange={handleSelectChange}
+									label='Sector'
+								>
+									{loadingSectors ? (
+										<MenuItem disabled>
+											<CircularProgress size={20} /> Cargando...
+										</MenuItem>
+									) : (
+										sectoresList &&
+										!errorSectors &&
+										sectoresList.map((sector) => (
+											<MenuItem key={sector.id} value={sector.id}>
+												{sector.sName}
+											</MenuItem>
+										))
+									)}
+									{errors.idSector && (
+										<FormHelperText>
+											{errors.idSector !== 'Este campo es obligatorio'
+												? errors.idSector
+												: ''}
+										</FormHelperText>
+									)}
+								</Select>
+							</FormControl>
+						</Grid>
+						<Grid item xs={6}>
+							<FormControl
+								fullWidth
+								required
+								margin='normal'
+								error={Boolean(errors.idSubscription)}
+							>
+								<InputLabel id='plan-label'>Plan</InputLabel>
+								<Select
+									labelId='plan-label'
+									id='idSubscription'
+									name='idSubscription'
+									value={formData.idSubscription}
+									onChange={handleSelectChange}
+									label='Plan'
+								>
+									{loadingPlanes ? (
+										<MenuItem disabled>
+											<CircularProgress size={20} /> Cargando...
+										</MenuItem>
+									) : (
+										planesList &&
+										!errorPlanes &&
+										planesList.map((plan) => (
+											<MenuItem key={plan.id} value={plan.id}>
+												{plan.sName}
+											</MenuItem>
+										))
+									)}
+								</Select>
+								{errors.idSubscription && (
+									<FormHelperText>
+										{errors.idSubscription !== 'Este campo es obligatorio'
+											? errors.idSubscription
+											: ''}
+									</FormHelperText>
+								)}
+							</FormControl>
+						</Grid>
+					</Grid>
+					<Grid container spacing={2}>
+						<Grid item xs={6}>
+							<FormControl
+								fullWidth
+								margin='normal'
+								error={Boolean(errors.sType)}
+								required
+							>
+								<InputLabel id='type-label'>Tipo</InputLabel>
+								<Select
+									labelId='type-label'
+									id='sType'
+									name='sType'
+									value={formData.sType}
+									onChange={handleSelectChange}
+									label='Tipo'
+								>
+									<MenuItem value='RF'>Radio Frecuencia</MenuItem>
+									<MenuItem value='FO'>Fibra Óptica</MenuItem>
+								</Select>
+								{errors.sType && (
+									<FormHelperText>
+										{errors.sType !== 'Este campo es obligatorio'
+											? errors.sType
+											: ''}
+									</FormHelperText>
+								)}
+							</FormControl>
+						</Grid>
+						{formData.sType === 'RF' && (
+							<Grid item xs={6}>
+								<TextField
+									fullWidth
+									id='sIp'
+									label='IP'
+									name='sIp'
+									value={formData.sIp}
+									onChange={handleChange}
+									margin='normal'
+									placeholder='192.168.1.2'
+									error={Boolean(errors.sIp)}
+									helperText={
+										errors.sIp !== 'Este campo es obligatorio'
+											? errors.sIp
+											: ''
+									}
+								/>
+							</Grid>
+						)}
+
+						{formData.sType === 'FO' && (
+							<Grid item xs={6}>
+								<TextField
+									fullWidth
+									id='sSn'
+									label='Serial Number'
+									name='sSn'
+									value={formData.sSn}
+									onChange={handleChange}
+									margin='normal'
+									placeholder='VSOL123ABC12'
+									error={Boolean(errors.sSn)}
+									helperText={
+										errors.sSn !== 'Este campo es obligatorio'
+											? errors.sSn
+											: ''
+									}
+								/>
+							</Grid>
+						)}
 					</Grid>
 					<Grid item xs={12}>
 						<TextField
 							fullWidth
-							id='coordenadas'
-							label='Coordenadas'
-							name='coordenadas'
-							value={formData.coordenadas}
+							multiline
+							rows={3}
+							id='sCommentary'
+							label='Comentario'
+							name='sCommentary'
+							value={formData.sCommentary}
 							onChange={handleChange}
 							margin='normal'
-							error={Boolean(attemptedSubmit && errors.coordenadas)}
-							helperText={attemptedSubmit && errors.coordenadas}
+							error={Boolean(errors.sCommentary)}
+							helperText={
+								errors.sCommentary !== 'Este campo es obligatorio'
+									? errors.sCommentary
+									: ''
+							}
 						/>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							required
-							fullWidth
-							id='email'
-							label='Correo'
-							name='email'
-							type='email'
-							value={formData.email}
-							onChange={handleChange}
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.email)}
-							helperText={attemptedSubmit && errors.email}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<FormControl
-							fullWidth
-							required
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.sectoresId)}
-						>
-							<InputLabel id='sector-label'>Sector</InputLabel>
-							<Select
-								labelId='sector-label'
-								id='sectoresId'
-								name='sectoresId'
-								value={formData.sectoresId}
-								onChange={handleSelectChange}
-								label='Sector'
-							>
-								{loadingSectors ? (
-									<MenuItem disabled>
-										<CircularProgress size={20} /> Cargando...
-									</MenuItem>
-								) : (
-									sectoresList &&
-									!errorSectors &&
-									sectoresList.map((sector) => (
-										<MenuItem
-											key={sector.id || sector._id}
-											value={sector.id || sector._id}
-										>
-											{sector.nombre}
-										</MenuItem>
-									))
-								)}
-							</Select>
-							{attemptedSubmit && errors.sectoresId && (
-								<FormHelperText>{errors.sectoresId}</FormHelperText>
-							)}
-						</FormControl>
-					</Grid>
-					<Grid item xs={12}>
-						<FormControl
-							fullWidth
-							required
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.planesId)}
-						>
-							<InputLabel id='plan-label'>Plan</InputLabel>
-							<Select
-								labelId='plan-label'
-								id='planesId'
-								name='planesId'
-								value={formData.planesId}
-								onChange={handleSelectChange}
-								label='Plan'
-							>
-								{loadingPlanes ? (
-									<MenuItem disabled>
-										<CircularProgress size={20} /> Cargando...
-									</MenuItem>
-								) : (
-									planesList &&
-									!errorPlanes &&
-									planesList.map((plan) => (
-										<MenuItem
-											key={plan.id || plan._id}
-											value={plan.id || plan._id}
-										>
-											{plan.nombre}
-										</MenuItem>
-									))
-								)}
-							</Select>
-							{attemptedSubmit && errors.planesId && (
-								<FormHelperText>{errors.planesId}</FormHelperText>
-							)}
-						</FormControl>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							fullWidth
-							id='ipv4'
-							label='IP'
-							name='ipv4'
-							value={formData.ipv4}
-							onChange={handleChange}
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.ipv4)}
-							helperText={attemptedSubmit && errors.ipv4}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<FormControl
-							fullWidth
-							margin='normal'
-							error={Boolean(attemptedSubmit && errors.routersId)}
-						>
-							<InputLabel id='router-label'>Router</InputLabel>
-							<Select
-								labelId='router-label'
-								id='routersId'
-								name='routersId'
-								value={formData.routersId}
-								onChange={handleSelectChange}
-								label='Router'
-							>
-								{loadingRouters ? (
-									<MenuItem disabled>
-										<CircularProgress size={20} /> Cargando...
-									</MenuItem>
-								) : (
-									routerList &&
-									!errorRouters &&
-									routerList.map((router) => (
-										<MenuItem key={router.id} value={router.id}>
-											{router.nombre}
-										</MenuItem>
-									))
-								)}
-							</Select>
-							{attemptedSubmit && errors.routersId && (
-								<FormHelperText>{errors.routersId}</FormHelperText>
-							)}
-						</FormControl>
 					</Grid>
 					<Grid
 						item

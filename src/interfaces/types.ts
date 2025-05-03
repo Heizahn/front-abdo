@@ -2,30 +2,32 @@ import { AlertColor } from '@mui/material';
 import { ReactNode } from 'react';
 
 export type ClientFormData = {
-	nombre: string;
-	identificacion: string;
-	telefonos: string;
-	direccion: string;
-	email: string;
-	sectoresId: string;
-	coordenadas: string;
-	planesId: string;
-	ipv4: string;
-	routersId: string;
+	sName: string;
+	typeDni: string;
+	sDni?: string;
+	sPhone: string;
+	sAddress: string;
+	sType: string;
+	sGps: string;
+	idSector: string;
+	idSubscription: string;
+	sIp?: string;
+	sSn?: string;
+	idOwner?: string;
+	sCommentary?: string;
 };
 
-export type ClientDataDTO = Omit<ClientFormData, 'planesId'> & {
-	estado: string;
-	creadoPor: string;
-	fechaCreacion: string;
-	fechaPago: number;
-	saldo: number;
+export type ClientDataDTO = Partial<ClientFormData> & {
+	sState: string;
+	sRif?: string;
+	idCreator: string;
+	dCreation: string;
+	nPayment: number;
 };
 
 export interface SelectList {
 	id?: string;
-	_id?: string;
-	nombre: string;
+	sName: string;
 	tag?: string;
 }
 
@@ -111,13 +113,6 @@ export interface NotificationContextType {
 	notifyWarning: (message: string, title?: string) => void;
 	notifyInfo: (message: string, title?: string) => void;
 }
-
-export type Subscription = {
-	fecha: string;
-	creadoPor: string;
-	planesId: string;
-	clientesId: string;
-};
 
 export type PaymentDataForm = {
 	tipoPago: string;
