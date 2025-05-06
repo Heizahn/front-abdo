@@ -8,25 +8,26 @@ import ConfirmDialog from '../../../common/Confirm';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 
 type CreateInvoiceFormData = {
-	motivo: string;
-	monto: number;
+	sReason: string;
+	nAmount: number;
+	sCommentary?: string;
 };
 
 type CreateInvoiceDTO = CreateInvoiceFormData & {
-	fechaFacturacion: string;
-	creadoPor: string;
-	estado: string;
-	clientesId: string;
+	dCreation: string;
+	idCreator: string;
+	sState: string;
+	idClient: string;
 };
 
 const validationSchema = yup.object({
-	motivo: yup.string().required('Requerido'),
-	monto: yup.number().required('Requerido'),
+	sReason: yup.string().required('Requerido'),
+	nAmount: yup.number().required('Requerido'),
 });
 
 const initialValues: CreateInvoiceFormData = {
-	motivo: '',
-	monto: 0,
+	sReason: '',
+	nAmount: 0,
 };
 
 export default function CreateInvoice({
@@ -56,9 +57,15 @@ export default function CreateInvoice({
 
 	const { notifyError, notifySuccess } = useNotification();
 
-	const queryKeys = ['clientsPieChart', `client-${clientId}`, 'all-clients', 'clientsList'];
+	const queryKeys = [
+		'clientsPieChart',
+		`client-${clientId}`,
+		'clients',
+		'clientsList',
+		'invoices-' + clientId,
+	];
 
-	const mutation = useMutateDate<CreateInvoiceDTO, CreateInvoiceDTO>(`/billsClient0`, {
+	const mutation = useMutateDate<CreateInvoiceDTO, CreateInvoiceDTO>(`/debts/create`, {
 		onSuccess: () => {
 			notifySuccess('El factura se ha creado correctamente', 'Factura creada');
 			queryKeys.forEach((key) => {
@@ -146,15 +153,15 @@ export default function CreateInvoice({
 		setShowConfirmation(false);
 
 		const Invoice: CreateInvoiceDTO = {
-			motivo: invoiceData.motivo,
-			monto: Number(invoiceData.monto),
-			creadoPor: (await authService.profile()).id,
-			estado: 'Activo',
-			clientesId: clientId,
-			fechaFacturacion: new Date().toISOString(),
+			sReason: invoiceData.sReason,
+			nAmount: Number(invoiceData.nAmount),
+			idCreator: (await authService.profile()).id,
+			sState: 'Activo',
+			idClient: clientId,
+			dCreation: new Date().toISOString(),
 		};
 
-		await mutation.mutateAsync(Invoice);
+		mutation.mutate(Invoice);
 
 		new Promise((resolve) => setTimeout(resolve, 150)).then(() => {
 			setSendingInvoice(false);
@@ -209,16 +216,16 @@ export default function CreateInvoice({
 					<Grid item xs={12}>
 						<TextField
 							margin='dense'
-							id='motivo'
-							name='motivo'
+							id='sReason'
+							name='sReason'
 							label='Motivo'
 							type='text'
 							fullWidth
-							value={invoiceData.motivo}
+							value={invoiceData.sReason}
 							onChange={handleChange}
 							variant='outlined'
-							error={Boolean(attemptedSubmit && errors.motivo)}
-							helperText={attemptedSubmit && errors.motivo}
+							error={Boolean(attemptedSubmit && errors.sReason)}
+							helperText={attemptedSubmit && errors.sReason}
 							required
 						/>
 					</Grid>
@@ -226,12 +233,12 @@ export default function CreateInvoice({
 					<Grid item xs={12}>
 						<TextField
 							margin='dense'
-							id='monto'
-							name='monto'
+							id='nAmount'
+							name='nAmount'
 							label='Monto'
 							type='number'
 							fullWidth
-							value={invoiceData.monto}
+							value={invoiceData.nAmount}
 							onInput={(e: ChangeEvent<HTMLInputElement>) => {
 								const { value } = e.target;
 								if (value.startsWith('0')) {
@@ -240,9 +247,27 @@ export default function CreateInvoice({
 							}}
 							onChange={handleChange}
 							variant='outlined'
-							error={Boolean(attemptedSubmit && errors.monto)}
-							helperText={attemptedSubmit && errors.monto}
+							error={Boolean(attemptedSubmit && errors.nAmount)}
+							helperText={attemptedSubmit && errors.nAmount}
 							required
+						/>
+					</Grid>
+
+					<Grid item xs={12}>
+						<TextField
+							margin='dense'
+							id='sCommentary'
+							name='sCommentary'
+							label='Comentario'
+							type='text'
+							fullWidth
+							multiline
+							rows={3}
+							value={invoiceData.sCommentary}
+							onChange={handleChange}
+							variant='outlined'
+							error={Boolean(attemptedSubmit && errors.sCommentary)}
+							helperText={attemptedSubmit && errors.sCommentary}
 						/>
 					</Grid>
 					<Grid

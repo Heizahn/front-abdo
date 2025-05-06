@@ -35,7 +35,7 @@ type OrderBy = keyof Factura;
 const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = false }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('fecha');
+	const [orderBy, setOrderBy] = useState<OrderBy>('dCreation');
 	const [selectedInvoice, setSelectedInvoice] = useState<Factura | null>(null);
 	const modalTriggerRef = useRef<HTMLButtonElement>(null);
 	const { id } = useParams();
@@ -71,12 +71,12 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 	const filteredInvoices = invoices
 		.filter(
 			(invoice) =>
-				invoice.motivo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				invoice.fecha.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				invoice.estado.toLowerCase().includes(searchTerm.toLowerCase()),
+				invoice.sReason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				invoice.dCreation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				invoice.sState.toLowerCase().includes(searchTerm.toLowerCase()),
 		)
 		.sort((a, b) => {
-			if (orderBy === 'monto' || orderBy === 'deuda') {
+			if (orderBy === 'nAmount' || orderBy === 'debt') {
 				return order === 'asc' ? a[orderBy] - b[orderBy] : b[orderBy] - a[orderBy];
 			} else {
 				const valueA = String(a[orderBy]).toLowerCase();
@@ -131,45 +131,45 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 						<TableRow>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'motivo'}
-									direction={orderBy === 'motivo' ? order : 'asc'}
-									onClick={createSortHandler('motivo')}
+									active={orderBy === 'sReason'}
+									direction={orderBy === 'sReason' ? order : 'asc'}
+									onClick={createSortHandler('sReason')}
 								>
 									Motivo
 								</TableSortLabel>
 							</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'fecha'}
-									direction={orderBy === 'fecha' ? order : 'asc'}
-									onClick={createSortHandler('fecha')}
+									active={orderBy === 'dCreation'}
+									direction={orderBy === 'dCreation' ? order : 'asc'}
+									onClick={createSortHandler('dCreation')}
 								>
 									Creado
 								</TableSortLabel>
 							</TableCell>
 							<TableCell align='right'>
 								<TableSortLabel
-									active={orderBy === 'monto'}
-									direction={orderBy === 'monto' ? order : 'asc'}
-									onClick={createSortHandler('monto')}
+									active={orderBy === 'nAmount'}
+									direction={orderBy === 'nAmount' ? order : 'asc'}
+									onClick={createSortHandler('nAmount')}
 								>
 									Monto
 								</TableSortLabel>
 							</TableCell>
 							<TableCell align='right'>
 								<TableSortLabel
-									active={orderBy === 'deuda'}
-									direction={orderBy === 'deuda' ? order : 'asc'}
-									onClick={createSortHandler('deuda')}
+									active={orderBy === 'debt'}
+									direction={orderBy === 'debt' ? order : 'asc'}
+									onClick={createSortHandler('debt')}
 								>
 									Deuda
 								</TableSortLabel>
 							</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'estado'}
-									direction={orderBy === 'estado' ? order : 'asc'}
-									onClick={createSortHandler('estado')}
+									active={orderBy === 'sState'}
+									direction={orderBy === 'sState' ? order : 'asc'}
+									onClick={createSortHandler('sState')}
 								>
 									Estado
 								</TableSortLabel>
@@ -186,7 +186,7 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 						) : filteredInvoices.length > 0 ? (
 							filteredInvoices.map((invoice) => (
 								<TableRowClickHandler
-									key={invoice._id}
+									key={invoice.id}
 									onRowClick={() => handleRowClick(invoice)}
 									sx={{
 										cursor: 'pointer',
@@ -198,10 +198,17 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 										},
 									}}
 								>
-									<TableCell>{invoice.motivo}</TableCell>
-									<TableCell>{invoice.fecha}</TableCell>
-									<TableCell align='right'>{invoice.monto}$</TableCell>
-									<TableCell align='right'>{invoice.deuda}$</TableCell>
+									<TableCell>{invoice.sReason}</TableCell>
+									<TableCell>{invoice.dCreation}</TableCell>
+									<TableCell align='right'>
+										{(invoice.nAmount || 0).toFixed(2)}
+									</TableCell>
+									<TableCell
+										align='right'
+										sx={{ color: invoice.debt > 0 ? 'red' : 'inherit' }}
+									>
+										{(invoice.debt || 0).toFixed(2)}
+									</TableCell>
 									<TableCell>
 										<Box
 											sx={{
@@ -215,13 +222,13 @@ const InvoicesTable: React.FC<InvoicesTableProps> = ({ invoices, isLoading = fal
 													height: 10,
 													borderRadius: '50%',
 													backgroundColor:
-														invoice.estado === 'Activo'
+														invoice.sState === 'Activo'
 															? 'success.main'
 															: 'error.main',
 													mr: 1,
 												}}
 											/>
-											{invoice.estado}
+											{invoice.sState}
 										</Box>
 									</TableCell>
 								</TableRowClickHandler>

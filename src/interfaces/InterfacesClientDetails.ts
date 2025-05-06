@@ -37,15 +37,17 @@ export interface Router {
 }
 
 export interface Factura {
-	_id: string;
-	estado: string;
-	monto: number;
-	motivo: string;
-	creadoPor: string;
-	editadoPor: string | null;
-	fecha: string;
-	fechaEdicion: string | null;
-	deuda: number;
+	id: string;
+	sState: string;
+	nAmount: number;
+	sReason: string;
+	idCreator: string;
+	idEditor: string | null;
+	dCreation: string;
+	dEdition: string | null;
+	debt: number;
+	creator: string;
+	editor: string;
 }
 
 export interface Pago {

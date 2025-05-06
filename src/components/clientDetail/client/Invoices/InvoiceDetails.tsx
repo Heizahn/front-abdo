@@ -39,10 +39,10 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose }) => 
 
 	const handleAnular = async () => {
 		try {
-			await axios.patch(HOST_API + '/billsClient0/' + invoice._id, {
-				estado: 'Anulado',
-				editadoPor: user?.id,
-				fechaEdicion: new Date().toISOString(),
+			await axios.patch(HOST_API + '/debts/' + invoice.id, {
+				sState: 'Anulado',
+				idEditor: user?.id,
+				dEdition: new Date().toISOString(),
 			});
 
 			queryKeys.forEach((key) => {
@@ -87,33 +87,37 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose }) => 
 				{invoice && (
 					<>
 						<Typography variant='body1' gutterBottom>
-							<strong>Motivo:</strong> {invoice.motivo}
+							<strong>Motivo:</strong> {invoice.sReason}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Monto:</strong> ${invoice.monto}
+							<strong>Monto:</strong> {invoice.nAmount}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Deuda:</strong> ${invoice.deuda}
+							<strong>Deuda:</strong>{' '}
+							<span style={{ color: invoice.debt > 0 ? '#d32f2f' : 'inherit' }}>
+								{invoice.debt}
+							</span>
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Estado:</strong> {invoice.estado}
+							<strong>Estado:</strong> {invoice.sState}
 						</Typography>
-						{invoice.creadoPor && (
+						{invoice.creator && (
 							<Typography variant='body1' gutterBottom>
-								<strong>Creado Por:</strong> {invoice.creadoPor}
+								<strong>Creado Por:</strong> {invoice.creator.toUpperCase()}
 							</Typography>
 						)}
 						<Typography variant='body1' gutterBottom>
-							<strong>Fecha de Creación:</strong> {formatDate(invoice.fecha)}
+							<strong>Fecha de Creación:</strong> {formatDate(invoice.dCreation)}
 						</Typography>
-						{invoice.editadoPor && invoice.fechaEdicion && (
+						{invoice.editor && invoice.dEdition && (
 							<>
 								<Typography variant='body1' gutterBottom>
-									<strong>Editado Por:</strong> {invoice.editadoPor}
+									<strong>Editado Por:</strong>{' '}
+									{invoice.editor.toUpperCase()}
 								</Typography>
 								<Typography variant='body1' gutterBottom>
 									<strong>Fecha de Edición:</strong>{' '}
-									{formatDate(invoice.fechaEdicion)}
+									{formatDate(invoice.dEdition)}
 								</Typography>
 							</>
 						)}
@@ -121,7 +125,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ invoice, onClose }) => 
 						<Box
 							sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}
 						>
-							{invoice.estado === 'Activo' && (
+							{invoice.sState === 'Activo' && (
 								<Button
 									onClick={() => setShowConfirmation(true)}
 									color='error'

@@ -9,7 +9,7 @@ const ClientAccounts: React.FC = () => {
 	const { id } = useParams();
 
 	const { data: invoices, isLoading } = useFetchData<Factura[]>(
-		`/client/${id}/invoices`,
+		`/debts/client/${id}`,
 		'invoices-' + id,
 	);
 
