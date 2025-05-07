@@ -329,8 +329,7 @@ export default function Pay({
 									) : (
 										invoices.map((invoice) => (
 											<MenuItem key={invoice.id} value={invoice.id}>
-												{invoice.sReason} - Deuda:{' '}
-												{invoice.debt?.toFixed(2)}
+												{invoice.sReason} - Deuda: {invoice.debt}
 											</MenuItem>
 										))
 									)}

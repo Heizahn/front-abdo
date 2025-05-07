@@ -8,10 +8,12 @@ import { queryClient } from '../../../../query-client';
 import { useParams } from 'react-router-dom';
 import { useNotification } from '../../../../context/NotificationContext';
 import { ROLES, useAuth } from '../../../../context/AuthContext';
+import { Client } from '../../../../interfaces/Interfaces';
 
 interface PaymentDetailsProps {
 	payment: Pago;
 	onClose?: () => void;
+	client?: Client;
 }
 
 // Función auxiliar para formatear fechas
@@ -27,7 +29,7 @@ const formatDate = (dateString: string) => {
 	});
 };
 
-const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => {
+const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, client }) => {
 	const { id: clientId } = useParams();
 	const queryKeys = [
 		'clientsPieChart',
@@ -35,6 +37,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 		'all-clients',
 		`paysPieChart0-${clientId}`,
 		`payments-${clientId}`,
+		`invoices-${clientId}`,
+		`invoice-list-${clientId}`,
 		'lastPays',
 	];
 	const { user } = useAuth();
@@ -42,7 +46,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 
 	const handleAnular = async () => {
 		try {
-			await axios.patch(HOST_API + '/paysClient0/' + payment._id, {
+			await axios.patch(HOST_API + '/paysClient0/' + payment.id, {
 				estado: 'Anulado',
 				editadoPor: user?.id,
 				fechaEdicion: new Date().toISOString(),
@@ -82,14 +86,6 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 		setShowConfirmation(false);
 	};
 
-	// Formatear moneda
-	const formatCurrency = (value: number, currency: string) => {
-		if (currency === 'VES') {
-			return `${value.toFixed(2)}Bs`;
-		}
-		return `${value.toFixed(2)}$`;
-	};
-
 	return (
 		<>
 			<Box sx={{ minWidth: 300, pt: 2 }}>
@@ -100,56 +96,55 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 				{payment && (
 					<>
 						<Typography variant='body1' gutterBottom>
-							{payment.motivo ? (
+							{payment.sReason ? (
 								<>
-									<strong>Motivo:</strong> {payment.motivo}
+									<strong>Motivo:</strong> {payment.sReason}
 								</>
 							) : (
-								payment.cliente && (
+								client && (
 									<>
-										<strong>Cliente:</strong> {payment.cliente}
+										<strong>Cliente:</strong> {client.sName}
 									</>
 								)
 							)}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Tipo de Pago:</strong> {payment.tipoPago}
+							<strong>Tipo de Pago:</strong> {payment.sState}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Referencia:</strong> {payment.referencia}
+							<strong>Referencia:</strong> {payment.sReference}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Monto (USD):</strong> {payment.montoUSD}$
+							<strong>Monto (USD):</strong> {payment.nAmount}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Monto (VES):</strong>{' '}
-							{formatCurrency(payment.montoVES, 'VES')}
+							<strong>Monto (VES):</strong> {payment.nBs}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Estado:</strong> {payment.estado}
+							<strong>Estado:</strong> {payment.sState}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Creado Por:</strong> {payment.creadoPor}
+							<strong>Creado Por:</strong> {payment.creator}
 						</Typography>
-						<Typography variant='body1' gutterBottom>
+						{/* <Typography variant='body1' gutterBottom>
 							<strong>Recibido Por:</strong> {payment.recibidoPor}
-						</Typography>
+						</Typography> */}
 						<Typography variant='body1' gutterBottom>
-							<strong>Fecha de Creación:</strong> {formatDate(payment.fecha)}
+							<strong>Fecha de Creación:</strong> {formatDate(payment.dCreation)}
 						</Typography>
-						{payment.comentario && (
+						{payment.sCommentary && (
 							<Typography variant='body1' gutterBottom>
-								<strong>Comentario:</strong> {payment.comentario}
+								<strong>Comentario:</strong> {payment.sCommentary}
 							</Typography>
 						)}
-						{payment.editadoPor && payment.fechaEdicion && (
+						{payment.editor && payment.dEdition && (
 							<>
 								<Typography variant='body1' gutterBottom>
-									<strong>Editado Por:</strong> {payment.editadoPor}
+									<strong>Editado Por:</strong> {payment.editor}
 								</Typography>
 								<Typography variant='body1' gutterBottom>
 									<strong>Fecha de Edición:</strong>{' '}
-									{formatDate(payment.fechaEdicion)}
+									{formatDate(payment.dEdition)}
 								</Typography>
 							</>
 						)}
@@ -157,7 +152,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose }) => 
 						<Box
 							sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 2 }}
 						>
-							{payment.estado === 'Activo' &&
+							{payment.sState === 'Activo' &&
 								user?.nRole !== ROLES.PAYMENT_USER && (
 									<Button
 										onClick={() => setShowConfirmation(true)}

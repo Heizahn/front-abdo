@@ -14,14 +14,14 @@ export default function SendPay({ paymentId }: { paymentId: string }) {
 
 	const handleSendPayment = async () => {
 		setIsSending(true);
-		notifyInfo('Enviando pago a ' + client?.nombre);
+		notifyInfo('Enviando pago a ' + client?.sName);
 		try {
 			console.log(paymentId);
 			const { data } = await axios.get(HOST_API + '/send-pay/' + paymentId);
 
 			if (data.success) {
 				notifySuccess(
-					'Recibo enviado exitosamente al cliente ' + client?.nombre,
+					'Recibo enviado exitosamente al cliente ' + client?.sName,
 					'Recibo enviado',
 				);
 			} else {
@@ -46,6 +46,9 @@ export default function SendPay({ paymentId }: { paymentId: string }) {
 				onClick={handleSendPayment}
 				size='small'
 				disabled={isSending}
+				sx={{
+					padding: 0,
+				}}
 			>
 				<SendIcon />
 			</IconButton>
