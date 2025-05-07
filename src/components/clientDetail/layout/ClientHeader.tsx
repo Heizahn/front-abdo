@@ -100,7 +100,7 @@ const ClientHeader = ({ activeTab }: { activeTab: string }) => {
 							alignItems: 'center',
 						}}
 					>
-						Saldo: {client && client.nBalance}$
+						Saldo: {client && client.nBalance}
 					</Typography>
 				</Box>
 			</Stack>

@@ -125,15 +125,15 @@ export type PaymentDataForm = {
 	facturaId: string;
 };
 
-export type PaymentDTO = Partial<PaymentDataForm> & {
-	monto: number;
-	fecha: string;
-	creadoPor: string;
-	estado: string;
-	recibidoPor: string;
-	tipo: 1 | 2;
-	tasa: number;
-	clientesId: string;
+export type PaymentDTO = {
+	nAmount: number;
+	nBs: number;
+	sCommentary: string;
+	sReference: string;
+	bCash: boolean;
+	bUSD: boolean;
+	idClient: string;
+	idCreator: string;
 };
 
 export type Invoice = {

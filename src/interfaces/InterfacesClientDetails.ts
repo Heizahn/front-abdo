@@ -51,20 +51,19 @@ export interface Factura {
 }
 
 export interface Pago {
-	_id: string;
-	cliente?: string;
-	fecha: string;
-	creadoPor: string;
-	recibidoPor: string;
-	estado: 'Activo' | 'Anulado' | string;
-	tipoPago: 'Digital' | 'Efectivo' | string;
-	referencia: string;
-	comentario?: string;
-	editadoPor?: string;
-	fechaEdicion?: string;
-	montoUSD: number;
-	montoVES: number;
-	motivo: string;
+	id: string;
+	nAmount: number;
+	nBs: number;
+	bCash: boolean;
+	bUSD: boolean;
+	sReference: string;
+	sCommentary: string;
+	sReason: string;
+	sState: string;
+	creator: string;
+	editor: string;
+	dCreation: string;
+	dEdition: string;
 }
 
 export interface ClientDetails extends Client {

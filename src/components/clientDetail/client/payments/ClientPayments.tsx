@@ -10,7 +10,7 @@ export default function ClientPayments() {
 	const { uploadPayments } = useClientDetailsContext();
 
 	const { data: payments, isLoading } = useFetchData<Pago[]>(
-		`/client/${id}/payments`,
+		`/payments/client/${id}`,
 		'payments-' + id,
 	);
 

@@ -29,7 +29,7 @@ export const ActionButtons = ({ client }: ActionButtonsProps) => {
 					padding: 0,
 				}}
 			>
-				<Pay clientesId={client.id} clientName={client.sName} onCancel={() => {}} />
+				<Pay clientId={client.id} clientName={client.sName} onCancel={() => {}} />
 			</SimpleModalWrapper>
 
 			<SendLastPay clientesId={client.id} />

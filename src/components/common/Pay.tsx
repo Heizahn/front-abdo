@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { getBsToUsd, getUsdToBs } from '../../services/BCBService';
-import { Invoice, PaymentDataForm, PaymentDTO } from '../../interfaces/types';
+import { PaymentDataForm, PaymentDTO } from '../../interfaces/types';
 import { useFetchData, useMutateDate } from '../../hooks/useQuery';
 import { validationSchema, valueInitial } from './validatePay';
 import * as yup from 'yup';
@@ -27,15 +27,16 @@ import { useNotification } from '../../context/NotificationContext';
 import { useClients } from '../../context/ClientsContext';
 import { queryClient } from '../../query-client';
 import { useAuth } from '../../context/AuthContext';
+import { Factura } from '../../interfaces/InterfacesClientDetails';
 
 export default function Pay({
-	clientesId,
+	clientId,
 	clientName,
 	onCancel,
 	closeModal,
 	onPaymentSuccess,
 }: {
-	clientesId: string;
+	clientId: string;
 	clientName: string;
 	onCancel: () => void;
 	closeModal?: () => void;
@@ -69,41 +70,21 @@ export default function Pay({
 		'clientsStats',
 		'clientsPieChart',
 		'lastPays',
-		`client-${clientesId}`,
+		`client-${clientId}`,
 		'clientsList',
 		'paysListSimple',
 		'paysList',
 		'all-clients',
-		`invoices-${clientesId}`,
-		`paysPieChart0-${clientesId}`,
-		`payments-${clientesId}`,
+		`invoices-${clientId}`,
+		`invoices-list-${clientId}`,
+		`paysPieChart0-${clientId}`,
+		`payments-${clientId}`,
 	];
 
-	const mutationWithInvoice = useMutateDate<PaymentDTO, PaymentDTO>(
-		`/paysClient0/factura/${paymentData.facturaId}`,
-		{
-			onSuccess: () => {
-				notifySuccess('El pago se ha creado correctamente', 'Pago creado');
-				queryKeys.forEach((key) => {
-					queryClient.invalidateQueries({
-						queryKey: [key],
-						predicate: (query) => query.queryKey.includes(key),
-					});
-				});
-
-				if (onPaymentSuccess) {
-					onPaymentSuccess();
-				}
-			},
-			onError: (err) => {
-				if (err instanceof Error) {
-					notifyError(err.message, 'Error al crear el pago');
-				}
-			},
-		},
-	);
-
-	const mutation = useMutateDate<PaymentDTO, PaymentDTO>(`/paysClient0`, {
+	const mutation = useMutateDate<
+		{ success: boolean; message: string },
+		{ payment: PaymentDTO; idDebt?: string }
+	>(`/payments`, {
 		onSuccess: () => {
 			notifySuccess('El pago se ha creado correctamente', 'Pago creado');
 			queryKeys.forEach((key) => {
@@ -238,26 +219,27 @@ export default function Pay({
 
 		try {
 			const Payment: PaymentDTO = {
-				monto: Number(paymentData.montoRef),
-				fecha: new Date().toISOString(),
-				creadoPor: user?.id as string,
-				estado: 'Activo',
-				recibidoPor: paymentData.reciboPor,
-				tasa: Number(paymentData.montoBs),
-				tipoPago: paymentData.tipoPago,
-				tipo: paymentData.tipoMoneda === 'USD' ? 1 : 2,
-				clientesId,
-				referencia: paymentData.referencia,
+				nAmount: Number(paymentData.montoRef),
+				nBs: Number(paymentData.montoBs),
+				sCommentary: paymentData.comentario || '',
+				sReference: paymentData.referencia,
+				bCash: paymentData.tipoPago === 'Efectivo' ? true : false,
+				bUSD: paymentData.tipoMoneda === 'USD' ? true : false,
+				idClient: clientId,
+				idCreator: user?.id as string,
 			};
 
 			if (paymentData.comentario) {
-				Payment.comentario = paymentData.comentario;
+				Payment.sCommentary = paymentData.comentario;
 			}
 
 			if (paymentData.facturaId) {
-				await mutationWithInvoice.mutateAsync(Payment);
+				await mutation.mutateAsync({
+					payment: Payment,
+					idDebt: paymentData.facturaId,
+				});
 			} else {
-				await mutation.mutateAsync(Payment);
+				await mutation.mutateAsync({ payment: Payment });
 			}
 
 			notifySuccess('El pago se ha creado correctamente', 'Pago creado');
@@ -307,15 +289,15 @@ export default function Pay({
 		}
 	};
 
-	const { data: invoices, isLoading: isLoadingInvoices } = useFetchData<Invoice[]>(
-		`/clients/${clientesId}/bills`,
-		`invoices-${clientesId}`,
+	const { data: invoices, isLoading: isLoadingInvoices } = useFetchData<Factura[]>(
+		`/debts/client/list/${clientId}`,
+		`invoices-list-${clientId}`,
 	);
 
-	const { data: profiles } = useFetchData<[{ id: string; username: string }]>(
-		'/users',
-		'profiles',
-	);
+	// const { data: profiles } = useFetchData<[{ id: string; name: string }]>(
+	// 	'/users/list',
+	// 	'profiles',
+	// );
 	return (
 		<>
 			<Box component='form' onSubmit={handleFormSubmit} noValidate>
@@ -347,8 +329,8 @@ export default function Pay({
 									) : (
 										invoices.map((invoice) => (
 											<MenuItem key={invoice.id} value={invoice.id}>
-												{invoice.motivo} - Deuda:{' '}
-												{invoice.deuda.toFixed(2)}
+												{invoice.sReason} - Deuda:{' '}
+												{invoice.debt?.toFixed(2)}
 											</MenuItem>
 										))
 									)}
@@ -360,7 +342,7 @@ export default function Pay({
 						</Grid>
 					)}
 
-					<Grid item xs={12}>
+					<Grid item xs={12} sm={6}>
 						<FormControl fullWidth required margin='dense'>
 							<FormLabel component='legend'>Tipo de Moneda</FormLabel>
 							<RadioGroup
@@ -386,6 +368,36 @@ export default function Pay({
 							</RadioGroup>
 							{attemptedSubmit && errors.tipoMoneda && (
 								<FormHelperText error>{errors.tipoMoneda}</FormHelperText>
+							)}
+						</FormControl>
+					</Grid>
+
+					<Grid item xs={12} sm={6}>
+						<FormControl fullWidth required margin='dense'>
+							<FormLabel component='legend'>Tipo de Pago</FormLabel>
+							<RadioGroup
+								row
+								name='tipoPago'
+								value={paymentData.tipoPago}
+								onChange={handleChange}
+								sx={{
+									display: 'grid',
+									gridTemplateColumns: '1fr 1fr',
+								}}
+							>
+								<FormControlLabel
+									value='Efectivo'
+									control={<Radio />}
+									label='Efectivo'
+								/>
+								<FormControlLabel
+									value='Digital'
+									control={<Radio />}
+									label='Digital'
+								/>
+							</RadioGroup>
+							{attemptedSubmit && errors.tipoPago && (
+								<FormHelperText error>{errors.tipoPago}</FormHelperText>
 							)}
 						</FormControl>
 					</Grid>
@@ -469,7 +481,7 @@ export default function Pay({
 							required
 						/>
 					</Grid>
-					<Grid item xs={12} sm={6}>
+					{/* <Grid item xs={12} sm={6}>
 						<FormControl fullWidth margin='dense' required>
 							<InputLabel id='tipo-pago-label'>Tipo de pago</InputLabel>
 							<Select
@@ -488,9 +500,9 @@ export default function Pay({
 								<FormHelperText>{errors.tipoPago}</FormHelperText>
 							)}
 						</FormControl>
-					</Grid>
+					</Grid> */}
 
-					<Grid item xs={12} sm={6}>
+					{/* <Grid item xs={12} sm={6}>
 						<FormControl fullWidth margin='dense' required>
 							<InputLabel id='recibo-por-label'>Recibo por</InputLabel>
 							<Select
@@ -507,12 +519,12 @@ export default function Pay({
 								{profiles &&
 									profiles.map((profile) => (
 										<MenuItem key={profile.id} value={profile.id}>
-											{profile.username}
+											{profile.name?.toUpperCase()}
 										</MenuItem>
 									))}
 							</Select>
 						</FormControl>
-					</Grid>
+					</Grid> */}
 
 					<Grid item xs={12}>
 						<TextField

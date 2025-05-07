@@ -19,7 +19,7 @@ const BalanceInfo = ({ data }: BalanceInfoProps) => {
 			</Typography>
 			<InfoField
 				label='Saldo'
-				value={`${data.saldo}$`}
+				value={`${data.saldo}`}
 				color={data.saldo < 0 ? 'error' : 'success'}
 			/>
 			{!isEditing ? (

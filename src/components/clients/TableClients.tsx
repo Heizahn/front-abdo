@@ -139,7 +139,7 @@ export default function TableClients() {
 							component='span'
 							sx={{ color: saldoValido < 0 ? '#d32f2f' : '#2e7d32' }}
 						>
-							{saldoValido % 1 === 0 ? saldoValido : saldoValido.toFixed(2)}
+							{saldoValido}
 						</Typography>
 					);
 				},

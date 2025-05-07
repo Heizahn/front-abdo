@@ -42,7 +42,7 @@ type OrderBy = keyof Pago | 'montoVES' | 'montoUSD';
 const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = false }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('fecha');
+	const [orderBy, setOrderBy] = useState<OrderBy>('dCreation');
 	const [selectedPayment, setSelectedPayment] = useState<Pago | null>(null);
 	const modalTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -79,15 +79,14 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 	const filteredPayments = payments
 		.filter(
 			(payment) =>
-				payment.motivo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				payment.fecha.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				payment.creadoPor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				payment.referencia.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				payment.tipoPago.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				payment.estado.toLowerCase().includes(searchTerm.toLowerCase()),
+				payment.sReason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				payment.dCreation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				payment.creator.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				payment.sReference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				payment.sState.toLowerCase().includes(searchTerm.toLowerCase()),
 		)
 		.sort((a, b) => {
-			if (orderBy === 'montoUSD' || orderBy === 'montoVES') {
+			if (orderBy === 'nAmount' || orderBy === 'nBs') {
 				return order === 'asc' ? a[orderBy] - b[orderBy] : b[orderBy] - a[orderBy];
 			} else {
 				const valueA = String(a[orderBy as keyof Pago]).toLowerCase();
@@ -97,14 +96,6 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 					: valueB.localeCompare(valueA);
 			}
 		});
-
-	// Format currency
-	const formatCurrency = (value: number, currency: string) => {
-		if (currency === 'VES') {
-			return `${value.toFixed(2)}Bs`;
-		}
-		return `${value.toFixed(2)}$`;
-	};
 
 	return (
 		<Box sx={{ width: '100%' }}>
@@ -140,8 +131,8 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 						icon={<AddIcon />}
 					>
 						<Pay
-							clientesId={client?.id as string}
-							clientName={client?.nombre as string}
+							clientId={client?.id as string}
+							clientName={client?.sName as string}
 							onCancel={() => {}}
 						/>
 					</SimpleModalWrapper>
@@ -157,81 +148,73 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 						<TableRow>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'motivo'}
-									direction={orderBy === 'motivo' ? order : 'asc'}
-									onClick={createSortHandler('motivo')}
+									active={orderBy === 'sReason'}
+									direction={orderBy === 'sReason' ? order : 'asc'}
+									onClick={createSortHandler('sReason')}
 								>
 									Motivo
 								</TableSortLabel>
 							</TableCell>
+							<TableCell>Tipo de Pago</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'tipoPago'}
-									direction={orderBy === 'tipoPago' ? order : 'asc'}
-									onClick={createSortHandler('tipoPago')}
-								>
-									Tipo de Pago
-								</TableSortLabel>
-							</TableCell>
-							<TableCell>
-								<TableSortLabel
-									active={orderBy === 'fecha'}
-									direction={orderBy === 'fecha' ? order : 'asc'}
-									onClick={createSortHandler('fecha')}
+									active={orderBy === 'dCreation'}
+									direction={orderBy === 'dCreation' ? order : 'asc'}
+									onClick={createSortHandler('dCreation')}
 								>
 									Creado
 								</TableSortLabel>
 							</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'creadoPor'}
-									direction={orderBy === 'creadoPor' ? order : 'asc'}
-									onClick={createSortHandler('creadoPor')}
+									active={orderBy === 'creator'}
+									direction={orderBy === 'creator' ? order : 'asc'}
+									onClick={createSortHandler('creator')}
 								>
 									Creado Por
 								</TableSortLabel>
 							</TableCell>
-							<TableCell>
+							{/* <TableCell>
 								<TableSortLabel
-									active={orderBy === 'recibidoPor'}
-									direction={orderBy === 'recibidoPor' ? order : 'asc'}
-									onClick={createSortHandler('recibidoPor')}
+									active={orderBy === 'receiver'}
+									direction={orderBy === 'receiver' ? order : 'asc'}
+									onClick={createSortHandler('receiver')}
 								>
 									Recibido Por
 								</TableSortLabel>
-							</TableCell>
+							</TableCell> */}
 							<TableCell align='right'>
 								<TableSortLabel
-									active={orderBy === 'montoUSD'}
-									direction={orderBy === 'montoUSD' ? order : 'asc'}
-									onClick={createSortHandler('montoUSD')}
+									active={orderBy === 'nAmount'}
+									direction={orderBy === 'nAmount' ? order : 'asc'}
+									onClick={createSortHandler('nAmount')}
 								>
 									Monto (USD)
 								</TableSortLabel>
 							</TableCell>
 							<TableCell align='right'>
 								<TableSortLabel
-									active={orderBy === 'montoVES'}
-									direction={orderBy === 'montoVES' ? order : 'asc'}
-									onClick={createSortHandler('montoVES')}
+									active={orderBy === 'nBs'}
+									direction={orderBy === 'nBs' ? order : 'asc'}
+									onClick={createSortHandler('nBs')}
 								>
 									Monto (VES)
 								</TableSortLabel>
 							</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'referencia'}
-									direction={orderBy === 'referencia' ? order : 'asc'}
-									onClick={createSortHandler('referencia')}
+									active={orderBy === 'sReference'}
+									direction={orderBy === 'sReference' ? order : 'asc'}
+									onClick={createSortHandler('sReference')}
 								>
 									Referencia
 								</TableSortLabel>
 							</TableCell>
 							<TableCell>
 								<TableSortLabel
-									active={orderBy === 'estado'}
-									direction={orderBy === 'estado' ? order : 'asc'}
-									onClick={createSortHandler('estado')}
+									active={orderBy === 'sState'}
+									direction={orderBy === 'sState' ? order : 'asc'}
+									onClick={createSortHandler('sState')}
 								>
 									Estado
 								</TableSortLabel>
@@ -249,7 +232,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 						) : filteredPayments.length > 0 ? (
 							filteredPayments.map((payment) => (
 								<TableRowClickHandler
-									key={payment._id}
+									key={payment.id}
 									onRowClick={() => handleRowClick(payment)}
 									sx={{
 										cursor: 'pointer',
@@ -262,16 +245,16 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 										},
 									}}
 								>
-									<TableCell>{payment.motivo}</TableCell>
-									<TableCell>{payment.tipoPago}</TableCell>
-									<TableCell>{payment.fecha}</TableCell>
-									<TableCell>{payment.creadoPor}</TableCell>
-									<TableCell>{payment.recibidoPor}</TableCell>
-									<TableCell align='right'>{payment.montoUSD}$</TableCell>
-									<TableCell align='right'>
-										{formatCurrency(payment.montoVES, 'VES')}
+									<TableCell>{payment.sReason}</TableCell>
+									<TableCell>
+										{payment.bCash ? 'Efectivo' : 'Digital'}
 									</TableCell>
-									<TableCell>{payment.referencia}</TableCell>
+									<TableCell>{payment.dCreation}</TableCell>
+									<TableCell>{payment.creator?.toUpperCase()}</TableCell>
+									{/* <TableCell>{payment.receiver}</TableCell> */}
+									<TableCell align='right'>{payment.nAmount}</TableCell>
+									<TableCell align='right'>{payment.nBs}</TableCell>
+									<TableCell>{payment.sReference}</TableCell>
 									<TableCell>
 										<Box
 											sx={{
@@ -285,13 +268,13 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 													height: 10,
 													borderRadius: '50%',
 													backgroundColor:
-														payment.estado === 'Activo'
+														payment.sState === 'Activo'
 															? 'success.main'
 															: 'error.main',
 													mr: 1,
 												}}
 											/>
-											{payment.estado}
+											{payment.sState}
 										</Box>
 									</TableCell>
 									<TableCell align='center'>
@@ -299,7 +282,7 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 											sx={{ display: 'flex', justifyContent: 'center' }}
 											onClick={(e) => e.stopPropagation()}
 										>
-											<SendPay paymentId={payment._id} />
+											<SendPay paymentId={payment.id} />
 											<Tooltip title='Descargar recibo'>
 												<IconButton
 													size='small'
