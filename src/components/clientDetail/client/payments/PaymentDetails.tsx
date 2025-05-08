@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { useNotification } from '../../../../context/NotificationContext';
 import { ROLES, useAuth } from '../../../../context/AuthContext';
 import { Client } from '../../../../interfaces/Interfaces';
+import { formatDate } from '../../../../services/formaterDate';
 
 interface PaymentDetailsProps {
 	payment: Pago;
@@ -16,25 +17,12 @@ interface PaymentDetailsProps {
 	client?: Client;
 }
 
-// Función auxiliar para formatear fechas
-const formatDate = (dateString: string) => {
-	if (!dateString) return '';
-	const date = new Date(dateString);
-	return date.toLocaleString('es-VE', {
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit',
-	});
-};
-
 const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, client }) => {
 	const { id: clientId } = useParams();
 	const queryKeys = [
 		'clientsPieChart',
 		`client-${clientId}`,
-		'all-clients',
+		'clients',
 		`paysPieChart0-${clientId}`,
 		`payments-${clientId}`,
 		`invoices-${clientId}`,
@@ -46,10 +34,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, clien
 
 	const handleAnular = async () => {
 		try {
-			await axios.patch(HOST_API + '/paysClient0/' + payment.id, {
-				estado: 'Anulado',
-				editadoPor: user?.id,
-				fechaEdicion: new Date().toISOString(),
+			await axios.put(HOST_API + '/payments/' + payment.id + '/cancel', {
+				idEditor: user?.id,
 			});
 
 			queryKeys.forEach((key) => {
@@ -109,7 +95,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, clien
 							)}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Tipo de Pago:</strong> {payment.sState}
+							<strong>Tipo de Pago:</strong>{' '}
+							{payment.bCash ? 'Efectivo' : 'Digital'}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
 							<strong>Referencia:</strong> {payment.sReference}
@@ -124,7 +111,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, clien
 							<strong>Estado:</strong> {payment.sState}
 						</Typography>
 						<Typography variant='body1' gutterBottom>
-							<strong>Creado Por:</strong> {payment.creator}
+							<strong>Creado Por:</strong> {payment.creator?.toUpperCase()}
 						</Typography>
 						{/* <Typography variant='body1' gutterBottom>
 							<strong>Recibido Por:</strong> {payment.recibidoPor}
@@ -140,7 +127,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, clien
 						{payment.editor && payment.dEdition && (
 							<>
 								<Typography variant='body1' gutterBottom>
-									<strong>Editado Por:</strong> {payment.editor}
+									<strong>Editado Por:</strong>{' '}
+									{payment.editor?.toUpperCase()}
 								</Typography>
 								<Typography variant='body1' gutterBottom>
 									<strong>Fecha de Edición:</strong>{' '}

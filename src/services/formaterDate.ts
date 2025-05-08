@@ -1,7 +1,11 @@
-export const formatDate = (date: string) => {
-	const dateObj = new Date(date);
-	const day = dateObj.getDate();
-	const month = dateObj.getMonth() + 1;
-	const year = dateObj.getFullYear();
-	return `${day}/${month}/${year} ${dateObj.getHours()}:${dateObj.getMinutes()}`;
+export const formatDate = (dateString: string) => {
+	if (!dateString) return '';
+	const date = new Date(dateString);
+	return date.toLocaleString('es-VE', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+	});
 };
