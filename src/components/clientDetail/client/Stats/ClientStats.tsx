@@ -21,27 +21,33 @@ import {
 	Cell,
 	Legend,
 } from 'recharts';
-import { useClientDetailsContext } from '../../../context/ClientDetailContext';
-import { useFetchData } from '../../../hooks/useQuery';
+import { useClientDetailsContext } from '../../../../context/ClientDetailContext';
+import { useFetchData } from '../../../../hooks/useQuery';
 import { useParams } from 'react-router-dom';
 import {
 	Pago,
 	ClientStats as TipoPagoStat,
-} from '../../../interfaces/InterfacesClientDetails';
+} from '../../../../interfaces/InterfacesClientDetails';
 
 const ClientStats = () => {
 	const { client, isClientLoading, error: clientError } = useClientDetailsContext();
 	const { id } = useParams<{ id: string }>();
 
 	const { data, isLoading } = useFetchData<Pago[]>(
-		`/client/${id}/payments`,
+		`/payments/client/${id}`,
 		'payments-' + id,
 	);
 
 	const payments = useMemo(() => {
 		if (!data) return [];
 
-		return data.filter((pago) => pago.estado === 'Activo');
+		return data.filter((pago) => pago.sState === 'Activo');
+	}, [data]);
+
+	// Pagos anulados
+	const canceledPayments = useMemo(() => {
+		if (!data) return [];
+		return data.filter((pago) => pago.sState === 'Anulado');
 	}, [data]);
 
 	// Usando el hook useFetchData para obtener los datos de tipos de pago
@@ -49,7 +55,7 @@ const ClientStats = () => {
 		data: tiposPagoData,
 		isLoading: tiposLoading,
 		error: tiposError,
-	} = useFetchData<TipoPagoStat[]>(`/paysPieChart0/${id}`, 'paysPieChart0-' + id);
+	} = useFetchData<TipoPagoStat[]>(`/payments/client/${id}/types`, 'paysPieChart' + id);
 
 	// Colores para las gráficas
 	const COLORS = ['#1976d2', '#ed6c02'];
@@ -63,7 +69,7 @@ const ClientStats = () => {
 
 		payments.forEach((pago) => {
 			// Extraer el día del mes de la fecha de pago
-			const fechaPago = new Date(pago.fecha);
+			const fechaPago = new Date(pago.dCreation);
 			const dia = fechaPago.getDate().toString();
 
 			// Incrementar contador para ese día
@@ -94,6 +100,8 @@ const ClientStats = () => {
 				totalUSD: 0,
 				totalVES: 0,
 				montoTotalUSD: 0,
+				totalCanceledPayments: 0,
+				montoCanceledUSD: 0,
 				percentages: {},
 			};
 		}
@@ -105,8 +113,15 @@ const ClientStats = () => {
 		const vesPayments =
 			tiposPagoData.find((item: { tipo: string }) => item.tipo === 'VES')?.count || 0;
 
-		// Calcular monto total en USD
-		const montoTotalUSD = payments.reduce((sum, pago) => sum + (pago.montoUSD || 0), 0);
+		// Calcular monto total en USD (solo pagos activos)
+		const montoTotalUSD = payments.reduce((sum, pago) => sum + (pago.nAmount || 0), 0);
+
+		// Calcular total de pagos anulados y su monto
+		const totalCanceledPayments = canceledPayments.length;
+		const montoCanceledUSD = canceledPayments.reduce(
+			(sum, pago) => sum + (pago.nAmount || 0),
+			0,
+		);
 
 		// Calcular porcentajes para el gráfico
 		const total = usdPayments + vesPayments;
@@ -122,9 +137,11 @@ const ClientStats = () => {
 			totalUSD: usdPayments,
 			totalVES: vesPayments,
 			montoTotalUSD,
+			totalCanceledPayments,
+			montoCanceledUSD,
 			percentages,
 		};
-	}, [payments, tiposPagoData]);
+	}, [payments, tiposPagoData, canceledPayments]);
 
 	// Mostrar loader mientras se cargan los datos
 	if (isClientLoading || tiposLoading || isLoading) {
@@ -186,7 +203,9 @@ const ClientStats = () => {
 	return (
 		<Box
 			sx={{
-				p: 3,
+				paddingX: 4,
+				paddingTop: 2,
+				paddingBottom: 4,
 				bgcolor: 'background.paper',
 				borderBottomLeftRadius: 8,
 				borderBottomRightRadius: 8,
@@ -203,7 +222,7 @@ const ClientStats = () => {
 					<Card>
 						<CardContent>
 							<Typography variant='subtitle2' color='text.secondary'>
-								Total Pagos
+								Total Pagos Activos
 							</Typography>
 							<Typography variant='h4' sx={{ mt: 1 }}>
 								{stats.totalPagos}
@@ -216,7 +235,7 @@ const ClientStats = () => {
 					<Card>
 						<CardContent>
 							<Typography variant='subtitle2' color='text.secondary'>
-								Monto Total (USD)
+								Monto Total Activos (USD)
 							</Typography>
 							<Typography variant='h4' sx={{ mt: 1 }}>
 								${stats.montoTotalUSD.toFixed(2)}
@@ -250,17 +269,50 @@ const ClientStats = () => {
 						</CardContent>
 					</Card>
 				</Grid>
+
+				{/* Mostrar tarjetas de pagos anulados solo si existen pagos anulados */}
+				{stats.totalCanceledPayments > 0 && (
+					<>
+						{/* Tarjeta para pagos anulados */}
+						<Grid item xs={12} md={6} lg={3}>
+							<Card sx={{ bgcolor: '#ffebee' }}>
+								<CardContent>
+									<Typography variant='subtitle2' color='text.secondary'>
+										Pagos Anulados
+									</Typography>
+									<Typography variant='h4' sx={{ mt: 1 }}>
+										{stats.totalCanceledPayments}
+									</Typography>
+								</CardContent>
+							</Card>
+						</Grid>
+
+						{/* Monto de pagos anulados */}
+						<Grid item xs={12} md={6} lg={3}>
+							<Card sx={{ bgcolor: '#ffebee' }}>
+								<CardContent>
+									<Typography variant='subtitle2' color='text.secondary'>
+										Monto Anulado (USD)
+									</Typography>
+									<Typography variant='h4' sx={{ mt: 1 }}>
+										${stats.montoCanceledUSD.toFixed(2)}
+									</Typography>
+								</CardContent>
+							</Card>
+						</Grid>
+					</>
+				)}
 			</Grid>
 
 			{/* Gráficos */}
 			<Grid container spacing={3} sx={{ mt: 2 }}>
 				{/* Gráfico de barras - Días de Pago */}
 				<Grid item xs={12} md={7}>
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={{ p: 4 }}>
 						<Typography variant='subtitle1' gutterBottom>
 							Días de Pago
 						</Typography>
-						<ResponsiveContainer width='100%' height={300}>
+						<ResponsiveContainer width='100%' height={280}>
 							<BarChart
 								data={barChartData}
 								margin={{
@@ -287,11 +339,11 @@ const ClientStats = () => {
 
 				{/* Gráfico de pastel - Tipos de Pago */}
 				<Grid item xs={12} md={5}>
-					<Paper sx={{ p: 3 }}>
+					<Paper sx={{ p: 4 }}>
 						<Typography variant='subtitle1' gutterBottom>
 							Tipos de Pago
 						</Typography>
-						<ResponsiveContainer width='100%' height={300}>
+						<ResponsiveContainer width='100%' height={280}>
 							<PieChart>
 								<Pie
 									data={pieChartData}

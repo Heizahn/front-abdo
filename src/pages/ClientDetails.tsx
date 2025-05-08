@@ -6,7 +6,7 @@ import Navigation from '../components/common/Navigation';
 import ClientDetailsCard from '../components/clientDetail/client/ClientDetailCard';
 import ClientAccounts from '../components/clientDetail/client/Invoices/ClientAccounts';
 import ClientPayments from '../components/clientDetail/client/payments/ClientPayments';
-import ClientStats from '../components/clientDetail/client/ClientStats';
+import ClientStats from '../components/clientDetail/client/Stats/ClientStats';
 import MainLayout from '../layouts/MainLayout';
 import { ClientDetailsProvider } from '../context/ClientDetailContext';
 import { useNavigate } from 'react-router-dom';
