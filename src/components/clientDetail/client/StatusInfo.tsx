@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import InfoField from '../common/InfoField';
+import { formatDate } from '../../../services/formaterDate';
 
 interface StatusInfoProps {
 	data: {
@@ -11,8 +12,6 @@ interface StatusInfoProps {
 		fechaEdicion?: string;
 		suspendidoPor?: string;
 		fechaSuspension?: string;
-		retiradoPor?: string;
-		fechaRetiro?: string;
 	};
 }
 
@@ -33,21 +32,22 @@ const StatusInfo = ({ data }: StatusInfoProps) => {
 						: 'error'
 				}
 			/>
-			<InfoField label='Creado Por' value={data.creadoPor} />
-			<InfoField label='Fecha de Creación' value={data.fechaCreacion} />
-			{data.editadoPor && <InfoField label='Editado Por' value={data.editadoPor} />}
+			<InfoField label='Creado Por' value={data.creadoPor?.toUpperCase()} />
+			<InfoField label='Fecha de Creación' value={formatDate(data.fechaCreacion)} />
+			{data.editadoPor && (
+				<InfoField label='Editado Por' value={data.editadoPor?.toUpperCase()} />
+			)}
 			{data.fechaEdicion && (
-				<InfoField label='Fecha de Edición' value={data.fechaEdicion} />
+				<InfoField label='Fecha de Edición' value={formatDate(data.fechaEdicion)} />
 			)}
 			{data.suspendidoPor && data.suspendidoPor.length > 0 && (
-				<InfoField label='Suspendido Por' value={data.suspendidoPor} />
+				<InfoField label='Suspendido Por' value={data.suspendidoPor?.toUpperCase()} />
 			)}
 			{data.fechaSuspension && (
-				<InfoField label='Fecha de Suspensión' value={data.fechaSuspension} />
-			)}
-			{data.retiradoPor && <InfoField label='Retirado Por' value={data.retiradoPor} />}
-			{data.fechaRetiro && (
-				<InfoField label='Fecha de Retiro' value={data.fechaRetiro} />
+				<InfoField
+					label='Fecha de Suspensión'
+					value={formatDate(data.fechaSuspension)}
+				/>
 			)}
 		</Box>
 	);

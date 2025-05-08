@@ -20,7 +20,7 @@ interface ServicesInfoProps {
 }
 
 const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
-	const { isEditing } = useClientDetailsContext();
+	const { isEditing, clientUpdate } = useClientDetailsContext();
 
 	const { data: planesList } = useFetchData<SelectList[]>('/plans/list', 'plans-list');
 
@@ -36,11 +36,11 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 						label='Tipo'
 						value={data.type === 'RF' ? 'Radio Frecuencia' : 'Fibra Óptica'}
 					/>
-					{data.sn && data.type === 'FO' && <InfoField label='SN' value={data.sn} />}
+					{data.type === 'FO' && <InfoField label='SN' value={data.sn || 'N/A'} />}
 					<InfoField
 						label='IPv4'
 						value={
-							(data && (
+							(data.ipv4 && (
 								<Link href={`http://${data.ipv4}`} target='_blank'>
 									{data.ipv4}
 								</Link>
@@ -48,7 +48,7 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 							'N/A'
 						}
 					/>
-					{data.mac && <InfoField label='MAC' value={data.mac} />}
+					{<InfoField label='MAC' value={data.mac || 'N/A'} />}
 				</>
 			) : (
 				<>
@@ -67,7 +67,7 @@ const ServicesInfo: React.FC<ServicesInfoProps> = ({ data }) => {
 							{ sName: 'Radio Frecuencia', id: 'RF' },
 						]}
 					/>
-					{data.type === 'FO' && (
+					{(data.type === 'FO' || clientUpdate?.sType === 'FO') && (
 						<EditableInfoField label='SN' valueInitial={data.sn} name='sSn' />
 					)}
 					<EditableInfoField
