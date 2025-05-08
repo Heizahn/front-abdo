@@ -45,7 +45,7 @@ export default function SendPay({ paymentId }: { paymentId: string }) {
 				color='primary'
 				onClick={handleSendPayment}
 				size='small'
-				disabled={isSending}
+				disabled={isSending || true}
 				sx={{
 					padding: 0,
 				}}

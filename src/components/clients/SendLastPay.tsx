@@ -42,12 +42,12 @@ export default function SendLastPay({ clientesId }: { clientesId: string }) {
 				size='medium'
 				color='primary'
 				onClick={handleSendLastPay}
-				disabled={sendingLastPay}
+				disabled={sendingLastPay || true}
 				sx={{
 					padding: 0,
 				}}
 			>
-				<SendIcon fontSize='medium' color={sendingLastPay ? 'disabled' : 'primary'} />
+				<SendIcon fontSize='medium' />
 			</IconButton>
 		</Tooltip>
 	);
