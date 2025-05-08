@@ -57,10 +57,11 @@ const SearchClient = () => {
 	const handleClientChange = (client: string) => {
 		setClientList(client);
 
-		//Actualizar el parametro provider en la url
-		const params = new URLSearchParams(location.search);
-		params.set('provider', client);
-		navigate({ search: params.toString() }, { replace: true });
+		// No actualizamos la URL aquí porque el componente Proveedor ya lo hace
+		// Esto evita la doble actualización que podría causar problemas
+		// const params = new URLSearchParams(location.search);
+		// params.set('provider', client);
+		// navigate({ search: params.toString() }, { replace: true });
 	};
 
 	const disableButton = useMemo(() => {

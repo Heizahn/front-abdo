@@ -16,7 +16,6 @@ import {
 	PersonRounded as PersonIcon,
 	PhoneRounded as PhoneIcon,
 	HomeRounded as HomeIcon,
-	RouterRounded as RouterIcon,
 	MonetizationOnRounded as MoneyIcon,
 	AssignmentRounded as DocumentIcon,
 	SendRounded as SendIcon,
@@ -118,9 +117,9 @@ const ClientDetail = ({
 							<Avatar
 								sx={{
 									bgcolor: `${
-										client.estado === 'Activo' && client.saldo >= 0
+										client.sState === 'Activo' && client.nBalance >= 0
 											? 'success.main'
-											: client.estado === 'Suspendido'
+											: client.sState === 'Suspendido'
 											? 'error.main'
 											: 'warning.main'
 									}`,
@@ -130,13 +129,13 @@ const ClientDetail = ({
 								<PersonIcon />
 							</Avatar>
 							<Typography variant='h5' component='div'>
-								{client.nombre}
+								{client.sName}
 							</Typography>
 						</Box>
 
 						<SuspendedClient
 							clientId={client.id}
-							clientStatus={client.estado}
+							clientStatus={client.sState}
 							isButton={true}
 						/>
 					</Box>
@@ -150,17 +149,19 @@ const ClientDetail = ({
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								<strong>Identificación:</strong> {client.identificacion}
+								<strong>Identificación:</strong> {client.sDni}
 							</Typography>
 						</Grid>
 
 						<Grid item xs={12} sm={6}>
 							<Typography variant='body2' color='text.secondary'>
-								<CalendarMonth
-									fontSize='small'
-									sx={{ mr: 1, verticalAlign: 'middle' }}
-								/>
-								<strong>Fecha Corte:</strong> {client.fechaCorte}
+								<strong>IPV4:</strong>{' '}
+								{(client.sIp && (
+									<Link href={`http://${client.sIp}`} target='_blank'>
+										{client.sIp}
+									</Link>
+								)) ||
+									'No asignada'}
 							</Typography>
 						</Grid>
 
@@ -170,7 +171,7 @@ const ClientDetail = ({
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								<strong>Teléfono:</strong> {client.telefonos || 'No asignado'}
+								<strong>Teléfono:</strong> {client.sPhone || 'No asignado'}
 							</Typography>
 						</Grid>
 
@@ -186,9 +187,9 @@ const ClientDetail = ({
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								{client.coordenadas ? (
+								{client.sGps ? (
 									<Link
-										href={`https://maps.google.com/?q=${client.coordenadas}`}
+										href={`https://maps.google.com/?q=${client.sGps}`}
 										target='_blank'
 									>
 										<strong>Dirección:</strong>{' '}
@@ -208,26 +209,13 @@ const ClientDetail = ({
 								<strong>Sector:</strong> {client.sector || 'No asignado'}
 							</Typography>
 						</Grid>
-
 						<Grid item xs={12} sm={6}>
 							<Typography variant='body2' color='text.secondary'>
-								<RouterIcon
+								<CalendarMonth
 									fontSize='small'
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
-								<strong>Router:</strong> {client.router || 'No asignado'}
-							</Typography>
-						</Grid>
-
-						<Grid item xs={12} sm={6}>
-							<Typography variant='body2' color='text.secondary'>
-								<strong>IPV4:</strong>{' '}
-								{(client.ipv4 && (
-									<Link href={`http://${client.ipv4}`} target='_blank'>
-										{client.ipv4}
-									</Link>
-								)) ||
-									'No asignada'}
+								<strong>Fecha Corte:</strong> {client.nPayment}
 							</Typography>
 						</Grid>
 					</Grid>
@@ -251,8 +239,8 @@ const ClientDetail = ({
 						>
 							<Chip
 								icon={<MoneyIcon />}
-								label={`Saldo: ${(client.saldo || 0).toFixed(2)} USD`}
-								color={getSaldoColor(client.saldo)}
+								label={`Saldo: ${(client.nBalance || 0).toFixed(2)} USD`}
+								color={getSaldoColor(client.nBalance)}
 								variant='outlined'
 							/>
 						</Box>
@@ -272,10 +260,7 @@ const ClientDetail = ({
 									clientId={client.id}
 									onCancel={() => {}}
 									onInvoiceSuccess={async () => {
-										const res = await getClient(
-											client.nombre,
-											buildParams,
-										);
+										const res = await getClient(client.sName, buildParams);
 										refetchSearch(res);
 									}}
 								/>
@@ -286,14 +271,11 @@ const ClientDetail = ({
 								showCloseButton={false}
 							>
 								<Pay
-									clientName={client.nombre}
-									clientesId={client.id}
+									clientName={client.sName}
+									clientId={client.id}
 									onCancel={() => {}}
 									onPaymentSuccess={async () => {
-										const res = await getClient(
-											client.nombre,
-											buildParams,
-										);
+										const res = await getClient(client.sName, buildParams);
 										refetchSearch(res);
 									}}
 								/>
@@ -304,7 +286,7 @@ const ClientDetail = ({
 								color='primary'
 								startIcon={<SendIcon />}
 								onClick={handleSendLastPayment}
-								disabled={sendingPayment}
+								disabled={sendingPayment || true}
 							>
 								{sendingPayment ? (
 									<CircularProgress size={24} />

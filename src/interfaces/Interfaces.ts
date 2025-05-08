@@ -4,15 +4,16 @@ export interface User {
 	nRole: number;
 	idOwner?: string;
 }
-export interface IPaymentHistory {
-	fecha: string;
-	tipoPago: string;
-	referencia: string;
-	motivo: string;
-	monto: number;
-	montoVES: number;
-}
 
+export interface IPaymentHistory {
+	id: string;
+	bCash: boolean;
+	dCreation: string;
+	sReference: string;
+	sReason: string;
+	nAmount: number;
+	nBs: number;
+}
 export interface ILastInvoice {
 	id: string;
 	fecha: string;

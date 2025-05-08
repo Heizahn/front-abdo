@@ -6,7 +6,7 @@ export async function getClient(searchTerm: string, buildParams: string) {
 	await validateData(clientSearchSchema, { searchTerm });
 	try {
 		const response = await axios.get(
-			`${HOST_API}/clientByIdentity/${searchTerm}${buildParams}`,
+			`${HOST_API}/clients/search/${searchTerm}${buildParams}`,
 		);
 
 		if (!response.data) {

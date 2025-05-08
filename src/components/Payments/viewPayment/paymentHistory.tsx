@@ -17,6 +17,7 @@ import {
 	AttachMoney as AttachMoneyIcon,
 } from '@mui/icons-material';
 import { IPaymentHistory } from '../../../interfaces/Interfaces';
+import { formatDate } from '../../../services/formaterDate';
 
 const PaymentHistory = ({ pagos = [] }: { pagos: IPaymentHistory[] }) => {
 	// Función para determinar el icono según el tipo de pago
@@ -55,8 +56,8 @@ const PaymentHistory = ({ pagos = [] }: { pagos: IPaymentHistory[] }) => {
 						<TableRow sx={{ bgcolor: 'primary.light' }}>
 							<TableCell sx={{ fontWeight: 'bold' }}>Fecha</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Tipo</TableCell>
-							<TableCell sx={{ fontWeight: 'bold' }}>Referencia</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Motivo</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}>Referencia</TableCell>
 							<TableCell align='right' sx={{ fontWeight: 'bold' }}>
 								Monto (USD)
 							</TableCell>
@@ -77,33 +78,35 @@ const PaymentHistory = ({ pagos = [] }: { pagos: IPaymentHistory[] }) => {
 								}}
 							>
 								<TableCell component='th' scope='row'>
-									{pago.fecha}
+									{formatDate(pago.dCreation)}
 								</TableCell>
 								<TableCell>
-									<Tooltip title={pago.tipoPago || 'No especificado'}>
+									<Tooltip title={pago.bCash ? 'Efectivo' : 'Digital'}>
 										<Chip
-											icon={getPaymentIcon(pago.tipoPago)}
-											label={pago.tipoPago || 'N/A'}
+											icon={getPaymentIcon(
+												pago.bCash ? 'Efectivo' : 'Digital',
+											)}
+											label={pago.bCash ? 'Efectivo' : 'Digital'}
 											size='small'
 											variant='outlined'
 											color='primary'
 										/>
 									</Tooltip>
 								</TableCell>
-								<TableCell>{pago.referencia || 'N/A'}</TableCell>
-								<TableCell>{pago.motivo || 'Sin motivo'}</TableCell>
+								<TableCell>{pago.sReason || 'Sin motivo'}</TableCell>
+								<TableCell>{pago.sReference || 'N/A'}</TableCell>
 								<TableCell align='right'>
 									<Typography
 										variant='body2'
 										fontWeight='medium'
 										color='primary.dark'
 									>
-										{pago.monto?.toFixed(2) || '0.00'}
+										{pago.nAmount || '0'}
 									</Typography>
 								</TableCell>
 								<TableCell align='right'>
 									<Typography variant='body2' color='text.secondary'>
-										{pago.montoVES?.toFixed(2) || '0.00'} Bs.
+										{pago.nBs || '0'} Bs.
 									</Typography>
 								</TableCell>
 							</TableRow>
