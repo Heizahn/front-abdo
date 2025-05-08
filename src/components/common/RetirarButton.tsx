@@ -25,50 +25,38 @@ export default function SuspendedClient({
 	const { refetchClients } = useClients();
 	const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 	const { user } = useAuth();
+	const queryKeys = ['clients-stats', `client-${clientId}`, 'clients'];
 
-	const handleStatus = async () => {
-		const newStatus: {
-			estado: string;
-			retiradoPor?: string;
-			fechaRetiro?: string;
-			editadoPor?: string;
-			fechaEdicion?: string;
-		} = {
-			estado: '',
-		};
-
-		if (clientStatus === 'Suspendido') {
-			newStatus.retiradoPor = user?.id as string;
-			newStatus.fechaRetiro = new Date().toISOString();
-			newStatus.estado = 'Retirado';
-			newStatus.editadoPor = user?.id as string;
-			newStatus.fechaEdicion = new Date().toISOString();
-		} else if (clientStatus === 'Retirado') {
-			newStatus.editadoPor = user?.id as string;
-			newStatus.fechaEdicion = new Date().toISOString();
-			newStatus.estado = 'Activo';
-		}
-
-		const { status } = await axios.patch(`${HOST_API}/clientes/${clientId}`, {
-			...newStatus,
+	const handleWithdraw = async () => {
+		const { status } = await axios.put(`${HOST_API}/clients/client/${clientId}/withdraw`, {
+			idEditor: user?.id as string,
 		});
 
 		if (status === 204) {
-			notifySuccess(
-				`El cliente se ha ${
-					clientStatus === 'Retirado' ? 'reactivado' : 'retirado'
-				} correctamente`,
-				'Cliente actualizado',
-			);
+			notifySuccess(`El cliente se ha retirado correctamente`, 'Cliente retirado');
 		} else {
-			notifyError('Error al actualizar el cliente', 'Error al actualizar el cliente');
+			notifyError('Error al retirar el cliente', 'Error al retirar el cliente');
 		}
 
-		queryClient.invalidateQueries({
-			queryKey: ['clientsStats'],
+		queryKeys.forEach((key) => {
+			queryClient.invalidateQueries({ queryKey: [key] });
 		});
-		queryClient.invalidateQueries({
-			queryKey: [`client-${clientId}`],
+		refetchClients();
+	};
+
+	const handleActive = async () => {
+		const { status } = await axios.put(`${HOST_API}/clients/client/${clientId}/activate`, {
+			idEditor: user?.id as string,
+		});
+
+		if (status === 204) {
+			notifySuccess(`El cliente se ha reactivado correctamente`, 'Cliente reactivado');
+		} else {
+			notifyError('Error al reactivar el cliente', 'Error al reactivar el cliente');
+		}
+
+		queryKeys.forEach((key) => {
+			queryClient.invalidateQueries({ queryKey: [key] });
 		});
 		refetchClients();
 	};
@@ -81,7 +69,11 @@ export default function SuspendedClient({
 	// Handle confirm action
 	const handleConfirm = () => {
 		setShowConfirmation(false);
-		handleStatus();
+		if (clientStatus === 'Suspendido') {
+			handleWithdraw();
+		} else {
+			handleActive();
+		}
 	};
 
 	// Handle cancel confirmation
@@ -138,13 +130,23 @@ export default function SuspendedClient({
 		<>
 			{clientStatus === 'Retirado' ? (
 				<Tooltip title='Reactivar cliente'>
-					<IconButton size='medium' color='success' onClick={handleShowConfirmation}>
+					<IconButton
+						size='medium'
+						color='success'
+						onClick={handleShowConfirmation}
+						sx={{ padding: 0 }}
+					>
 						<CheckIcon fontSize='medium' color='success' />
 					</IconButton>
 				</Tooltip>
 			) : (
 				<Tooltip title='Retirar cliente'>
-					<IconButton size='medium' color='error' onClick={handleShowConfirmation}>
+					<IconButton
+						size='medium'
+						color='error'
+						onClick={handleShowConfirmation}
+						sx={{ padding: 0 }}
+					>
 						<SuspendeIcon fontSize='medium' color='error' />
 					</IconButton>
 				</Tooltip>
