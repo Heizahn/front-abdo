@@ -76,7 +76,7 @@ const ClientDetailsCard = () => {
 						data={{
 							sector: data?.sector ?? '',
 							direccion: data?.sAddress ?? '',
-							coordenadas: data?.sCommentary ?? '',
+							coordenadas: data?.sGps ?? '',
 							idSector: data?.idSector ?? '',
 						}}
 					/>
