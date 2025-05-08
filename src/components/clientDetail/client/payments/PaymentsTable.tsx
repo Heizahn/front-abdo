@@ -137,7 +137,10 @@ const PaymentsTable: React.FC<PaymentsTableProps> = ({ payments, isLoading = fal
 							}
 							maxWidth='md'
 						>
-							<PaymentDetails payment={selectedPayment} />
+							<PaymentDetails
+								payment={selectedPayment}
+								clientId={client?.id as string}
+							/>
 						</SimpleModalWrapper>
 					) : null}
 					<SimpleModalWrapper

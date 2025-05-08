@@ -5,31 +5,22 @@ import Navigation from '../components/Payments/Navigation';
 import Create from '../components/Payments/Create';
 import TableLastPay from '../components/Payments/TableLastPay';
 import { useFetchData } from '../hooks/useQuery';
+import { Pago } from '../interfaces/InterfacesClientDetails';
+import { useBuildParams } from '../hooks/useBuildParams';
 
 // Definimos la interfaz Pago
-interface Pago {
-	_id: string;
-	cliente: string;
-	tipoPago: string;
-	fecha: string;
-	creadoPor: string;
-	montoUSD: number;
-	montoVES: number;
-	referencia: string;
-	comentario: string;
-	estado: 'Activo' | 'Anulado';
-	recibidoPor: string;
-	motivo: string;
+interface IPaymentView extends Pago {
+	clientName: string;
+	clientId: string;
 }
 
 export default function PaymentsView() {
 	const [activeTab, setActiveTab] = useState('create');
 
 	// Precargamos los datos simples cuando se carga el componente
-	const { data: pagosSimpleData = [], isLoading: isLoadingSimple } = useFetchData<Pago[]>(
-		'/paysListSimple',
-		'paysListSimple',
-	);
+	const { data: pagosSimpleData = [], isLoading: isLoadingSimple } = useFetchData<
+		IPaymentView[]
+	>(`/payments/list/simple${useBuildParams()}`, 'payments-list-simple');
 
 	// Renderizamos el contenido activo según la pestaña seleccionada
 	const renderTabContent = () => {

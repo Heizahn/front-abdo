@@ -5,20 +5,23 @@ import ConfirmDialog from '../../../common/Confirm';
 import axios from 'axios';
 import { HOST_API } from '../../../../config/env';
 import { queryClient } from '../../../../query-client';
-import { useParams } from 'react-router-dom';
 import { useNotification } from '../../../../context/NotificationContext';
 import { ROLES, useAuth } from '../../../../context/AuthContext';
-import { Client } from '../../../../interfaces/Interfaces';
 import { formatDate } from '../../../../services/formaterDate';
 
 interface PaymentDetailsProps {
 	payment: Pago;
 	onClose?: () => void;
-	client?: Client;
+	clientName?: string;
+	clientId: string;
 }
 
-const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, client }) => {
-	const { id: clientId } = useParams();
+const PaymentDetails: React.FC<PaymentDetailsProps> = ({
+	payment,
+	onClose,
+	clientName,
+	clientId,
+}) => {
 	const queryKeys = [
 		'clientsPieChart',
 		`client-${clientId}`,
@@ -81,19 +84,18 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({ payment, onClose, clien
 
 				{payment && (
 					<>
-						<Typography variant='body1' gutterBottom>
-							{payment.sReason ? (
+						{payment.sReason && (
+							<Typography variant='body1' gutterBottom>
 								<>
 									<strong>Motivo:</strong> {payment.sReason}
 								</>
-							) : (
-								client && (
-									<>
-										<strong>Cliente:</strong> {client.sName}
-									</>
-								)
-							)}
-						</Typography>
+							</Typography>
+						)}
+						{clientName && (
+							<Typography variant='body1' gutterBottom>
+								<strong>Cliente:</strong> {clientName.toUpperCase()}
+							</Typography>
+						)}
 						<Typography variant='body1' gutterBottom>
 							<strong>Tipo de Pago:</strong>{' '}
 							{payment.bCash ? 'Efectivo' : 'Digital'}

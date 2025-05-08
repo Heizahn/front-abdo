@@ -13,49 +13,43 @@ import {
 	InputAdornment,
 	Typography,
 	CircularProgress,
-	Button,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useFetchData } from '../../hooks/useQuery';
 import SimpleModalWrapper from '../common/ContainerForm';
 import PaymentDetails from '../clientDetail/client/payments/PaymentDetails';
 import { TableRowClickHandler } from '../common/TableRowClickHandler';
+import { Pago } from '../../interfaces/InterfacesClientDetails';
+import { useBuildParams } from '../../hooks/useBuildParams';
 
-interface Pago {
-	_id: string;
-	cliente: string;
-	tipoPago: string;
-	fecha: string;
-	creadoPor: string;
-	montoUSD: number;
-	montoVES: number;
-	referencia: string;
-	comentario: string;
-	estado: 'Activo' | 'Anulado';
-	recibidoPor: string;
-	motivo: string;
+interface IPaymentView extends Pago {
+	clientName: string;
+	clientId: string;
 }
 
 // Props para el componente
 interface TableLastPayProps {
-	pagosSimpleData: Pago[];
+	pagosSimpleData: IPaymentView[];
 	isLoadingSimple: boolean;
 }
 
 // Tipo para ordenar
 type Order = 'asc' | 'desc';
-type OrderBy = keyof Pago;
+type OrderBy = keyof IPaymentView;
 
 const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingSimple }) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [order, setOrder] = useState<Order>('desc');
-	const [orderBy, setOrderBy] = useState<OrderBy>('fecha');
+	const [orderBy, setOrderBy] = useState<OrderBy>('dCreation');
 	const [visibleItems, setVisibleItems] = useState(100);
 	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
-	const { data: pagosCompletosData = [] } = useFetchData<Pago[]>('/paysList', 'paysList');
-	const [datosCombinados, setDatosCombinados] = useState<Pago[]>([]);
-	const [selectedPayment, setSelectedPayment] = useState<Pago | null>(null);
+	const { data: pagosCompletosData = [] } = useFetchData<IPaymentView[]>(
+		'/payments/list/complete' + useBuildParams(),
+		'paysList',
+	);
+	const [datosCombinados, setDatosCombinados] = useState<IPaymentView[]>([]);
+	const [selectedPayment, setSelectedPayment] = useState<IPaymentView | null>(null);
 	const modalTriggerRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
@@ -95,7 +89,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 	};
 
 	// Handle row click to show details
-	const handleRowClick = (payment: Pago) => {
+	const handleRowClick = (payment: IPaymentView) => {
 		setSelectedPayment(payment);
 		// Activar programáticamente el modal después de que el estado se actualice
 		setTimeout(() => {
@@ -106,7 +100,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 	};
 
 	const filteredPagos = useMemo(() => {
-		if (!searchTerm && orderBy === 'fecha' && order === 'desc') {
+		if (!searchTerm && orderBy === 'dCreation' && order === 'desc') {
 			return datosCombinados;
 		}
 
@@ -114,13 +108,13 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 			.filter(
 				(pago) =>
 					!searchTerm || // Si no hay término de búsqueda, incluir todos
-					safeIncludes(pago.cliente, searchTerm) ||
-					safeIncludes(pago.tipoPago, searchTerm) ||
-					safeIncludes(pago.fecha, searchTerm) ||
-					safeIncludes(pago.creadoPor, searchTerm) ||
-					safeIncludes(pago.referencia, searchTerm) ||
-					safeIncludes(pago.comentario, searchTerm) ||
-					safeIncludes(pago.estado, searchTerm),
+					safeIncludes(pago.clientName, searchTerm) ||
+					safeIncludes(pago.sReason, searchTerm) ||
+					safeIncludes(pago.dCreation, searchTerm) ||
+					safeIncludes(pago.creator, searchTerm) ||
+					safeIncludes(pago.sReference, searchTerm) ||
+					safeIncludes(pago.sCommentary, searchTerm) ||
+					safeIncludes(pago.sState, searchTerm),
 			)
 			.sort((a, b) => {
 				const valueA = a[orderBy];
@@ -172,7 +166,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 		}
 	}, [handleScroll]);
 
-	const renderEstadoChip = (estado: 'Activo' | 'Anulado' | 'Procesado') => {
+	const renderEstadoChip = (estado: string) => {
 		let color: 'success' | 'error' = 'success';
 
 		if (estado.toLowerCase() !== 'activo') {
@@ -203,6 +197,22 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 				<Typography variant='h5' gutterBottom>
 					Pagos
 				</Typography>
+				{/* Modal para mostrar detalles del pago - Solo se renderiza cuando hay un pago seleccionado */}
+				{selectedPayment && (
+					<SimpleModalWrapper
+						showCloseButton={false}
+						triggerComponent={
+							<span id='modal-trigger-element' ref={modalTriggerRef} />
+						}
+						maxWidth='md'
+					>
+						<PaymentDetails
+							payment={selectedPayment}
+							clientName={selectedPayment.clientName}
+							clientId={selectedPayment.clientId}
+						/>
+					</SimpleModalWrapper>
+				)}
 				<TextField
 					size='small'
 					placeholder='Buscar'
@@ -238,81 +248,82 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 							<TableRow>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'cliente'}
-										direction={orderBy === 'cliente' ? order : 'asc'}
-										onClick={createSortHandler('cliente')}
+										active={orderBy === 'clientName'}
+										direction={orderBy === 'clientName' ? order : 'asc'}
+										onClick={createSortHandler('clientName')}
 									>
 										Cliente
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'tipoPago'}
-										direction={orderBy === 'tipoPago' ? order : 'asc'}
-										onClick={createSortHandler('tipoPago')}
+										active={orderBy === 'sReason'}
+										direction={orderBy === 'sReason' ? order : 'asc'}
+										onClick={createSortHandler('sReason')}
 									>
-										Tipo de Pago
+										Motivo
 									</TableSortLabel>
 								</TableCell>
+								<TableCell>Tipo de Pago</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'fecha'}
-										direction={orderBy === 'fecha' ? order : 'asc'}
-										onClick={createSortHandler('fecha')}
+										active={orderBy === 'dCreation'}
+										direction={orderBy === 'dCreation' ? order : 'asc'}
+										onClick={createSortHandler('dCreation')}
 									>
 										Creado
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'creadoPor'}
-										direction={orderBy === 'creadoPor' ? order : 'asc'}
-										onClick={createSortHandler('creadoPor')}
+										active={orderBy === 'creator'}
+										direction={orderBy === 'creator' ? order : 'asc'}
+										onClick={createSortHandler('creator')}
 									>
 										Creado Por
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'montoUSD'}
-										direction={orderBy === 'montoUSD' ? order : 'asc'}
-										onClick={createSortHandler('montoUSD')}
+										active={orderBy === 'nAmount'}
+										direction={orderBy === 'nAmount' ? order : 'asc'}
+										onClick={createSortHandler('nAmount')}
 									>
 										Monto (USD)
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'montoVES'}
-										direction={orderBy === 'montoVES' ? order : 'asc'}
-										onClick={createSortHandler('montoVES')}
+										active={orderBy === 'nBs'}
+										direction={orderBy === 'nBs' ? order : 'asc'}
+										onClick={createSortHandler('nBs')}
 									>
 										Monto (VES)
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'referencia'}
-										direction={orderBy === 'referencia' ? order : 'asc'}
-										onClick={createSortHandler('referencia')}
+										active={orderBy === 'sReference'}
+										direction={orderBy === 'sReference' ? order : 'asc'}
+										onClick={createSortHandler('sReference')}
 									>
 										Referencia
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'comentario'}
-										direction={orderBy === 'comentario' ? order : 'asc'}
-										onClick={createSortHandler('comentario')}
+										active={orderBy === 'sCommentary'}
+										direction={orderBy === 'sCommentary' ? order : 'asc'}
+										onClick={createSortHandler('sCommentary')}
 									>
 										Comentario
 									</TableSortLabel>
 								</TableCell>
 								<TableCell>
 									<TableSortLabel
-										active={orderBy === 'estado'}
-										direction={orderBy === 'estado' ? order : 'asc'}
-										onClick={createSortHandler('estado')}
+										active={orderBy === 'sState'}
+										direction={orderBy === 'sState' ? order : 'asc'}
+										onClick={createSortHandler('sState')}
 									>
 										Estado
 									</TableSortLabel>
@@ -330,7 +341,7 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 								<>
 									{visibleData.map((pago) => (
 										<TableRowClickHandler
-											key={pago._id}
+											key={pago.id}
 											onRowClick={() => handleRowClick(pago)}
 											sx={{
 												cursor: 'pointer',
@@ -342,24 +353,20 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 												},
 											}}
 										>
-											<TableCell>{pago.cliente || '-'}</TableCell>
-											<TableCell>{pago.tipoPago || '-'}</TableCell>
-											<TableCell>{pago.fecha || '-'}</TableCell>
-											<TableCell>{pago.creadoPor || '-'}</TableCell>
+											<TableCell>{pago.clientName || '-'}</TableCell>
+											<TableCell>{pago.sReason || '-'}</TableCell>
 											<TableCell>
-												{pago.montoUSD !== undefined
-													? pago.montoUSD.toFixed(2)
-													: '-'}
+												{pago.bCash ? 'Efectivo' : 'Digital'}
 											</TableCell>
+											<TableCell>{pago.dCreation || '-'}</TableCell>
+											<TableCell>{pago.creator || '-'}</TableCell>
+											<TableCell>{pago.nAmount || '-'}</TableCell>
+											<TableCell>{pago.nBs || '-'}</TableCell>
+											<TableCell>{pago.sReference || '-'}</TableCell>
+											<TableCell>{pago.sCommentary || '-'}</TableCell>
 											<TableCell>
-												{Number(pago.montoVES).toFixed(2) + 'Bs' ||
-													'-'}
-											</TableCell>
-											<TableCell>{pago.referencia || '-'}</TableCell>
-											<TableCell>{pago.comentario || '-'}</TableCell>
-											<TableCell>
-												{pago.estado
-													? renderEstadoChip(pago.estado)
+												{pago.sState
+													? renderEstadoChip(pago.sState)
 													: '-'}
 											</TableCell>
 										</TableRowClickHandler>
@@ -406,26 +413,6 @@ const TableLastPay: React.FC<TableLastPayProps> = ({ pagosSimpleData, isLoadingS
 					</Table>
 				</TableContainer>
 			</Paper>
-
-			{/* Botón oculto que sirve como trigger para el SimpleModalWrapper */}
-			<div style={{ display: 'none' }}>
-				<Button ref={modalTriggerRef} id='hidden-modal-trigger'>
-					Trigger
-				</Button>
-			</div>
-
-			{/* Modal para mostrar detalles del pago - Solo se renderiza cuando hay un pago seleccionado */}
-			{selectedPayment && (
-				<SimpleModalWrapper
-					showCloseButton={false}
-					triggerComponent={
-						<span id='modal-trigger-element' ref={modalTriggerRef} />
-					}
-					maxWidth='md'
-				>
-					<PaymentDetails payment={selectedPayment} />
-				</SimpleModalWrapper>
-			)}
 		</>
 	);
 };

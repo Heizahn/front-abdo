@@ -7,7 +7,8 @@ import {
 } from '@mui/material';
 import { useFetchData } from '../../../hooks/useQuery';
 import { SelectList } from '../../../interfaces/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type ProveedorProps = {
 	handleClientChange: (e: string) => void;
@@ -16,9 +17,27 @@ type ProveedorProps = {
 export default function Proveedor({ handleClientChange }: ProveedorProps) {
 	const [selectedValue, setSelectedValue] = useState<string>('');
 	const { data: clientList, isLoading } = useFetchData<SelectList[]>(
-		'/providers',
+		'/users/providers',
 		'providers',
 	);
+	const location = useLocation();
+
+	useEffect(() => {
+		// Extraer el ID del proveedor de la URL
+		const searchParams = new URLSearchParams(location.search);
+		const proveedorId = searchParams.get('provider');
+
+		// Si hay un ID de proveedor en la URL y tenemos la lista de proveedores
+		if (proveedorId && clientList?.length) {
+			// Verificar si el ID existe en la lista de proveedores
+			const proveedorExiste = clientList.some((client) => client.id === proveedorId);
+
+			if (proveedorExiste) {
+				setSelectedValue(proveedorId);
+				handleClientChange(proveedorId);
+			}
+		}
+	}, [clientList, location.search, handleClientChange, isLoading]);
 
 	if (isLoading) return <CircularProgress size={20} />;
 

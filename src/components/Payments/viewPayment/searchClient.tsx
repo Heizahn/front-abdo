@@ -44,7 +44,7 @@ const SearchClient = () => {
 
 	const { user } = useAuth();
 
-	const buildParams = useBuildParams() || `?provider=${clientList}`;
+	const buildParams = useBuildParams() || `?idOwner=${clientList}`;
 
 	const { data } = useQuery({
 		queryKey: ['bcvData'],
