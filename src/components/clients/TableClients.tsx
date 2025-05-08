@@ -15,7 +15,6 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { Client } from '../../interfaces/Interfaces';
 import { useClients } from '../../context/ClientsContext';
 import { ActionButtons } from './table/ActionButtons';
-// import { TableBodyComponent } from './table/TableBodyComponent';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import {
 	useReactTable,
