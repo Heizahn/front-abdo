@@ -25,49 +25,39 @@ export default function SuspendedClient({
 	const { refetchClients } = useClients();
 	const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 	const { user } = useAuth();
-	const handleStatus = async () => {
-		const newStatus: {
-			suspendidoPor?: string;
-			fechaSuspension?: string;
-			editadoPor?: string;
-			fechaEdicion?: string;
-			estado: string;
-		} = {
-			estado: '',
-		};
 
-		if (clientStatus === 'Activo') {
-			newStatus.suspendidoPor = user?.id as string;
-			newStatus.fechaSuspension = new Date().toISOString();
-			newStatus.estado = 'Suspendido';
-			newStatus.editadoPor = user?.id as string;
-			newStatus.fechaEdicion = new Date().toISOString();
-		} else if (clientStatus === 'Suspendido') {
-			newStatus.editadoPor = user?.id as string;
-			newStatus.fechaEdicion = new Date().toISOString();
-			newStatus.estado = 'Activo';
-		}
+	const queryKeys = ['clients-stats', `client-${clientId}`, 'clients'];
 
-		const { status } = await axios.patch(`${HOST_API}/clientes/${clientId}`, {
-			...newStatus,
+	const handleSuspended = async () => {
+		const { status } = await axios.put(`${HOST_API}/clients/client/${clientId}/suspend`, {
+			idSuspender: user?.id as string,
 		});
 
 		if (status === 204) {
-			notifySuccess(
-				`El cliente se ha ${
-					clientStatus === 'Suspendido' ? 'activado' : 'suspendido'
-				} correctamente`,
-				'Cliente actualizado',
-			);
+			notifySuccess(`El cliente se ha suspendido correctamente`, 'Cliente suspendido');
 		} else {
-			notifyError('Error al actualizar el cliente', 'Error al actualizar el cliente');
+			notifyError('Error al suspender el cliente', 'Error al suspender el cliente');
 		}
 
-		queryClient.invalidateQueries({
-			queryKey: ['clientsStats'],
+		queryKeys.forEach((key) => {
+			queryClient.invalidateQueries({ queryKey: [key] });
 		});
-		queryClient.invalidateQueries({
-			queryKey: [`client-${clientId}`],
+		refetchClients();
+	};
+
+	const handleActive = async () => {
+		const { status } = await axios.put(`${HOST_API}/clients/client/${clientId}/activate`, {
+			idEditor: user?.id as string,
+		});
+
+		if (status === 204) {
+			notifySuccess(`El cliente se ha activado correctamente`, 'Cliente activado');
+		} else {
+			notifyError('Error al activar el cliente', 'Error al activar el cliente');
+		}
+
+		queryKeys.forEach((key) => {
+			queryClient.invalidateQueries({ queryKey: [key] });
 		});
 		refetchClients();
 	};
@@ -80,7 +70,11 @@ export default function SuspendedClient({
 	// Handle confirm action
 	const handleConfirm = () => {
 		setShowConfirmation(false);
-		handleStatus();
+		if (clientStatus === 'Activo') {
+			handleSuspended();
+		} else {
+			handleActive();
+		}
 	};
 
 	// Handle cancel confirmation
