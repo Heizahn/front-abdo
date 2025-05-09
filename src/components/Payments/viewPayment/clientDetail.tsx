@@ -177,7 +177,10 @@ const ClientDetail = ({
 
 						<Grid item xs={12} sm={6}>
 							<Typography variant='body2' color='text.secondary'>
-								<strong>Plan:</strong> {client.plan || 'No asignado'}
+								<strong>Plan:</strong>{' '}
+								{client.plan && client.nMBPS
+									? `${client.plan} (${client.nMBPS} MBPS)`
+									: 'No asignado'}
 							</Typography>
 						</Grid>
 
@@ -188,17 +191,19 @@ const ClientDetail = ({
 									sx={{ mr: 1, verticalAlign: 'middle' }}
 								/>
 								{client.sGps ? (
-									<Link
-										href={`https://maps.google.com/?q=${client.sGps}`}
-										target='_blank'
-									>
+									<>
 										<strong>Dirección:</strong>{' '}
-										{client.direccion || 'No asignado'}
-									</Link>
+										<Link
+											href={`https://maps.google.com/?q=${client.sGps}`}
+											target='_blank'
+										>
+											{client.sAddress || 'No asignado'}
+										</Link>
+									</>
 								) : (
 									<>
 										<strong>Dirección:</strong>{' '}
-										{client.direccion || 'No asignado'}
+										{client.sAddress || 'No asignado'}
 									</>
 								)}
 							</Typography>
@@ -260,7 +265,11 @@ const ClientDetail = ({
 									clientId={client.id}
 									onCancel={() => {}}
 									onInvoiceSuccess={async () => {
-										const res = await getClient(client.sName, buildParams);
+										const identification = client.sDni || client.sRif;
+										const res = await getClient(
+											identification!,
+											buildParams,
+										);
 										refetchSearch(res);
 									}}
 								/>
@@ -275,7 +284,11 @@ const ClientDetail = ({
 									clientId={client.id}
 									onCancel={() => {}}
 									onPaymentSuccess={async () => {
-										const res = await getClient(client.sName, buildParams);
+										const identification = client.sDni || client.sRif;
+										const res = await getClient(
+											identification!,
+											buildParams,
+										);
 										refetchSearch(res);
 									}}
 								/>

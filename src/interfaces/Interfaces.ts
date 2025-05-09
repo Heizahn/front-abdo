@@ -12,14 +12,16 @@ export interface IPaymentHistory {
 	sReference: string;
 	sReason: string;
 	nAmount: number;
+	sState: string;
 	nBs: number;
 }
 export interface ILastInvoice {
 	id: string;
-	fecha: string;
-	monto: number;
-	estado: string;
-	motivo: string;
+	dCreation: string;
+	nAmount: number;
+	sState: string;
+	sReason: string;
+	debt: number;
 }
 
 // Agregar esta interfaz para el plan
@@ -46,8 +48,7 @@ export interface Client {
 }
 
 export interface IClientPayment extends Client {
-	fechaCorte: string;
-	direccion: string;
+	sAddress: string;
 	ultimosPagos: IPaymentHistory[];
 	ultimasFacturas: ILastInvoice[];
 }

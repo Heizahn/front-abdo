@@ -10,6 +10,7 @@ import {
 	Typography,
 } from '@mui/material';
 import { ILastInvoice } from '../../../interfaces/Interfaces';
+import { formatDate } from '../../../services/formaterDate';
 
 interface Props {
 	invoices: ILastInvoice[];
@@ -42,6 +43,9 @@ export default function LastInvoices({ invoices }: Props) {
 								Monto (USD)
 							</TableCell>
 							<TableCell align='right' sx={{ fontWeight: 'bold' }}>
+								Deuda (USD)
+							</TableCell>
+							<TableCell align='right' sx={{ fontWeight: 'bold' }}>
 								Estado
 							</TableCell>
 						</TableRow>
@@ -57,28 +61,37 @@ export default function LastInvoices({ invoices }: Props) {
 									paddingY: 1,
 								}}
 							>
-								<TableCell>{invoice.motivo}</TableCell>
-								<TableCell>{invoice.fecha}</TableCell>
+								<TableCell>{invoice.sReason}</TableCell>
+								<TableCell>{formatDate(invoice.dCreation)}</TableCell>
 								<TableCell align='right'>
 									<Typography
 										variant='body2'
 										fontWeight='medium'
 										color='primary.dark'
 									>
-										{invoice.monto?.toFixed(2) || '0.00'}
+										{invoice.nAmount || '0'}
+									</Typography>
+								</TableCell>
+								<TableCell align='right'>
+									<Typography
+										variant='body2'
+										fontWeight='medium'
+										color='primary.dark'
+									>
+										{invoice.debt || '0'}
 									</Typography>
 								</TableCell>
 								<TableCell
 									align='right'
 									sx={{
 										color: `${
-											invoice.estado === 'Activo'
+											invoice.sState === 'Activo'
 												? 'success.main'
 												: 'error.main'
 										}`,
 									}}
 								>
-									{invoice.estado}
+									{invoice.sState}
 								</TableCell>
 							</TableRow>
 						))}

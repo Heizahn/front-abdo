@@ -64,6 +64,9 @@ const PaymentHistory = ({ pagos = [] }: { pagos: IPaymentHistory[] }) => {
 							<TableCell align='right' sx={{ fontWeight: 'bold' }}>
 								Monto (VES)
 							</TableCell>
+							<TableCell align='right' sx={{ fontWeight: 'bold' }}>
+								Estado
+							</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -108,6 +111,18 @@ const PaymentHistory = ({ pagos = [] }: { pagos: IPaymentHistory[] }) => {
 									<Typography variant='body2' color='text.secondary'>
 										{pago.nBs || '0'} Bs.
 									</Typography>
+								</TableCell>
+								<TableCell
+									align='right'
+									sx={{
+										color: `${
+											pago.sState === 'Activo'
+												? 'success.main'
+												: 'error.main'
+										}`,
+									}}
+								>
+									<Typography variant='body2'>{pago.sState}</Typography>
 								</TableCell>
 							</TableRow>
 						))}
