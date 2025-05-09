@@ -7,7 +7,7 @@ import ClientsStatusChartSkeleton from './skeletons/ClientStatusChartSkeleton';
 const ClientStatusChart = () => {
 	const CHART_COLORS = ['#1976d2', '#ed6c02'];
 	const { data, isLoading, error } = useFetchData<[{ data: PieChartDTO[] }]>(
-		'/clientsPieChart0',
+		'/dashboard/clients/status',
 		'clientsPieChart',
 	);
 

@@ -53,23 +53,16 @@ export interface IClientPayment extends Client {
 	ultimasFacturas: ILastInvoice[];
 }
 
-export interface LastPays {
-	id: string;
-	motivo: string;
-	cliente: string;
-	fecha: string;
-	montoUSD: number;
-	montoVES: number;
-	tipoPago: string;
-	referencia: string;
-	estado: string;
+export interface LastPays extends IPaymentHistory {
+	clientName: string;
+	idClient: string;
 }
 
 export interface CollectionsChartDTO {
 	dim0: string;
 	mea0: number;
 	mea1: number;
-	__id: string;
+	idDate: string;
 }
 
 export interface PieChartDTO {

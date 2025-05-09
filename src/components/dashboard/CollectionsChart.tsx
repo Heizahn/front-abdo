@@ -20,7 +20,7 @@ const CollectionsChart = () => {
 				data: CollectionsChartDTO[];
 			},
 		]
-	>('/paysBarChart0', 'paysBarChart0');
+	>('/dashboard/payments/chart', 'paysBarChart0');
 
 	if (isLoading) {
 		return <CollectionsChartSkeleton />;

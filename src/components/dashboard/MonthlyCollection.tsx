@@ -16,7 +16,7 @@ import MonthlyCollectionSkeleton from './skeletons/MonthlyCollectionSkeleton';
 export default function MonthlyCollection() {
 	const { data, isLoading, error } = useFetchData<
 		[{ _id: string; mea0: number; mea1: number }]
-	>('/clientsChart1', 'clientsChart1');
+	>('/dashboard/payments/monthly/collection', 'monthlyCollection');
 
 	if (isLoading) {
 		return <MonthlyCollectionSkeleton />;

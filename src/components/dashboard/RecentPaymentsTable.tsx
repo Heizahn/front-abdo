@@ -11,9 +11,13 @@ import {
 } from '@mui/material';
 import { useFetchData } from '../../hooks/useQuery';
 import { LastPays } from '../../interfaces/Interfaces';
+import { formatDate } from '../../services/formaterDate';
 
 const RecentPaymentsTable = () => {
-	const { data, isLoading, error } = useFetchData<LastPays[]>('/lastPays', 'lastPays');
+	const { data, isLoading, error } = useFetchData<LastPays[]>(
+		'/dashboard/payments/last',
+		'lastPays',
+	);
 
 	if (error) {
 		return <div>Hubo un error al cargar los pagos</div>;
@@ -31,14 +35,19 @@ const RecentPaymentsTable = () => {
 				</Typography>
 			</Box>
 			<TableContainer sx={{ maxHeight: 503, overflowY: 'auto' }}>
-				<Table stickyHeader sx={{ minWidth: 650 }} aria-label='payments table'>
+				<Table
+					stickyHeader
+					sx={{ minWidth: 650 }}
+					aria-label='payments table'
+					size='small'
+				>
 					<TableHead>
 						<TableRow>
 							<TableCell>Motivo</TableCell>
 							<TableCell>Cliente</TableCell>
 							<TableCell>Fecha</TableCell>
-							<TableCell>USD</TableCell>
-							<TableCell>VES</TableCell>
+							<TableCell>Monto (USD)</TableCell>
+							<TableCell>Monto (Bs)</TableCell>
 							<TableCell>Tipo de Pago</TableCell>
 							<TableCell>Referencia</TableCell>
 							<TableCell>Estado</TableCell>
@@ -55,16 +64,16 @@ const RecentPaymentsTable = () => {
 								}}
 							>
 								<TableCell component='th' scope='row'>
-									{row.motivo}
+									{row.sReason}
 								</TableCell>
-								<TableCell>{row.cliente}</TableCell>
-								<TableCell>{row.fecha}</TableCell>
-								<TableCell>{row.montoUSD.toFixed(2)}</TableCell>
-								<TableCell>{row.montoVES.toFixed(2)}</TableCell>
-								<TableCell>{row.tipoPago}</TableCell>
-								<TableCell>{row.referencia}</TableCell>
+								<TableCell>{row.clientName}</TableCell>
+								<TableCell>{formatDate(row.dCreation)}</TableCell>
+								<TableCell>{row.nAmount}</TableCell>
+								<TableCell>{row.nBs}</TableCell>
+								<TableCell>{row.sReference}</TableCell>
+								<TableCell>{row.bCash ? 'Efectivo' : 'Digital'}</TableCell>
 								<TableCell>
-									{row.estado === 'Activo' ? (
+									{row.sState === 'Activo' ? (
 										<Typography color='success'>Activo</Typography>
 									) : (
 										<Typography color='error'>Inactivo</Typography>
